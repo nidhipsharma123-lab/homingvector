@@ -1,0 +1,1010 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Homingvector</title>
+<meta name="description" content="Homingvector builds TurtleShield, software that keeps a team of drones, ground robots and boats working when GPS is jammed and the radio cuts out, and Turtle Eyes, the operator's screen.">
+<meta property="og:title" content="Homingvector">
+<meta property="og:description" content="Software that keeps a team of drones, ground robots and boats doing their job when GPS is jammed, the radio cuts out and nobody at base can reach them.">
+<meta name="theme-color" content="#ebe6da">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23141310'/%3E%3Ccircle cx='40' cy='24' r='12' fill='none' stroke='%23ff4a1c' stroke-width='5'/%3E%3Cpath d='M8 56 L33 31' stroke='%23ebe6da' stroke-width='6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@700;900&family=Martian+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Reenie+Beanie&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ebe6da; --paper-2:#e1d9c8; --ink:#141310; --ink-2:#3b3830; --mute:#6f695c;
+  --sig:#ff4a1c; --night:#12110d; --cream:#e7dec6; --olive:#a3b06f; --rule:#2c2a22;
+  --stencil:"Big Shoulders Stencil Display", Impact, "Arial Narrow", sans-serif;
+  --mono:"Martian Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --serif:"Newsreader", Georgia, "Times New Roman", serif;
+  --hand:"Reenie Beanie", "Comic Sans MS", cursive;
+  --gut:clamp(16px,4vw,56px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{overflow-x:clip;scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:19px;line-height:1.5;overflow-x:clip;-webkit-font-smoothing:antialiased}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:200;opacity:.14;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+::selection{background:var(--sig);color:var(--ink)}
+a{color:inherit}
+button{font:inherit}
+:focus-visible{outline:3px solid var(--sig);outline-offset:3px}
+
+/* ---------- nav ---------- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:150;display:flex;align-items:center;gap:28px;padding:16px var(--gut);color:#ebe6da;mix-blend-mode:difference;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.nav .brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;letter-spacing:.22em}
+.nav .links{display:flex;gap:22px;margin-left:auto}
+.nav .links a{text-decoration:none}
+.nav .links a:hover{text-decoration:line-through}
+.nav .clk{min-width:9ch;text-align:right}
+
+/* ---------- hero ---------- */
+.hero{position:relative;isolation:isolate;min-height:max(680px,100svh);border-bottom:2px solid var(--ink);overflow:hidden}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;z-index:2;cursor:crosshair;touch-action:manipulation}
+.hero-in{display:flex;flex-direction:column;min-height:max(680px,100svh);padding:76px var(--gut) var(--gut);pointer-events:none}
+.mega{position:relative;z-index:1;font-family:var(--stencil);font-weight:900;text-transform:uppercase;line-height:.8;letter-spacing:-.005em;font-size:clamp(78px,17.5vw,300px);user-select:none}
+.mega.b{align-self:flex-end;color:transparent;-webkit-text-stroke:2px var(--ink);display:flex;align-items:center;gap:.08em}
+.mega.b svg{width:.62em;height:.62em;flex:none}
+.grow{flex:1;min-height:140px}
+.hero-bar{position:relative;z-index:3;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.9fr) minmax(0,1fr);gap:clamp(16px,2vw,28px);align-items:end;margin-top:18px}
+.pitch{background:var(--paper);border:2px solid var(--ink);padding:16px 20px 18px;box-shadow:8px 8px 0 var(--sig)}
+.pitch .tag{font-family:var(--mono);font-size:10px;letter-spacing:.16em;display:flex;justify-content:space-between;gap:10px;margin-bottom:10px;text-transform:uppercase}
+.pitch p{font-size:clamp(18px,1.45vw,23px);line-height:1.35}
+.ctl{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:12px;pointer-events:auto}
+.ctl .hand{position:absolute;left:4px;bottom:calc(100% + 6px);white-space:nowrap}
+.tg{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:var(--paper);color:var(--ink);border:2px solid var(--ink);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;box-shadow:4px 4px 0 var(--ink);transition:transform .07s,box-shadow .07s;text-align:left}
+.tg:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--ink)}
+.tg .led{width:11px;height:11px;border-radius:50%;border:2px solid var(--ink);flex:none}
+.tg[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.tg[aria-pressed="true"] .led{background:var(--sig);border-color:var(--sig);box-shadow:0 0 12px var(--sig)}
+.tg.reset{background:transparent;box-shadow:none;border-style:dashed}
+.panel{background:var(--paper);border:2px solid var(--ink);padding:12px 14px;font-family:var(--mono);font-size:11px;letter-spacing:.03em}
+.ro{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;border-bottom:1px solid var(--ink);padding-bottom:9px;margin-bottom:8px}
+.ro small{display:block;color:var(--mute);font-size:9px;letter-spacing:.14em}
+.ro b{font-size:15px;font-weight:600}
+.ro b.bad{color:#c4300b}
+#simlog{min-height:5.8em}
+#simlog li{list-style:none;padding:2px 0;line-height:1.45}
+#simlog li span{color:var(--mute);margin-right:6px}
+.panel .fine{margin-top:8px;padding-top:7px;border-top:1px dashed var(--ink-2);color:var(--mute);font-size:9.5px}
+
+.hand{font-family:var(--hand);font-size:clamp(30px,2.6vw,42px);color:var(--sig);line-height:.85;display:inline-block;transform:rotate(-4deg)}
+.scrawl{width:90px;height:44px;vertical-align:middle;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- ticker ---------- */
+.tick{background:var(--ink);color:var(--paper);font-family:var(--stencil);font-weight:700;font-size:clamp(26px,3.6vw,50px);white-space:nowrap;overflow:hidden;transform:rotate(-1.3deg);margin:34px -30px 0;padding:6px 0;border-block:3px solid var(--sig)}
+.tick-track{display:inline-flex;animation:mq 42s linear infinite}
+.tick-track span{padding:0 .55em;text-transform:uppercase;letter-spacing:.01em}
+.tick-track i{font-style:normal;color:var(--sig);padding:0 .1em}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* ---------- sections ---------- */
+.sec{position:relative;padding:clamp(80px,11vw,160px) var(--gut);overflow:clip}
+.ghostno{position:absolute;right:calc(var(--gut) * -.4);top:clamp(20px,4vw,60px);font-family:var(--stencil);font-weight:900;font-size:clamp(160px,30vw,460px);line-height:.75;color:transparent;-webkit-text-stroke:1.5px currentColor;opacity:.16;pointer-events:none;user-select:none;z-index:0}
+.sec>*{position:relative;z-index:1}
+.sec>.ghostno{position:absolute;z-index:0}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;display:flex;gap:14px;align-items:center;margin-bottom:28px}
+.eyebrow::before{content:"";width:44px;height:2px;background:currentColor}
+.h2{font-family:var(--serif);font-weight:400;font-size:clamp(40px,6vw,100px);line-height:1;letter-spacing:-.025em;max-width:17ch}
+.h2 em{font-style:italic}
+.lead{font-size:clamp(20px,1.8vw,26px);line-height:1.38;max-width:34ch;margin-top:26px}
+.wrap{max-width:1500px;margin:0 auto}
+
+/* problem */
+.prob{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(30px,6vw,110px);align-items:end}
+.fails{margin-top:10px}
+.fail{display:flex;align-items:baseline;gap:12px;font-family:var(--mono);font-size:clamp(12px,1.05vw,15px);letter-spacing:.08em;text-transform:uppercase;padding:14px 0;border-bottom:2px solid var(--ink)}
+.fail i{flex:1;border-bottom:2px dotted var(--ink-2);transform:translateY(-4px)}
+.fail b{font-weight:600;position:relative;white-space:nowrap}
+.fail b::after{content:"";position:absolute;left:-4px;right:-4px;top:52%;height:3px;background:var(--sig);transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.7,0,.2,1)}
+.in .fail b::after{transform:scaleX(1)}
+.in .fail:nth-child(2) b::after{transition-delay:.35s}
+.in .fail:nth-child(3) b::after{transition-delay:.7s}
+.prob-body{font-size:clamp(19px,1.5vw,22px);max-width:40ch;margin-top:34px}
+.prob .hand{margin-top:20px;transform:rotate(-3deg)}
+
+/* shield */
+.shield{background:var(--sig);color:var(--ink);border-block:2px solid var(--ink)}
+.ptitle{font-family:var(--stencil);font-weight:900;text-transform:uppercase;font-size:clamp(70px,14.5vw,250px);line-height:.8;letter-spacing:-.005em}
+.ptitle sup{font-family:var(--mono);font-size:max(14px,.13em);font-weight:600;border:2px solid currentColor;padding:.15em .35em;vertical-align:top;position:relative;top:.6em;margin-left:.25em;letter-spacing:.1em}
+.shield-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(30px,6vw,100px);margin-top:50px;align-items:start}
+.shield .lead{max-width:30ch;margin-top:0}
+.shield p.small{font-size:18px;max-width:44ch;margin-top:22px}
+.stack{display:grid;gap:12px}
+.plate{border:2px solid var(--ink);background:var(--sig);padding:14px 18px;display:grid;grid-template-columns:minmax(120px,200px) 1fr;gap:14px;align-items:baseline;box-shadow:6px 6px 0 var(--ink);font-family:var(--mono);font-size:12px;letter-spacing:.02em}
+.plate b{font-family:var(--stencil);font-weight:900;font-size:clamp(24px,2.2vw,32px);letter-spacing:.02em}
+.plate:nth-child(1){margin-right:12%}
+.plate:nth-child(2){margin-left:4%;margin-right:4%}
+.plate:nth-child(3){margin-left:8%}
+.plate:nth-child(4){margin-left:12%;margin-right:-2%}
+.plate.hot{background:var(--ink);color:var(--paper);transform:rotate(-1deg) translateX(-14px);box-shadow:10px 10px 0 var(--paper)}
+.plate.hot b{color:var(--sig)}
+.stack-note{font-family:var(--hand);font-size:clamp(30px,2.6vw,40px);line-height:.9;margin:4px 0 0 4%;transform:rotate(-2deg)}
+.tickets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(18px,2.4vw,34px);margin-top:clamp(60px,8vw,110px)}
+.ticket{position:relative;background:var(--paper);color:var(--ink);padding:26px 24px 30px 36px;
+  -webkit-mask:radial-gradient(circle at 0 13px,transparent 7px,#000 7.6px) 0 0/100% 26px repeat-y;mask:radial-gradient(circle at 0 13px,transparent 7px,#000 7.6px) 0 0/100% 26px repeat-y}
+.tickets .ticket:nth-child(1){transform:rotate(-1.6deg)}
+.tickets .ticket:nth-child(2){transform:rotate(1.1deg) translateY(18px)}
+.tickets .ticket:nth-child(3){transform:rotate(-.5deg)}
+.ticket .no{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--mute)}
+.ticket h3{font-family:var(--stencil);font-weight:900;font-size:clamp(36px,3.4vw,52px);line-height:.9;margin:12px 0 14px}
+.ticket strong{display:block;font-size:20px;line-height:1.25;font-weight:600}
+.ticket p{font-size:16px;margin-top:10px;color:var(--ink-2)}
+.stamp{position:absolute;right:16px;top:18px;font-family:var(--stencil);font-weight:900;font-size:15px;letter-spacing:.1em;color:#d1360c;border:3px solid #d1360c;padding:3px 8px 1px;transform:rotate(10deg);opacity:.85}
+.honest{margin-top:clamp(60px,7vw,90px);font-family:var(--hand);font-size:clamp(34px,3.6vw,56px);line-height:.95;max-width:26ch;transform:rotate(-1.5deg)}
+
+/* idea */
+.idea{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(30px,6vw,110px);align-items:center}
+.kcard{border:2px solid var(--ink);background:var(--paper-2);padding:18px;box-shadow:10px 10px 0 var(--ink)}
+.kcard svg{display:block;width:100%;height:auto;background:var(--paper)}
+.kcard .krow{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin:16px 0 8px}
+.kcard output{display:block;font-size:22px;line-height:1.25;min-height:2.6em;margin-top:10px}
+.kcard #klab{font-weight:600}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;cursor:ew-resize}
+input[type=range]::-webkit-slider-runnable-track{height:6px;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 10px),var(--paper);border:2px solid var(--ink)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:30px;margin-top:-14px;background:var(--sig);border:2px solid var(--ink)}
+input[type=range]::-moz-range-track{height:6px;background:var(--paper);border:2px solid var(--ink)}
+input[type=range]::-moz-range-thumb{width:18px;height:26px;border-radius:0;background:var(--sig);border:2px solid var(--ink)}
+.zero-row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(24px,4vw,70px);align-items:center;margin-top:clamp(90px,11vw,160px);border-top:2px solid var(--ink);padding-top:30px}
+.zero-row .big0{font-family:var(--stencil);font-weight:900;font-size:clamp(180px,26vw,400px);line-height:.72;color:transparent;-webkit-text-stroke:3px var(--ink)}
+.zero-row h3{font-family:var(--serif);font-weight:400;font-size:clamp(28px,3vw,46px);line-height:1.08;letter-spacing:-.015em;max-width:22ch}
+.zero-row p{font-size:19px;max-width:46ch;margin-top:18px}
+.fineprint{font-family:var(--mono);font-size:11px;line-height:1.6;color:var(--ink-2);margin-top:16px;max-width:60ch}
+
+/* turtle eyes */
+.te{background:var(--night);color:var(--cream)}
+.te .ptitle{color:var(--cream);position:relative;display:inline-block}
+.te .ptitle::after{content:"";position:absolute;left:-2%;right:-2%;height:3px;background:var(--olive);box-shadow:0 0 18px var(--olive);top:10%;animation:scan 4.5s ease-in-out infinite alternate;opacity:.8}
+@keyframes scan{to{top:88%}}
+.te-head{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:40px;align-items:end}
+.te .lead{color:#cfc6ad;margin-top:0}
+.console{margin-top:clamp(40px,6vw,70px);border:1px solid #3a372b;background:#0e0d0a;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;border-radius:6px;overflow:hidden;box-shadow:0 0 0 10px #1b1a15,0 0 0 11px #36332a,0 50px 90px -30px #000}
+.c-top{display:flex;align-items:center;gap:16px;padding:8px 14px;border-bottom:1px solid var(--rule)}
+.c-logo{display:flex;gap:10px;align-items:center;white-space:nowrap}
+.c-logo b{font-family:var(--serif);font-weight:600;font-size:15px;letter-spacing:.14em}
+.c-logo small{display:block;font-size:7.5px;color:#8d8570;letter-spacing:.2em}
+.c-tabs{display:flex;gap:2px;margin-left:14px;overflow-x:auto;scrollbar-width:none}
+.c-tabs button{color:#a39b84;background:none;border:0;border-bottom:2px solid transparent;padding:10px 14px;cursor:pointer;text-transform:uppercase;letter-spacing:.16em;font-size:10.5px;white-space:nowrap}
+.c-tabs button:hover{color:var(--cream)}
+.c-tabs button[aria-selected="true"]{color:var(--cream);background:#211f19;border-bottom-color:var(--cream)}
+.c-meta{margin-left:auto;display:flex;gap:12px;align-items:center;white-space:nowrap}
+.mock{background:var(--cream);color:#111;padding:5px 9px;font-weight:600;letter-spacing:.14em}
+.c-body{display:grid;grid-template-columns:220px minmax(0,1fr) 280px;min-height:460px}
+.c-left{border-right:1px solid var(--rule);padding:10px 0;overflow:hidden}
+.c-h{color:#9c947c;letter-spacing:.18em;font-size:9.5px;padding:0 12px 8px;border-bottom:1px solid var(--rule)}
+.veh{padding:8px 12px;border-bottom:1px solid #1d1c16;border-left:3px solid transparent;display:grid;grid-template-columns:1fr auto;gap:2px 8px}
+.veh b{font-family:var(--serif);font-size:13px;letter-spacing:.06em;font-weight:600}
+.veh .st{color:var(--olive);font-size:9px;letter-spacing:.12em}
+.veh .sub{color:#877f69;font-size:9px}
+.veh.warn{border-left-color:#d9a13b}.veh.warn .st{color:#d9a13b}
+.veh.dr .sub:first-of-type{color:#d9a13b}
+.c-map{position:relative;border-right:1px solid var(--rule);background:#15140f}
+.c-map svg{display:block;width:100%;height:100%;min-height:340px}
+.c-mode{position:absolute;left:12px;bottom:12px;right:12px;display:flex;gap:10px;align-items:center;pointer-events:none}
+.c-mode span{background:rgba(14,13,10,.86);border:1px solid #3a372b;padding:6px 10px;color:var(--cream);font-size:10px;letter-spacing:.08em}
+.c-right{padding:12px;display:flex;flex-direction:column;gap:10px}
+.c-note{border-left:2px solid #6b6552;background:#1a1913;padding:9px 11px;font-family:var(--serif);font-size:13px;letter-spacing:0;line-height:1.35;color:#cfc6ad}
+.c-note b{color:var(--cream)}
+.c-order{border:1px solid #3a372b;background:#12110d;min-height:64px;padding:10px;font-size:11.5px;line-height:1.5;color:var(--cream);letter-spacing:.02em}
+.c-order .pr{color:var(--olive);margin-right:6px}
+.caret{display:inline-block;width:7px;height:13px;background:var(--cream);vertical-align:-2px;margin-left:2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.hold{--p:0;position:relative;overflow:hidden;background:#1d1c16;color:var(--cream);border:1px solid var(--cream);padding:13px;cursor:pointer;letter-spacing:.2em;text-transform:uppercase;font-size:10.5px;user-select:none;-webkit-user-select:none;touch-action:none}
+.hold::before{content:"";position:absolute;inset:0;background:var(--cream);transform:scaleX(var(--p));transform-origin:left}
+.hold span{position:relative;mix-blend-mode:difference;color:var(--cream)}
+.hold:disabled{opacity:.35;cursor:not-allowed}
+.hold.rel::before{transition:transform .25s}
+.c-hint{color:#9c947c;font-size:9.5px;min-height:1.4em;letter-spacing:.08em}
+.c-log{border-top:1px solid var(--rule);padding-top:8px;flex:1}
+#olog li{list-style:none;padding:5px 0;border-bottom:1px dashed #2a2820;line-height:1.45;color:#b9b099}
+#olog li em{font-style:normal;margin:0 6px;letter-spacing:.12em}
+#olog li em.ok{color:var(--olive)} #olog li em.no{color:#d9a13b}
+.c-foot{display:flex;gap:22px;padding:7px 14px;border-top:1px solid var(--rule);color:#8d8570;font-size:9.5px;letter-spacing:.14em;flex-wrap:wrap}
+.c-foot b{color:var(--cream);font-weight:400}
+.te-feats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin-top:clamp(50px,6vw,80px);border-top:1px solid #3a372b}
+.te-feats div{padding:26px 26px 0 0}
+.te-feats h3{font-family:var(--stencil);font-weight:700;font-size:clamp(28px,2.6vw,40px);line-height:.95;color:var(--cream);margin-bottom:10px}
+.te-feats p{color:#bdb49c;font-size:17px;max-width:32ch}
+.te-feats .last h3{color:var(--olive)}
+.te .fineprint{color:#8d8570}
+
+/* record */
+.record{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(34px,5vw,90px);margin-top:clamp(50px,6vw,80px);align-items:start}
+.colhead{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px}
+.row{display:grid;grid-template-columns:minmax(130px,220px) minmax(0,1fr);gap:22px;padding:22px 0 24px;border-top:2px solid var(--ink);align-items:start}
+.row .n{font-family:var(--stencil);font-weight:900;font-size:clamp(58px,6.4vw,100px);line-height:.78;white-space:nowrap}
+.row h3{font-family:var(--serif);font-size:clamp(20px,1.6vw,24px);font-weight:600;line-height:1.18}
+.row p{font-family:var(--mono);font-size:11.5px;line-height:1.65;color:var(--ink-2);margin-top:8px}
+.notyet{position:relative;background:var(--paper-2);border:2px solid var(--ink);padding:26px 26px 18px;transform:rotate(.9deg);box-shadow:-10px 10px 0 var(--ink)}
+.notyet .zero{display:flex;gap:18px;align-items:flex-end}
+.notyet .zero b{font-family:var(--stencil);font-weight:900;font-size:clamp(150px,15vw,230px);line-height:.74;color:#d1360c}
+.notyet .zero span{font-size:clamp(19px,1.6vw,23px);line-height:1.25;padding-bottom:8px;max-width:17ch}
+.notyet ul{margin-top:22px}
+.notyet li{list-style:none;position:relative;padding:12px 0 12px 30px;border-top:1px dashed var(--ink-2);font-size:17px;line-height:1.4}
+.notyet li::before{content:"\2715";position:absolute;left:2px;top:12px;color:#d1360c;font-family:var(--mono);font-size:14px}
+.notyet .hand{position:absolute;right:-6px;top:-50px;transform:rotate(6deg)}
+
+/* line */
+.line{background:var(--paper-2);border-block:2px solid var(--ink)}
+.chain{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:clamp(40px,6vw,70px);border:2px solid var(--ink);background:var(--paper)}
+.chain div{position:relative;padding:26px 22px 30px;border-right:2px solid var(--ink);font-family:var(--stencil);font-weight:700;font-size:clamp(28px,3vw,46px);line-height:.92;text-transform:uppercase}
+.chain div:last-child{border-right:0;background:var(--sig)}
+.chain div:not(:last-child)::after{content:"";position:absolute;right:-13px;top:50%;width:22px;height:22px;background:var(--paper);border-top:2px solid var(--ink);border-right:2px solid var(--ink);transform:translateY(-50%) rotate(45deg);z-index:2}
+.chain small{display:block;font-family:var(--mono);font-size:10px;font-weight:400;letter-spacing:.16em;margin-bottom:16px}
+.line-body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(24px,4vw,70px);margin-top:36px;font-size:19px;max-width:1100px}
+
+/* next */
+.ruler{position:relative;margin-top:clamp(60px,8vw,100px);display:grid;grid-template-columns:repeat(12,minmax(0,1fr));border-top:3px solid var(--ink)}
+.ruler span{height:26px;border-left:2px solid var(--ink);font-family:var(--mono);font-size:10px;padding:8px 0 0 5px;color:var(--ink-2)}
+.ruler span:nth-child(even){height:16px}
+.ruler span:last-child{border-right:2px solid var(--ink)}
+.pin{position:absolute;top:-12px;width:22px;height:22px;margin-left:-11px;background:var(--sig);border:2px solid var(--ink);transform:rotate(45deg)}
+.miles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(14px,2vw,26px);margin-top:44px}
+.mile{border-top:6px solid var(--ink);padding-top:16px}
+.mile .m{font-family:var(--mono);font-size:11px;letter-spacing:.16em}
+.mile h3{font-family:var(--stencil);font-weight:700;font-size:clamp(28px,2.5vw,38px);line-height:.95;margin:10px 0 12px;text-transform:uppercase}
+.mile p{font-size:16.5px;color:var(--ink-2)}
+.mile:last-child{border-top-color:var(--sig)}
+
+/* contact */
+.contact{background:var(--ink);color:var(--paper)}
+.contact .mega2{font-family:var(--stencil);font-weight:900;text-transform:uppercase;font-size:clamp(84px,18vw,320px);line-height:.8}
+.contact .mega2 span{color:var(--sig)}
+.contact-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(30px,6vw,100px);margin-top:50px;align-items:end}
+.contact p{font-size:clamp(19px,1.6vw,23px);max-width:40ch;color:#d8d1c1}
+.mail{display:inline-block;font-family:var(--serif);font-size:clamp(22px,3vw,44px);color:var(--paper);text-decoration:none;border-bottom:3px solid var(--sig);overflow-wrap:anywhere;line-height:1.2}
+.mail:hover{color:var(--sig)}
+.foot{display:flex;flex-wrap:wrap;gap:12px 36px;justify-content:space-between;margin-top:clamp(70px,9vw,130px);padding-top:18px;border-top:1px solid #3b3830;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#9a9384}
+
+/* reveal */
+.js .rv{opacity:0;transform:translateY(26px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
+.js .rv.in{opacity:1;transform:none}
+
+/* ---------- responsive ---------- */
+@media (max-width:1100px){
+  .hero-bar{grid-template-columns:1fr 1fr}
+  .pitch{grid-column:1/-1}
+  .c-body{grid-template-columns:minmax(0,1fr) 260px}
+  .c-left{display:none}
+}
+@media (max-width:760px){
+  body{font-size:18px}
+  .nav .links{display:none}
+  .nav .clk{margin-left:auto}
+  .hero-in{padding-top:68px}
+  .grow{min-height:360px}
+  .hero-bar{grid-template-columns:1fr;gap:18px}
+  .ctl{margin-top:34px}
+  .prob,.shield-grid,.idea,.te-head,.record,.contact-grid,.line-body{grid-template-columns:1fr}
+  .plate{grid-template-columns:1fr;gap:4px}
+  .plate:nth-child(n){margin-left:0;margin-right:0}
+  .plate.hot{transform:rotate(-1deg)}
+  .tickets,.te-feats,.miles{grid-template-columns:1fr}
+  .tickets .ticket:nth-child(n){transform:none}
+  .ticket{padding-bottom:62px}
+  .stamp{top:auto;bottom:16px;right:18px;transform:rotate(-6deg)}
+  .ptitle{font-size:13vw}
+  .zero-row{grid-template-columns:1fr}
+  .c-top{flex-wrap:wrap;gap:6px}
+  .c-tabs{margin-left:0;order:3;width:100%}
+  .c-meta .clkc{display:none}
+  .c-body{grid-template-columns:1fr}
+  .c-map{border-right:0;border-bottom:1px solid var(--rule)}
+  .c-map svg{min-height:320px}
+  .c-mode span{font-size:9px;padding:4px 8px}
+  .row{grid-template-columns:1fr;gap:10px}
+  .notyet{transform:none}
+  .notyet .hand{top:-44px;right:4px}
+  .chain{grid-template-columns:1fr}
+  .chain div{border-right:0;border-bottom:2px solid var(--ink)}
+  .chain div:last-child{border-bottom:0}
+  .chain div:not(:last-child)::after{right:auto;top:auto;left:28px;bottom:-13px;transform:rotate(135deg)}
+  .ruler span{font-size:0}
+  .ruler span:nth-child(3n){font-size:9px}
+}
+@media (prefers-reduced-motion:reduce){
+  .tick-track,.te .ptitle::after,.caret{animation:none}
+  .js .rv{transition:none}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js')</script>
+
+<nav class="nav" aria-label="Main">
+  <a class="brand" href="#top">
+    <svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true"><circle cx="40" cy="24" r="12" fill="none" stroke="currentColor" stroke-width="5"/><path d="M6 58 L32 32" stroke="currentColor" stroke-width="6"/></svg>
+    Homingvector
+  </a>
+  <div class="links">
+    <a href="#shield">TurtleShield</a>
+    <a href="#eyes">Turtle Eyes</a>
+    <a href="#record">The record</a>
+    <a href="#talk">Talk to us</a>
+  </div>
+  <span class="clk" data-clock>--:--:--Z</span>
+</nav>
+
+<header class="hero" id="top">
+  <canvas id="sim" aria-label="A small animated sketch of nine vehicles holding a ring around an objective. Use the buttons to jam GPS, cut the radio or lose a vehicle."></canvas>
+  <div class="hero-in">
+    <div class="mega a">Homing</div>
+    <div class="grow" id="simzone"></div>
+    <div class="mega b"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="64" cy="36" r="24" fill="none" stroke="#ff4a1c" stroke-width="9"/><path d="M6 94 L46 54" stroke="#ff4a1c" stroke-width="10"/><path d="M26 50 L48 52 L50 74" fill="none" stroke="#ff4a1c" stroke-width="9"/></svg>Vector</div>
+    <div class="hero-bar">
+      <div class="pitch">
+        <div class="tag"><span>Autonomy software</span><span>Made in India</span></div>
+        <p>We write the software that keeps a team of drones, ground robots and boats doing their job when GPS is jammed, the radio cuts out, and nobody at base can reach them.</p>
+      </div>
+      <div class="ctl">
+        <span class="hand">go on, break it <svg class="scrawl" viewBox="0 0 120 60" aria-hidden="true"><path d="M4 18 C 34 6, 70 14, 96 44"/><path d="M78 42 L97 45 L99 26"/></svg></span>
+        <button class="tg" id="b-jam" aria-pressed="false">Jam GPS <span class="led"></span></button>
+        <button class="tg" id="b-cut" aria-pressed="false">Cut radio <span class="led"></span></button>
+        <button class="tg" id="b-lose">Lose one <span class="led"></span></button>
+        <button class="tg reset" id="b-reset">Reset</button>
+      </div>
+      <div class="panel" aria-live="polite">
+        <div class="ro">
+          <div><small>GPS</small><b id="ro-gps">OK</b></div>
+          <div><small>LINKS UP</small><b id="ro-links">–</b></div>
+          <div><small>VEHICLES</small><b id="ro-fleet">9/9</b></div>
+        </div>
+        <ol id="simlog"></ol>
+        <div class="fine">A sketch running in your browser, to show the idea. It is not our flight software. Click the map to move the objective.</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="tick" aria-hidden="true"><div class="tick-track">
+  <span>GPS jammed <i>/</i></span><span>Radio patchy <i>/</i></span><span>Base out of reach <i>/</i></span><span>The team keeps working <i>/</i></span><span>742 simulated missions <i>/</i></span><span>0 real flights, yet <i>/</i></span><span>A person decides <i>/</i></span>
+  <span>GPS jammed <i>/</i></span><span>Radio patchy <i>/</i></span><span>Base out of reach <i>/</i></span><span>The team keeps working <i>/</i></span><span>742 simulated missions <i>/</i></span><span>0 real flights, yet <i>/</i></span><span>A person decides <i>/</i></span>
+</div></div>
+
+<main>
+
+<section class="sec" id="problem">
+  <div class="ghostno" aria-hidden="true">01</div>
+  <div class="wrap prob rv">
+    <div>
+      <div class="eyebrow">The problem</div>
+      <h2 class="h2">Picture a dozen drones watching a border <em>at night.</em></h2>
+      <p class="prob-body">Then someone jams GPS. The radio link gets patchy. The operator back at base loses contact. Each drone can usually keep itself in the air. What falls apart is the team: who watches which stretch, who follows what was spotted, and who fills the gap when one goes down.</p>
+    </div>
+    <div>
+      <div class="fails">
+        <div class="fail"><span>GPS</span><i></i><b>jammed</b></div>
+        <div class="fail"><span>Radio</span><i></i><b>patchy, then gone</b></div>
+        <div class="fail"><span>Link to base</span><i></i><b>lost</b></div>
+      </div>
+      <span class="hand">this is normal now, not rare.</span>
+    </div>
+  </div>
+</section>
+
+<section class="sec shield" id="shield">
+  <div class="ghostno" aria-hidden="true">02</div>
+  <div class="wrap">
+    <div class="eyebrow rv">Product 01 / runs on every vehicle</div>
+    <h2 class="ptitle rv">TurtleShield<sup>AI</sup></h2>
+    <div class="shield-grid">
+      <div class="rv">
+        <p class="lead">It puts the whole team plan on every vehicle. No vehicle waits for base, and no vehicle is the boss. If the group gets split up, each part carries on by itself.</p>
+        <p class="small">Every drone has an autopilot that flies it very well. It has no idea what the other drones are doing. So today the teamwork usually runs from a laptop or server at base, and when that link is jammed, every vehicle is left waiting for orders. We moved the teamwork onto the vehicles.</p>
+      </div>
+      <div class="rv">
+        <div class="stack">
+          <div class="plate"><b>People</b><span>set the mission, approve, pause, call everyone home</span></div>
+          <div class="plate hot"><b>TurtleShield</b><span>runs on every vehicle and keeps the team working together</span></div>
+          <div class="plate"><b>Autopilot</b><span>flies each vehicle: balance, steering, motors</span></div>
+          <div class="plate"><b>Vehicle</b><span>planes, ground robots, boats</span></div>
+        </div>
+        <div class="stack-note">&uarr; we sit in the middle, on every vehicle</div>
+      </div>
+    </div>
+
+    <div class="tickets">
+      <article class="ticket rv">
+        <div class="stamp">SIM-TESTED</div>
+        <div class="no">WHEN THINGS GO WRONG / 01</div>
+        <h3>GPS jammed</h3>
+        <strong>They keep going on what they can still trust.</strong>
+        <p>Each vehicle works out where it probably is, and how sure it is, and plans around that.</p>
+      </article>
+      <article class="ticket rv">
+        <div class="stamp">SIM-TESTED</div>
+        <div class="no">WHEN THINGS GO WRONG / 02</div>
+        <h3>Radio cut</h3>
+        <strong>Messages find another way through.</strong>
+        <p>Vehicles pass messages along for each other and hold them until a path opens up again.</p>
+      </article>
+      <article class="ticket rv">
+        <div class="stamp">SIM-TESTED</div>
+        <div class="no">WHEN THINGS GO WRONG / 03</div>
+        <h3>A vehicle is lost</h3>
+        <strong>Someone else picks up its job.</strong>
+        <p>The rest of the group notices the gap and shares out the work again, without being told.</p>
+      </article>
+    </div>
+    <p class="honest rv">All of this has been tested in simulation. None of it has flown on a real aircraft yet.</p>
+  </div>
+</section>
+
+<section class="sec" id="idea">
+  <div class="ghostno" aria-hidden="true">03</div>
+  <div class="wrap">
+    <div class="idea">
+      <div class="rv">
+        <div class="eyebrow">The one idea behind it</div>
+        <h2 class="h2">Know what you <em>don't</em> know.</h2>
+        <p class="lead">Most systems store a position as a dot on a map and trust it. Ours stores the dot and a circle around it that says how sure the vehicle is. The worse the GPS, the bigger the circle, and the vehicle plans around the circle.</p>
+      </div>
+      <div class="kcard rv">
+        <svg viewBox="0 0 320 300" role="img" aria-label="An aircraft with an uncertainty circle that grows as GPS quality drops">
+          <defs><pattern id="kg" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="#141310" stroke-opacity=".12"/></pattern></defs>
+          <rect width="320" height="300" fill="url(#kg)"/>
+          <rect id="kspot" x="118" y="108" width="84" height="84" fill="none" stroke="#141310" stroke-width="2" stroke-dasharray="6 5"/>
+          <circle id="kc" cx="160" cy="150" r="24" fill="#ff4a1c" fill-opacity=".12" stroke="#ff4a1c" stroke-width="2"/>
+          <path d="M160 138 L170 160 L160 155 L150 160Z" fill="#141310"/>
+          <g id="knb" opacity="0" style="transition:opacity .3s">
+            <path d="M268 40 L278 62 L268 57 L258 62Z" fill="#141310"/>
+            <rect x="248" y="22" width="40" height="48" fill="none" stroke="#141310" stroke-width="2" stroke-dasharray="4 4"/>
+            <path d="M176 138 C 200 100, 222 80, 244 64" fill="none" stroke="#141310" stroke-width="2"/>
+            <path d="M232 62 L245 63 L240 76" fill="none" stroke="#141310" stroke-width="2"/>
+            <text x="236" y="92" font-family="Martian Mono, monospace" font-size="9" fill="#141310">NEIGHBOUR</text>
+          </g>
+          <text id="kspotlab" x="12" y="288" font-family="Martian Mono, monospace" font-size="9" fill="#141310">- - - THE SPOT IT TAKES</text>
+        </svg>
+        <div class="krow"><label for="gpsq">GPS quality</label><span id="klab">GPS good</span></div>
+        <input type="range" id="gpsq" min="0" max="100" value="90">
+        <output id="kout" for="gpsq">Takes a tight, precise spot.</output>
+      </div>
+    </div>
+
+    <div class="zero-row rv">
+      <div class="big0" aria-hidden="true">0</div>
+      <div>
+        <h3>changes to our core software when we added a second autopilot brand.</h3>
+        <p>Armies rarely buy all their drones from one maker, and they change suppliers. So TurtleShield sits on top of the autopilot. Adding a new kind of vehicle means writing a small adapter. The part that does the thinking stays exactly the same, and customers keep the drones they already own.</p>
+        <p class="fineprint">The second brand, ArduPilot, has only been tested standing still in simulation so far. All our flying tests use the first, PX4.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec te" id="eyes">
+  <div class="ghostno" aria-hidden="true">04</div>
+  <div class="wrap">
+    <div class="te-head">
+      <div class="rv">
+        <div class="eyebrow">Product 02 / the operator's screen</div>
+        <h2 class="ptitle">Turtle Eyes</h2>
+      </div>
+      <p class="lead rv">What the operator sees. Three modes, one click each. Orders go in as plain English and nothing moves until a person holds the button down.</p>
+    </div>
+
+    <div class="console rv" id="console">
+      <div class="c-top">
+        <div class="c-logo">
+          <svg width="26" height="26" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="none" stroke="#e7dec6" stroke-width="1.5"/><circle cx="20" cy="20" r="6" fill="none" stroke="#e7dec6" stroke-width="1.5"/><path d="M20 0V10M20 30V40M0 20H10M30 20H40" stroke="#e7dec6" stroke-width="1.5"/></svg>
+          <div><b>TURTLE EYES</b><small>PERSISTENT OVERWATCH</small></div>
+        </div>
+        <div class="c-tabs" role="tablist" aria-label="Console mode">
+          <button role="tab" aria-selected="true" data-mode="0">Targeting</button>
+          <button role="tab" aria-selected="false" data-mode="1">Surveillance</button>
+          <button role="tab" aria-selected="false" data-mode="2">Simulation</button>
+        </div>
+        <div class="c-meta"><span class="mock">MOCK</span><span class="clkc" data-clock>--:--:--Z</span></div>
+      </div>
+      <div class="c-body">
+        <aside class="c-left">
+          <div class="c-h">CONNECTED &middot; 9/9</div>
+          <div id="vlist"></div>
+        </aside>
+        <div class="c-map">
+          <svg id="tmap" viewBox="0 0 640 440" preserveAspectRatio="xMidYMid slice" aria-label="Drawn map showing vehicles moving in the selected mode"></svg>
+          <div class="c-mode"><span id="cmode">TARGETING: find something of interest and keep eyes on it.</span></div>
+        </div>
+        <aside class="c-right">
+          <p class="c-note"><b>Operations console ready.</b> Type an order in plain English. Orders are shown on the map and need one hold-to-confirm.</p>
+          <div class="c-order"><span class="pr">&gt;</span><span id="otext"></span><i class="caret"></i></div>
+          <button class="hold" id="hold" disabled><span>Hold to confirm</span></button>
+          <p class="c-hint" id="ohint">&nbsp;</p>
+          <div class="c-log"><div class="c-h" style="padding-left:0">ORDER LOG</div><ol id="olog"></ol></div>
+        </aside>
+      </div>
+      <div class="c-foot"><span>VEHICLES <b>9</b></span><span>MESH PEERS <b id="cpeers">8</b></span><span>REJECTED/S <b>0</b></span><span>ALERTS <b id="calerts">1</b></span></div>
+    </div>
+    <p class="fineprint">Drawn for this page. The real Turtle Eyes runs on sample data today and says MOCK in the corner, same as this one.</p>
+
+    <div class="te-feats">
+      <div class="rv"><h3>Works with no internet.</h3><p>It carries its own maps and is built to run on a rugged laptop in the field.</p></div>
+      <div class="rv"><h3>Locked down.</h3><p>Operators see only what they need. Engineering controls sit behind a separate login.</p></div>
+      <div class="rv last"><h3>Tells vehicles where to go and what to watch. Nothing more.</h3><p>Pause, stop, or call every vehicle home at any time.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="record">
+  <div class="ghostno" aria-hidden="true">05</div>
+  <div class="wrap">
+    <div class="eyebrow rv">The record, as of 15 September 2026</div>
+    <h2 class="h2 rv">What we've proven. <em>And what we haven't.</em></h2>
+    <p class="lead rv">We keep every failure, because that is where the lessons are. Everything on the left happened in simulation, with the same autopilot software that flies real aircraft.</p>
+
+    <div class="record">
+      <div>
+        <div class="colhead rv">Proven in simulation</div>
+        <div class="row rv"><div class="n" data-count="742">742</div><div><h3>test missions flown in simulation</h3><p>531 passed, 141 failed, 70 were skipped. Every failure is kept on record.</p></div></div>
+        <div class="row rv"><div class="n" data-count="2000" data-suf="+">2,000+</div><div><h3>orders from our software, accepted by the autopilot</h3><p>Our software commanding simulated aircraft after the base station handed over, counted across recorded runs.</p></div></div>
+        <div class="row rv"><div class="n" data-count="8">8</div><div><h3>aircraft in tight formation, kept safely apart</h3><p>6 out of 6 runs passed. Closest approach 33.25 m against a 30 m limit, measured from the simulator's true positions.</p></div></div>
+        <div class="row rv"><div class="n" data-count="90" data-suf="%+">90%+</div><div><h3>less position error without GPS, after one day of fixes</h3><p>Average error went from 396–750 m down to 25.5–39.0 m. Still not accurate enough to rely on.</p></div></div>
+        <div class="row rv"><div class="n" data-count="103">103</div><div><h3>problems written down, with their causes</h3><p>47 of them are still open.</p></div></div>
+      </div>
+      <div class="rv">
+        <div class="colhead">Not yet</div>
+        <div class="notyet">
+          <span class="hand">read this side first</span>
+          <div class="zero"><b>0</b><span>flights on a real aircraft.</span></div>
+          <ul>
+            <li>Everything so far is simulation, or a real flight controller wired to a simulator.</li>
+            <li>The biggest group flown together: 8 aircraft in simulation, 11 with a real flight controller in the loop.</li>
+            <li>Navigation without GPS has improved fast, and is still not accurate enough to rely on.</li>
+            <li>Each vehicle uses about 33 times the radio capacity we budget for.</li>
+            <li>Some backup behaviours are written and tested, and not yet switched on in the flying software.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec line" id="line">
+  <div class="ghostno" aria-hidden="true">06</div>
+  <div class="wrap">
+    <div class="eyebrow rv">People stay in charge</div>
+    <h2 class="h2 rv">The software finds and follows. <em>A person decides.</em></h2>
+    <div class="chain rv">
+      <div><small>01</small>Spot something</div>
+      <div><small>02</small>Keep track of it</div>
+      <div><small>03</small>Suggest a way to intercept</div>
+      <div><small>04</small>A person decides</div>
+    </div>
+    <div class="line-body rv">
+      <p>TurtleShield contains no weapon code. It stops at a suggestion, and a person takes it from there.</p>
+      <p>An operator can pause the mission, stop it, or call every vehicle home at any time.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="next">
+  <div class="ghostno" aria-hidden="true">07</div>
+  <div class="wrap">
+    <div class="eyebrow rv">The next twelve months</div>
+    <h2 class="h2 rv">Out of the simulator, into the air, <em>with someone watching.</em></h2>
+    <div class="ruler rv" aria-hidden="true">
+      <span>M1</span><span>M2</span><span>M3</span><span>M4</span><span>M5</span><span>M6</span><span>M7</span><span>M8</span><span>M9</span><span>M10</span><span>M11</span><span>M12</span>
+      <i class="pin" style="left:25%"></i><i class="pin" style="left:50%"></i><i class="pin" style="left:75%"></i><i class="pin" style="left:83.333%"></i>
+    </div>
+    <div class="miles">
+      <div class="mile rv"><div class="m">MONTH 3</div><h3>First real flight with our software in charge</h3><p>A safety pilot on standby, every bench safety check done first.</p></div>
+      <div class="mile rv"><div class="m">MONTH 6</div><h3>Three aircraft in formation, in real wind</h3><p>Radio use brought down to budget. Real numbers replace simulated ones.</p></div>
+      <div class="mile rv"><div class="m">MONTH 9</div><h3>Flying without GPS, against a jamming rig</h3><p>Backup behaviours switched on. Our core idea, tested for real.</p></div>
+      <div class="mile rv"><div class="m">MONTH 10</div><h3>A five-aircraft field trial, run by an outsider</h3><p>Operated through Turtle Eyes, with jamming and radio trouble, and signed off by someone who watched.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec contact" id="talk">
+  <div class="wrap">
+    <div class="eyebrow rv">Talk to us</div>
+    <div class="mega2 rv">Say<br>hello<span>.</span></div>
+    <div class="contact-grid">
+      <p class="rv">Homingvector is raising a pre-seed round to take TurtleShield from simulation to a witnessed field trial. Founded by Nidhip Sharma, who wrote TurtleShield and the testing system behind it. If you fly drones, build them, or fund the people who do, write to us.</p>
+      <div class="rv"><a class="mail" id="mail" href="#talk">nidhip.sharma.23 [at] gmail.com</a></div>
+    </div>
+    <div class="foot">
+      <span>&copy; 2026 Homingvector</span>
+      <span>Performance figures come from simulation unless stated otherwise</span>
+      <span>No cookies</span>
+    </div>
+  </div>
+</section>
+</main>
+
+<script>
+(function(){
+"use strict";
+var RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+function $(s,r){return (r||document).querySelector(s)}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+function pad(n){return String(n).padStart(2,'0')}
+function utc(){var d=new Date();return pad(d.getUTCHours())+':'+pad(d.getUTCMinutes())+':'+pad(d.getUTCSeconds())+'Z'}
+function tickClock(){$$('[data-clock]').forEach(function(e){e.textContent=utc()})}
+tickClock(); setInterval(tickClock,1000);
+
+/* email, assembled here so it is not sitting in the HTML for scrapers */
+(function(){var u='nidhip.sharma.23',d='gmail.com',a=$('#mail');a.textContent=u+'@'+d;a.href='mailto:'+u+'@'+d+'?subject=Homingvector';})();
+
+/* reveal + counters */
+function countUp(n){
+  var end=+n.dataset.count, suf=n.dataset.suf||'';
+  function fmt(v){return Math.round(v).toLocaleString('en-IN')+suf}
+  if(RM){n.textContent=fmt(end);return}
+  var t0=performance.now(), D=1500;
+  (function f(){var k=Math.max(0,Math.min(1,(performance.now()-t0)/D)), e=1-Math.pow(1-k,3); n.textContent=fmt(end*e); if(k<1) requestAnimationFrame(f)})(t0);
+}
+/* visibility by plain rect checks on scroll: no observer APIs to trust */
+var watchers=[];
+function watch(el,fn,once){watchers.push({el:el,fn:fn,once:once,last:null,done:false})}
+function checkViews(){
+  var h=window.innerHeight;
+  watchers.forEach(function(w){
+    if(w.done) return;
+    var r=w.el.getBoundingClientRect();
+    if(w.once){ if(r.top<h*.92 && r.bottom>0){w.done=true; w.fn(true)} }
+    else { var vis=r.top<h && r.bottom>0; if(vis!==w.last){w.last=vis; w.fn(vis)} }
+  });
+}
+var viewQueued=false;
+function queueViews(){ if(viewQueued) return; viewQueued=true; requestAnimationFrame(function(){viewQueued=false; checkViews()}) }
+window.addEventListener('scroll',queueViews,{passive:true});
+window.addEventListener('resize',queueViews);
+$$('.rv').forEach(function(x){watch(x,function(){x.classList.add('in'); $$('[data-count]',x).forEach(countUp)},true)});
+
+/* ================= hero sketch ================= */
+(function(){
+  var cv=$('#sim'), ctx=cv.getContext('2d'), zone=$('#simzone');
+  var INK='#141310', SIG='#ff4a1c';
+  var W=0,H=0,R=100, narrow=false;
+  var st={jam:false,cut:false,t:0,orbit:0,cx:null,cy:null,tx:null,ty:null,moved:false,packets:[],pk:0,t0:performance.now(),lastMoveLog:0};
+  var fleet=[], i;
+  for(i=0;i<5;i++) fleet.push({id:'FW-0'+(i+1),k:'fw',off:i/5*Math.PI*2});
+  for(i=0;i<2;i++) fleet.push({id:'GND-0'+(i+1),k:'ugv',ph:i*Math.PI});
+  for(i=0;i<2;i++) fleet.push({id:'SEA-0'+(i+1),k:'usv',ph:i*2.6});
+  fleet.forEach(function(v,n){v.n=n;v.alive=true;v.dead=0;v.sig=4;v.jx=0;v.jy=0;v.x=0;v.y=0;v.hd=0;v.vx=0;v.vy=0});
+
+  function home(){
+    var hr=cv.getBoundingClientRect(), zr=zone.getBoundingClientRect();
+    if(narrow) return [W/2, zr.top-hr.top+zr.height*.5];
+    return [W*.64, H*.45];
+  }
+  function resize(){
+    var r=cv.getBoundingClientRect(), d=Math.min(window.devicePixelRatio||1,2);
+    W=r.width; H=r.height; narrow=W<760;
+    cv.width=Math.round(W*d); cv.height=Math.round(H*d); ctx.setTransform(d,0,0,d,0,0);
+    var zh=zone.getBoundingClientRect().height;
+    R = narrow ? Math.max(56,Math.min(W*.24,zh*.3)) : Math.max(80,Math.min(W,H)*.2);
+    var h=home();
+    if(!st.moved||st.tx===null){st.tx=h[0];st.ty=h[1]}
+    st.tx=Math.min(Math.max(st.tx,20),W-20); st.ty=Math.min(Math.max(st.ty,20),H-20);
+    if(st.cx===null){st.cx=st.tx;st.cy=st.ty}
+  }
+  function keep(a,b){var s=Math.sin((a+1)*12.9898+(b+1)*78.233)*43758.5453;return (s-Math.floor(s))<.34}
+
+  var links=[];
+  function step(dt){
+    st.t+=dt; st.orbit+=dt*(RM?.08:.24);
+    var f=Math.min(1,dt*1.8); st.cx+=(st.tx-st.cx)*f; st.cy+=(st.ty-st.cy)*f;
+    var fws=fleet.filter(function(v){return v.k==='fw'&&v.alive});
+    fws.forEach(function(v,k){var want=k/fws.length*Math.PI*2, d=want-v.off; d=Math.atan2(Math.sin(d),Math.cos(d)); v.off+=d*Math.min(1,dt*1.1)});
+    fleet.forEach(function(v){
+      if(!v.alive){v.dead+=dt; v.x+=v.vx*dt; v.y+=v.vy*dt; v.vy+=40*dt; return}
+      var tgt=st.jam?(v.k==='fw'?22:v.k==='ugv'?13:17):4;
+      v.sig+=(tgt-v.sig)*Math.min(1,dt*(st.jam?.45:1.3));
+      v.jx+=(Math.random()-.5)*dt*70; v.jy+=(Math.random()-.5)*dt*70;
+      var lim=v.sig*.7, m=Math.hypot(v.jx,v.jy); if(m>lim){v.jx*=lim/m; v.jy*=lim/m}
+      var px,py,a,r;
+      if(v.k==='fw'){a=st.orbit+v.off; r=R+v.sig*1.7; px=st.cx+Math.cos(a)*r; py=st.cy+Math.sin(a)*r; v.hd=a+Math.PI/2}
+      else if(v.k==='ugv'){a=-st.orbit*.5+v.ph; r=R*.4+v.sig*.5; px=st.cx+Math.cos(a)*r; py=st.cy+Math.sin(a)*r*.7}
+      else {a=st.t*.15+v.ph; px=st.cx+Math.sin(a)*R*1.45; py=st.cy+R*1.32+Math.cos(a*1.3)*7}
+      v.x=px+v.jx; v.y=py+v.jy;
+    });
+    var alive=fleet.filter(function(v){return v.alive});
+    links=[];
+    for(var p=0;p<alive.length;p++) for(var q=p+1;q<alive.length;q++){
+      var A=alive[p],B=alive[q];
+      if(Math.hypot(A.x-B.x,A.y-B.y)<R*1.4) links.push({a:A,b:B,ok:!st.cut||keep(A.n,B.n)});
+    }
+    st.pk+=dt;
+    var live=links.filter(function(l){return l.ok});
+    st.nOk=live.length; st.nLinks=links.length;
+    if(st.pk>.1 && live.length){st.pk=0; var L=live[Math.floor(Math.random()*live.length)]; st.packets.push({a:L.a,b:L.b,t:0,rev:Math.random()<.5})}
+    st.packets=st.packets.filter(function(k){k.t+=dt*1.5; return k.t<1 && k.a.alive && k.b.alive});
+  }
+
+  function glyph(v){
+    ctx.save(); ctx.translate(v.x,v.y);
+    var al=v.alive?1:Math.max(0,1-v.dead/2.2); ctx.globalAlpha=al;
+    if(!v.alive){ctx.strokeStyle=SIG;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(-7,-7);ctx.lineTo(7,7);ctx.moveTo(7,-7);ctx.lineTo(-7,7);ctx.stroke();ctx.restore();return}
+    ctx.fillStyle=INK;
+    if(v.k==='fw'){ctx.rotate(v.hd);ctx.beginPath();ctx.moveTo(11,0);ctx.lineTo(-7,-7);ctx.lineTo(-3,0);ctx.lineTo(-7,7);ctx.closePath();ctx.fill()}
+    else if(v.k==='ugv'){ctx.fillRect(-6,-6,12,12)}
+    else {ctx.rotate(Math.PI/4);ctx.fillRect(-6,-6,12,12);ctx.fillStyle='#ebe6da';ctx.fillRect(-2,-2,4,4)}
+    ctx.restore();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    var avg=0,c=0; fleet.forEach(function(v){if(v.k==='fw'&&v.alive){avg+=v.sig;c++}}); avg=c?avg/c:4;
+    ctx.save(); ctx.setLineDash([2,7]); ctx.strokeStyle='rgba(20,19,16,.35)'; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.arc(st.cx,st.cy,R+avg*1.7,0,Math.PI*2); ctx.stroke(); ctx.restore();
+    // objective
+    ctx.save(); ctx.translate(st.cx,st.cy); ctx.strokeStyle=SIG; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(0,0,11,0,Math.PI*2); ctx.stroke();
+    ctx.rotate(st.t*.6); for(var k=0;k<4;k++){ctx.rotate(Math.PI/2);ctx.beginPath();ctx.moveTo(16,0);ctx.lineTo(26,0);ctx.stroke()}
+    ctx.restore();
+    ctx.fillStyle=SIG; ctx.font='600 10px "Martian Mono", monospace'; ctx.fillText('OBJECTIVE',st.cx+20,st.cy+30);
+    // links
+    links.forEach(function(l){
+      ctx.save();
+      if(l.ok){ctx.strokeStyle='rgba(20,19,16,.42)';ctx.lineWidth=1}
+      else {ctx.strokeStyle='rgba(20,19,16,.14)';ctx.setLineDash([3,5]);ctx.lineWidth=1}
+      ctx.beginPath(); ctx.moveTo(l.a.x,l.a.y); ctx.lineTo(l.b.x,l.b.y); ctx.stroke(); ctx.restore();
+    });
+    ctx.fillStyle=SIG;
+    st.packets.forEach(function(p){var t=p.rev?1-p.t:p.t; ctx.fillRect(p.a.x+(p.b.x-p.a.x)*t-2, p.a.y+(p.b.y-p.a.y)*t-2, 4, 4)});
+    // uncertainty
+    fleet.forEach(function(v){
+      if(!v.alive) return;
+      ctx.save(); ctx.beginPath(); ctx.arc(v.x,v.y,v.sig*1.5+4,0,Math.PI*2);
+      if(st.jam||v.sig>6){ctx.fillStyle='rgba(255,74,28,.09)';ctx.fill();ctx.strokeStyle='rgba(255,74,28,.9)'}
+      else ctx.strokeStyle='rgba(20,19,16,.35)';
+      ctx.lineWidth=1.2; ctx.stroke(); ctx.restore();
+    });
+    fleet.forEach(glyph);
+    ctx.font='9px "Martian Mono", monospace'; ctx.fillStyle='rgba(20,19,16,.75)';
+    fleet.forEach(function(v){if(v.alive) ctx.fillText(v.id, v.x+11, v.y-10)});
+  }
+
+  var logEl=$('#simlog');
+  function log(msg){
+    var s=Math.floor((performance.now()-st.t0)/1000), li=document.createElement('li'), sp=document.createElement('span');
+    sp.textContent='T+'+pad(Math.floor(s/60))+':'+pad(s%60); li.appendChild(sp); li.appendChild(document.createTextNode(msg));
+    logEl.insertBefore(li,logEl.firstChild); while(logEl.children.length>3) logEl.removeChild(logEl.lastChild);
+  }
+  var WORDS=['none','one','two','three','four','five'];
+  $('#b-jam').addEventListener('click',function(){
+    st.jam=!st.jam; this.setAttribute('aria-pressed',st.jam);
+    log(st.jam?'GPS jammed. Every circle grows, and the aircraft take looser spots.':'GPS back. Circles shrink and the spots tighten again.');
+  });
+  $('#b-cut').addEventListener('click',function(){
+    st.cut=!st.cut; this.setAttribute('aria-pressed',st.cut);
+    log(st.cut?'Radio cut. Messages hop through whoever can still hear.':'Radio back. Every link carries traffic again.');
+  });
+  $('#b-lose').addEventListener('click',function(){
+    var fws=fleet.filter(function(v){return v.k==='fw'&&v.alive});
+    if(fws.length<=2){log('Two aircraft left. We will stop there.');return}
+    var v=fws[Math.floor(Math.random()*fws.length)];
+    v.alive=false; v.dead=0; v.vx=Math.cos(v.hd)*30; v.vy=Math.sin(v.hd)*30-10;
+    log(v.id+' lost. The other '+WORDS[fws.length-1]+' spread out to cover its arc. Nobody told them to.');
+  });
+  $('#b-reset').addEventListener('click',function(){
+    fleet.forEach(function(v){v.alive=true;v.dead=0});
+    st.jam=false; st.cut=false; st.moved=false; $('#b-jam').setAttribute('aria-pressed','false'); $('#b-cut').setAttribute('aria-pressed','false');
+    var h=home(); st.tx=h[0]; st.ty=h[1];
+    log('Reset. Nine vehicles on the mesh, ring held.');
+  });
+  cv.addEventListener('click',function(e){
+    var r=cv.getBoundingClientRect(); st.tx=e.clientX-r.left; st.ty=e.clientY-r.top; st.moved=true;
+    var now=performance.now(); if(now-st.lastMoveLog>2500){st.lastMoveLog=now; log('New objective. The ring moves with it.')}
+  });
+
+  var roG=$('#ro-gps'), roL=$('#ro-links'), roF=$('#ro-fleet');
+  setInterval(function(){
+    roG.textContent=st.jam?'JAMMED':'OK'; roG.className=st.jam?'bad':'';
+    roL.textContent=(st.nOk||0)+'/'+(st.nLinks||0); roL.className=st.cut?'bad':'';
+    roF.textContent=fleet.filter(function(v){return v.alive}).length+'/9';
+  },250);
+
+  var running=true, last=performance.now();
+  function loop(){
+    var t=performance.now(), dt=Math.max(0,Math.min(.05,(t-last)/1000)); last=t;
+    if(running){step(dt); draw()}
+    requestAnimationFrame(loop);
+  }
+  window.addEventListener('resize',resize);
+  watch(cv,function(v){running=v; last=performance.now()},false);
+  resize(); for(var w=0;w<30;w++) step(1/30);
+  log('Nine vehicles on the mesh. Ring held around the objective.');
+  requestAnimationFrame(loop);
+})();
+
+/* ================= know what you don't know ================= */
+(function(){
+  var q=$('#gpsq'), c=$('#kc'), spot=$('#kspot'), nb=$('#knb'), out=$('#kout'), lab=$('#klab'), sl=$('#kspotlab');
+  var LAB=['GPS good','GPS shaky','GPS gone'];
+  var OUT=['Takes a tight, precise spot.','Takes a looser spot, with room to spare.','Holds back and hands the job to a better-placed neighbour.'];
+  function upd(){
+    var v=+q.value, r=16+(100-v)*1.0, s=v>66?0:v>30?1:2;
+    c.setAttribute('r',r.toFixed(1));
+    var side=Math.min(r*2+22,280); spot.setAttribute('x',(160-side/2).toFixed(1)); spot.setAttribute('y',(150-side/2).toFixed(1));
+    spot.setAttribute('width',side.toFixed(1)); spot.setAttribute('height',side.toFixed(1));
+    spot.style.opacity=s===2?0:1; nb.setAttribute('opacity',s===2?1:0); sl.style.opacity=s===2?0:1;
+    lab.textContent=LAB[s]; out.textContent=OUT[s];
+  }
+  q.addEventListener('input',upd); upd();
+})();
+
+/* ================= Turtle Eyes console ================= */
+(function(){
+  var svg=$('#tmap'), NS='http://www.w3.org/2000/svg';
+  function el(n,a,p){var e=document.createElementNS(NS,n); for(var k in a) e.setAttribute(k,a[k]); (p||svg).appendChild(e); return e}
+  function g(a){return el('g',a||{})}
+  el('rect',{x:0,y:0,width:640,height:440,fill:'#15140f'});
+  var grid=g({stroke:'#221f18','stroke-width':1});
+  for(var x=0;x<=640;x+=40) el('line',{x1:x,y1:0,x2:x,y2:440},grid);
+  for(var y=0;y<=440;y+=40) el('line',{x1:0,y1:y,x2:640,y2:y},grid);
+  var hills=[[140,120,1,.3],[470,300,1.25,1.7],[560,70,.7,2.9],[250,370,.6,4.1]];
+  var cg=g({fill:'none',stroke:'#4a4633','stroke-width':1});
+  hills.forEach(function(h){
+    for(var k=0;k<7;k++){
+      var d='';
+      for(var i=0;i<=72;i++){var a=i/72*Math.PI*2, r=(k+1)*18*h[2]*(1+.17*Math.sin(3*a+h[3])+.08*Math.cos(5*a+h[3]*2)+.04*Math.sin(9*a+k));
+        d+=(i?'L':'M')+(h[0]+Math.cos(a)*r).toFixed(1)+' '+(h[1]+Math.sin(a)*r).toFixed(1)}
+      el('path',{d:d+'Z','stroke-opacity':k%3===2?.95:.45},cg);
+    }
+  });
+  var river=el('path',{d:'M-10 398 C 110 352 210 424 320 368 S 520 282 650 322',fill:'none',stroke:'#2b3a3f','stroke-width':10,'stroke-linecap':'round'});
+  var road=el('path',{d:'M-10 214 L 170 236 L 300 208 L 430 170 L 650 196',fill:'none',stroke:'#5a543b','stroke-width':1.5,'stroke-dasharray':'7 5'});
+  var lbl={'font-family':'Martian Mono, monospace','font-size':9,fill:'#7d7660','letter-spacing':1};
+  var t1=el('text',Object.assign({x:108,y:30},lbl)); t1.textContent='HILL 412';
+  var t2=el('text',Object.assign({x:520,y:382},lbl)); t2.textContent='RIVER';
+  var t3=el('text',Object.assign({x:18,y:428},lbl)); t3.textContent='2 KM';
+  el('path',{d:'M18 414 H 98 M18 410 V418 M98 410 V418',stroke:'#7d7660','stroke-width':1.2});
+  var comp=g({transform:'translate(600 44)',stroke:'#7d7660',fill:'none'});
+  el('circle',{r:16},comp); el('path',{d:'M0 -22 V22 M-22 0 H22'},comp);
+  var tn=el('text',Object.assign({x:-3,y:-26},lbl),comp); tn.textContent='N';
+
+  var Ltrack=g(), Lsect=g({opacity:0}), Lsim=g({opacity:0}), Lorder=g();
+  [Ltrack,Lsect,Lsim].forEach(function(L){L.style.transition='opacity .5s'});
+  for(var s=0;s<5;s++){
+    el('rect',{x:190+s*82,y:48,width:82,height:340,fill:s%2?'#e7dec6':'#a3b06f','fill-opacity':.04,stroke:'#a3b06f','stroke-opacity':.5,'stroke-dasharray':'4 4'},Lsect);
+    var st2=el('text',Object.assign({x:196+s*82,y:62},lbl,{fill:'#a3b06f'}),Lsect); st2.textContent='SECTOR '+(s+1);
+  }
+  var eightD=''; for(var j=0;j<=120;j++){var u=j/120*Math.PI*2; eightD+=(j?'L':'M')+(320+200*Math.sin(u)).toFixed(1)+' '+(210+120*Math.sin(2*u)*.9).toFixed(1)}
+  el('path',{d:eightD,fill:'none',stroke:'#e7dec6','stroke-opacity':.45,'stroke-dasharray':'3 6'},Lsim);
+  var defs=el('defs',{}); var pat=el('pattern',{id:'hatch',width:10,height:10,patternUnits:'userSpaceOnUse',patternTransform:'rotate(45)'},defs);
+  el('line',{x1:0,y1:0,x2:0,y2:10,stroke:'#e7dec6','stroke-opacity':.06,'stroke-width':4},pat);
+  el('rect',{x:0,y:0,width:640,height:440,fill:'url(#hatch)'},Lsim);
+  var sw=el('text',Object.assign({x:320,y:30,'text-anchor':'middle'},lbl,{fill:'#e7dec6','font-size':11}),Lsim); sw.textContent='REHEARSAL: NOTHING IS FLYING';
+  var trk=g({},Ltrack); trk.setAttribute('transform','translate(330 215)');
+  el('path',{d:'M0 -9 L9 0 L0 9 L-9 0Z',fill:'none',stroke:'#d9a13b','stroke-width':2},trk);
+  el('circle',{r:58,fill:'none',stroke:'#d9a13b','stroke-opacity':.35,'stroke-dasharray':'2 5'},trk);
+  var tt=el('text',Object.assign({x:12,y:-12},lbl,{fill:'#d9a13b'}),trk); tt.textContent='TRK-07';
+  var homeMark=g({transform:'translate(46 380)',opacity:.8});
+  el('rect',{x:-8,y:-8,width:16,height:16,fill:'none',stroke:'#e7dec6'},homeMark);
+  var hm=el('text',Object.assign({x:12,y:4},lbl),homeMark); hm.textContent='HOME';
+
+  var V=[
+    {n:'FIXED-01',s:'F1',k:'fw',nav:'GNSS OK',bat:91},{n:'FIXED-02',s:'F2',k:'fw',nav:'GNSS OK',bat:88},
+    {n:'FIXED-03',s:'F3',k:'fw',nav:'DEAD-RECKON',bat:84,dr:1},{n:'FIXED-04',s:'F4',k:'fw',nav:'GNSS OK',bat:27,warn:1},
+    {n:'FIXED-05',s:'F5',k:'fw',nav:'GNSS SHAKY',bat:79},{n:'GROUND-01',s:'G1',k:'ugv',nav:'GNSS OK',bat:96},
+    {n:'GROUND-02',s:'G2',k:'ugv',nav:'GNSS OK',bat:93},{n:'SURFACE-01',s:'S1',k:'usv',nav:'GNSS OK',bat:72},
+    {n:'SURFACE-02',s:'S2',k:'usv',nav:'GNSS OK',bat:70}
+  ];
+  var vg=g(), list=$('#vlist');
+  V.forEach(function(v,i){
+    v.i=i; v.x=320; v.y=220; v.hd=0;
+    v.g=el('g',{},vg);
+    if(v.k==='fw') el('path',{d:'M9 0 L-6 -6 L-2 0 L-6 6Z',fill:'#e7dec6'},v.g);
+    else if(v.k==='ugv') el('rect',{x:-5,y:-5,width:10,height:10,fill:'#a3b06f'},v.g);
+    else el('rect',{x:-5,y:-5,width:10,height:10,fill:'#8fb3bd',transform:'rotate(45)'},v.g);
+    v.lab=el('text',Object.assign({},lbl,{fill:'#cfc6ad','font-size':8}),vg); v.lab.textContent=v.s;
+    var row=document.createElement('div'); row.className='veh'+(v.warn?' warn':'')+(v.dr?' dr':'');
+    row.innerHTML='<b></b><span class="st"></span><span class="sub"></span><span class="sub"></span>';
+    row.children[0].textContent=v.n; row.children[1].textContent=v.warn?'LOW FUEL':'CONNECTED';
+    row.children[2].textContent=v.nav; row.children[3].textContent=v.bat+'%';
+    list.appendChild(row);
+  });
+
+  var mode=0, vt=0, holdUntil=0, homeUntil=0, bias=[0,0];
+  var MODES=['TARGETING: find something of interest and keep eyes on it.','SURVEILLANCE: keep watch over an area, shared out between whoever is up.','SIMULATION: rehearse the mission before anyone flies.'];
+  $$('.c-tabs button').forEach(function(b){
+    b.addEventListener('click',function(){
+      mode=+b.dataset.mode;
+      $$('.c-tabs button').forEach(function(o){o.setAttribute('aria-selected',o===b)});
+      $('#cmode').textContent=MODES[mode];
+      Ltrack.setAttribute('opacity',mode===0?1:0); Lsect.setAttribute('opacity',mode===1?1:0); Lsim.setAttribute('opacity',mode===2?1:0);
+    });
+  });
+  var rLen=river.getTotalLength(), dLen=road.getTotalLength();
+  function target(v,now){
+    var T=[330+110*Math.sin(vt*.11)+bias[0], 215+60*Math.sin(vt*.17)+bias[1]];
+    if(mode===0) trk.setAttribute('transform','translate('+T[0].toFixed(1)+' '+T[1].toFixed(1)+')');
+    if(v.warn && now<homeUntil) return [46,380];
+    var fi=v.i, p;
+    if(v.k==='fw'){
+      if(mode===0){var a=vt*.55+fi*Math.PI*2/5; return [T[0]+Math.cos(a)*58, T[1]+Math.sin(a)*58]}
+      if(mode===1){return [231+fi*82+22*Math.cos(vt*.7+fi), 218+150*Math.sin(vt*.33+fi*1.3)]}
+      var u=vt*.28+fi*Math.PI*2/5; return [320+200*Math.sin(u), 210+108*Math.sin(2*u)];
+    }
+    if(v.k==='ugv'){
+      if(mode===0){return [T[0]-70-(fi-5)*24, T[1]+44+(fi-5)*8]}
+      p=road.getPointAtLength(((vt*16+(fi-5)*260)%dLen+dLen)%dLen); return [p.x,p.y];
+    }
+    var frac = mode===2 ? .42+(fi-7)*.16 : ((vt*.012+(fi-7)*.3)%1+1)%1;
+    p=river.getPointAtLength(frac*rLen); return [p.x,p.y];
+  }
+  var visible=false, last=performance.now();
+  function frame(){
+    var t=performance.now(), dt=Math.max(0,Math.min(.05,(t-last)/1000)); last=t;
+    if(visible){
+      if(t>holdUntil) vt+=dt*(RM?.3:1);
+      V.forEach(function(v){
+        var p=target(v,t), k=Math.min(1,dt*2.6), ox=v.x, oy=v.y;
+        v.x+=(p[0]-v.x)*k; v.y+=(p[1]-v.y)*k;
+        var mx=v.x-ox, my=v.y-oy; if(Math.hypot(mx,my)>.05) v.hd=Math.atan2(my,mx);
+        v.g.setAttribute('transform','translate('+v.x.toFixed(1)+' '+v.y.toFixed(1)+') rotate('+(v.hd*57.2958).toFixed(1)+')');
+        v.lab.setAttribute('x',(v.x+9).toFixed(1)); v.lab.setAttribute('y',(v.y-8).toFixed(1));
+      });
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  /* orders */
+  var ORDERS=['take the swarm of 5 fixed wing to 50.68, 9.05','HAWK-02 orbit 50.69, 9.04 radius 400','send the ground vehicles to 50.68, 9.06 in column','bring anything below 30% fuel home','hold everything'];
+  var oi=0, cur='', typer=null, idle=null, started=false;
+  var otext=$('#otext'), hold=$('#hold'), hint=$('#ohint'), olog=$('#olog');
+  function addLog(ok,s){
+    var li=document.createElement('li'), em=document.createElement('em');
+    li.appendChild(document.createTextNode(utc())); em.className=ok?'ok':'no'; em.textContent=ok?'CONFIRMED':'DISCARDED';
+    li.appendChild(em); li.appendChild(document.createTextNode(s));
+    olog.insertBefore(li,olog.firstChild); while(olog.children.length>4) olog.removeChild(olog.lastChild);
+  }
+  function typeNext(){
+    clearTimeout(idle); clearInterval(typer);
+    cur=ORDERS[oi%ORDERS.length]; oi++; hold.disabled=true; otext.textContent=''; hint.textContent='operator typing...';
+    var i=0;
+    typer=setInterval(function(){
+      otext.textContent=cur.slice(0,++i);
+      if(i>=cur.length){
+        clearInterval(typer); hold.disabled=false; hint.textContent='press and hold the button to confirm';
+        idle=setTimeout(function(){addLog(false,cur); hint.textContent='not confirmed, so nothing moved'; setTimeout(typeNext,1800)},9000);
+      }
+    }, RM?8:42);
+  }
+  function confirmOrder(){
+    clearTimeout(idle); hold.disabled=true;
+    addLog(true,cur); hint.textContent='confirmed. shown on the map.';
+    var now=performance.now();
+    if(/hold everything/.test(cur)) holdUntil=now+5000;
+    else if(/home/.test(cur)) homeUntil=now+7000;
+    else bias=[(Math.random()-.5)*140,(Math.random()-.5)*80];
+    if(mode!==0 && /swarm|orbit/.test(cur)) $('.c-tabs button[data-mode="0"]').click();
+    releaseVisual(); setTimeout(typeNext,2400);
+  }
+  var holding=false, hp=0, ht0=0;
+  function holdFrame(){
+    if(!holding) return;
+    hp=Math.max(0,Math.min(1,(performance.now()-ht0)/1100)); hold.style.setProperty('--p',hp);
+    if(hp>=1){holding=false; confirmOrder(); return}
+    requestAnimationFrame(holdFrame);
+  }
+  function releaseVisual(){hold.classList.add('rel'); hold.style.setProperty('--p',0); hp=0}
+  function startHold(e){
+    if(hold.disabled||holding) return; if(e&&e.preventDefault) e.preventDefault();
+    holding=true; hold.classList.remove('rel'); ht0=performance.now(); hint.textContent='keep holding...'; requestAnimationFrame(holdFrame);
+  }
+  function endHold(){
+    if(!holding) return; holding=false; releaseVisual();
+    if(!hold.disabled) hint.textContent='let go too early. hold for about a second.';
+  }
+  hold.addEventListener('pointerdown',startHold);
+  ['pointerup','pointerleave','pointercancel'].forEach(function(ev){hold.addEventListener(ev,endHold)});
+  hold.addEventListener('keydown',function(e){if((e.key===' '||e.key==='Enter')&&!e.repeat) startHold(e)});
+  hold.addEventListener('keyup',function(e){if(e.key===' '||e.key==='Enter') endHold()});
+  hold.addEventListener('contextmenu',function(e){e.preventDefault()});
+
+  watch($('#console'),function(v){visible=v; last=performance.now(); if(v&&!started){started=true; typeNext()}},false);
+})();
+
+checkViews(); setTimeout(checkViews,150);
+})();
+</script>
+</body>
+</html>
