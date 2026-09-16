@@ -17,7 +17,12 @@ html,body{margin:0;background:#070707;color:#f2f0ea;font-family:"Host Grotesk",s
 img{display:block;width:100%;height:100%;object-fit:cover}
 .mono{font-family:"IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase}
 .word{font-weight:700;letter-spacing:.17em;text-transform:uppercase}
-.banner{width:1584px;height:396px;display:grid;grid-template-columns:900px 4px 680px}
+/* The row must be explicit. Without it the single implicit row auto-sizes to the image's natural
+   height (900px wide / 16:9 = 506px), overflowing height:396px and pushing the TurtleShield /
+   Turtle Eyes line below LinkedIn's 1584x396 crop. .post never had this bug because it declares
+   its rows. Verified by measuring luma below y=396: YMAX 157 before, background-only after. */
+.banner{width:1584px;height:396px;display:grid;grid-template-columns:900px 4px 680px;grid-template-rows:396px}
+.banner>div,.post>div{min-height:0;overflow:hidden}
 .banner .rule,.post .rule{background:#ff4a2b}
 .banner .txt{padding:46px 56px;display:flex;flex-direction:column;justify-content:space-between}
 .brand{display:flex;align-items:center;gap:18px}
