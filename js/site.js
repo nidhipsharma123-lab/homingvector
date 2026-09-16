@@ -171,6 +171,8 @@ if (matchMedia('(pointer: fine)').matches && !RM) {
 })();
 
 /* ---------------- film tracking brackets: loaded after first paint, never blocks it ---------------- */
-addEventListener('load', () => { import('./film-hud.js').then(m => m.startHud({ RM })).catch(() => {}); }, { once: true });
+// Only when the page declares tracks for the film it ships: brackets from one render over another render
+// land on empty ground, and a missing file would log a 404 on every visit.
+if ($('#filmv').dataset.tracks) addEventListener('load', () => { import('./film-hud.js').then(m => m.startHud({ RM })).catch(() => {}); }, { once: true });
 
 checkViews(); story(); setTimeout(() => { checkViews(); story(); }, 150);
