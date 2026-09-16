@@ -165,48 +165,93 @@
   <div class="w">
     <p class="idx">03 · Live</p>
     <div class="live-head">
-      <h2 id="lv" class="rv">Attack the swarm.</h2>
-      <p class="rv">This is not an animation. The decisions below are made by TurtleShield’s own allocation, health, quorum and spoof-detection code, compiled to WebAssembly from commit <code id="sim-sha">b04e493</code> and running in your browser. Jam it, cut it, destroy part of it, and watch it hold.</p>
+      <h2 id="lv" class="rv">Fly the mission yourself.</h2>
+      <p class="rv">Twenty aircraft launch, assemble, fly in formation, split into two groups, search, meet again and come home. Introduce failures and watch the swarm keep going. The decisions that matter are made by TurtleShield’s own code, compiled from commit <code id="sim-sha">b04e493</code> and running in your browser. The formation shapes and the mission script around them are demonstration code written for this page.</p>
     </div>
   </div>
-  <div class="rig" id="rig">
-    <div class="tools" role="toolbar" aria-label="Adversary controls" aria-controls="map">
-      <button type="button" class="tool" data-tool="jam" aria-pressed="false" data-cursor="scan">Jam GNSS</button>
-      <button type="button" class="tool" data-tool="spoof" aria-pressed="false" data-cursor="scan">Spoof GNSS</button>
-      <button type="button" class="tool" data-tool="sever" aria-pressed="false" data-cursor="scan">Sever link</button>
-      <button type="button" class="tool" data-tool="destroy" aria-pressed="false" data-cursor="scan">Destroy vehicle</button>
-      <button type="button" class="tool" data-tool="band" aria-pressed="false">Collapse bandwidth</button>
-      <span class="tools-sep" aria-hidden="true"></span>
-      <button type="button" class="tool" data-act="pause" aria-pressed="false">Pause</button>
-      <button type="button" class="tool" data-act="replay">Replay</button>
-      <button type="button" class="tool" data-act="reset">Reset to nominal</button>
+  <div class="mission" id="rig">
+    <div class="scen" role="radiogroup" aria-label="Scenario">
+      <button type="button" role="radio" aria-checked="false" data-scen="1"><span>01</span>Single UAV</button>
+      <button type="button" role="radio" aria-checked="false" data-scen="2"><span>02</span>Formation flight</button>
+      <button type="button" role="radio" aria-checked="false" data-scen="3"><span>03</span>Swarm mission</button>
+      <button type="button" role="radio" aria-checked="false" data-scen="4"><span>04</span>GPS denied</button>
+      <button type="button" role="radio" aria-checked="false" data-scen="5"><span>05</span>Comms loss</button>
+      <button type="button" role="radio" aria-checked="false" data-scen="6"><span>06</span>UAV loss</button>
+      <button type="button" role="radio" aria-checked="true" data-scen="7"><span>07</span>Full mission</button>
     </div>
-    <div class="rig-body">
+    <ol class="phases" id="phases" tabindex="0" aria-label="Mission phase">
+      <li>Launch</li><li>Assembly</li><li>Formation</li><li>Transit</li><li>Split</li><li>Search</li><li>Rendezvous</li><li>Reform</li><li>Return</li><li>Complete</li>
+    </ol>
+    <div class="theatre">
       <div class="map-col">
-        <canvas id="map" class="map" width="1280" height="800" tabindex="0" role="img" aria-label="Live map of the simulated fleet. Use the adversary controls; with a tool selected, arrow keys move the aim and Enter applies it." aria-describedby="tool-hint"></canvas>
+        <canvas id="map" class="map" width="1600" height="960" tabindex="0" role="img" aria-label="Live map of the simulated swarm. Arrow keys select an aircraft; plus and minus zoom." aria-describedby="tool-hint"></canvas>
+        <div class="transport" role="toolbar" aria-label="Simulation controls">
+          <button type="button" class="tool" data-act="play" aria-pressed="true">Pause</button>
+          <button type="button" class="tool" data-act="step">Step 1 s</button>
+          <button type="button" class="tool" data-act="restart">Restart</button>
+          <span class="speed" role="radiogroup" aria-label="Simulation speed">
+            <button type="button" class="tool" role="radio" aria-checked="false" data-speed="0.5">0.5×</button><button type="button" class="tool" role="radio" aria-checked="true" data-speed="1">1×</button><button type="button" class="tool" role="radio" aria-checked="false" data-speed="2">2×</button><button type="button" class="tool" role="radio" aria-checked="false" data-speed="4">4×</button>
+          </span>
+          <button type="button" class="tool" data-act="follow" aria-pressed="true">Follow swarm</button>
+          <button type="button" class="tool" data-act="eng" aria-pressed="false">Engineering view</button>
+        </div>
+        <div class="inject" role="toolbar" aria-label="Introduce failures">
+          <span class="inject-k" aria-hidden="true">Introduce</span>
+          <button type="button" class="tool" data-ev="gps" aria-pressed="false">GPS unavailable</button>
+          <button type="button" class="tool" data-ev="radio" aria-pressed="false">Degrade radio</button>
+          <button type="button" class="tool" data-ev="cut">Cut comms to selected</button>
+          <button type="button" class="tool" data-ev="leave">Selected leaves formation</button>
+          <button type="button" class="tool" data-ev="lose">Lose selected UAV</button>
+          <button type="button" class="tool" data-ev="form">Change formation</button>
+        </div>
         <p class="tool-hint" id="tool-hint" aria-live="polite">Loading the TurtleShield core…</p>
-        <dl class="metrics" id="metrics">
-          <div><dt>Vehicles alive</dt><dd id="m-alive">–</dd></div>
-          <div><dt>Mission complete</dt><dd id="m-done">–</dd></div>
-          <div><dt>Open work with an owner</dt><dd id="m-owned">–</dd></div>
-          <div><dt>Mesh connectivity</dt><dd id="m-conn">–</dd></div>
-          <div><dt>Time to reallocate</dt><dd id="m-realloc">–</dd></div>
-        </dl>
       </div>
-      <aside class="log-col" aria-label="Turtle Eyes decision log">
-        <div class="log-h"><span>TURTLE EYES · DECISION LOG</span><span id="sim-clock">T+00:00</span></div>
-        <ol class="dlog" id="dlog" tabindex="0" aria-label="Decision log"></ol>
+      <aside class="gcs" id="gcs" aria-label="Turtle Eyes console for the live mission">
+        <div class="gcs-top"><b>TURTLE EYES</b><span>PERSISTENT OVERWATCH</span><span class="gcs-mode">SIMULATION</span><span id="sim-clock">T+00:00</span></div>
+        <div class="gcs-grid">
+          <section class="gcs-block" aria-labelledby="g-status"><h3 id="g-status">Swarm status</h3>
+            <dl class="stat">
+              <div><dt>UAVs</dt><dd id="s-n">–</dd></div><div><dt>Active</dt><dd id="s-act">–</dd></div>
+              <div><dt>Rejoining</dt><dd id="s-rej">–</dd></div><div><dt>Comms lost</dt><dd id="s-cl">–</dd></div>
+              <div><dt>Lost</dt><dd id="s-lost">–</dd></div><div><dt>Landed</dt><dd id="s-land">–</dd></div>
+            </dl>
+          </section>
+          <section class="gcs-block" aria-labelledby="g-mission"><h3 id="g-mission">Mission</h3>
+            <p class="chain" id="chain"><span data-p="3">Transit</span> → <span data-p="5">Search</span> → <span data-p="6">Rendezvous</span> → <span data-p="8">Return</span></p>
+            <div class="groups">
+              <div class="grp"><b>Group A</b><span id="ga-n">–</span><span id="ga-f">–</span><span id="ga-l">–</span></div>
+              <div class="grp"><b>Group B</b><span id="gb-n">–</span><span id="gb-f">–</span><span id="gb-l">–</span></div>
+            </div>
+          </section>
+          <section class="gcs-block rec" id="rec" aria-labelledby="g-rec"><h3 id="g-rec">Awaiting operator</h3>
+            <p id="rec-text">No decision pending. The swarm is executing the plan.</p>
+            <button type="button" class="hold" id="hold" disabled><span>Hold to confirm</span></button>
+            <p class="hold-hint" id="hold-hint" aria-live="polite"></p>
+            <label class="demo-op"><input type="checkbox" id="demo-op" checked> Demo operator confirms after 6 s</label>
+          </section>
+          <section class="gcs-block" aria-labelledby="g-sel"><h3 id="g-sel">Selected UAV</h3>
+            <dl class="tele" id="tele"><div><dt>ID</dt><dd>–</dd></div></dl>
+          </section>
+          <section class="gcs-block roster-b" aria-labelledby="g-roster"><h3 id="g-roster">Fleet</h3>
+            <div class="roster" id="roster" role="group" aria-label="Select a UAV"></div>
+          </section>
+          <section class="gcs-block log-b" aria-labelledby="g-log"><h3 id="g-log">Event and order log</h3>
+            <ol class="dlog" id="dlog" tabindex="0" aria-label="Event and order log"></ol>
+          </section>
+        </div>
         <p class="vh" id="narrate" aria-live="polite"></p>
-        <div class="seed"><span>SEED <b id="seed">–</b></span><a id="share" href="#live">Link to this run</a></div>
       </aside>
     </div>
     <div class="rig-fallback" id="rig-fallback" hidden>
-      <p>This browser cannot run the live simulation (it needs WebAssembly and Web Workers). Below is what it shows: survey stations on land and water, a mixed fleet sharing them out, and what changes when you attack it.</p>
-      <img src="brand/sim-static.svg" alt="Diagram: twelve vehicles split across land and water survey stations; a jammed sector where vehicles fall back to ranging off their peers; a destroyed aircraft whose stations are taken over by the survivors after its lease expires." width="1280" height="800">
+      <p>This browser cannot run the live simulation (it needs WebAssembly and Web Workers). Below is a frame of it: twenty aircraft split into two groups over the search area, one group in formation, lanes assigned, one aircraft lost and its lane taken over.</p>
+      <img src="brand/sim-static.svg" alt="Diagram: a swarm of twenty aircraft split into Group A and Group B over an abstract search area, each flying an assigned lane; one lost aircraft and the lane another aircraft took over from it." width="1600" height="960">
     </div>
   </div>
   <div class="w">
-    <p class="live-note">What is TurtleShield code and what is not: vehicle motion, the radio model, the navigation error model and the terrain are a simple harness written for this page. Who takes which station, when a silent vehicle’s work may be taken, what a degraded or isolated vehicle is still allowed to do, and when GPS is convicted of lying are decided by the product code, unchanged. The same seed always produces the same run.</p>
+    <div class="live-note">
+      <p><b>TurtleShield code, unchanged:</b> which aircraft flies which search lane and who takes a lost aircraft’s lane (CBBA); when a silent aircraft counts as lost; what a degraded or cut-off aircraft may still do, including how much it widens its spacing; what a group of this size may still do; the separation monitor that makes aircraft climb to a new layer; peer-aided navigation without GPS; and the assembly and rendezvous rings.</p>
+      <p><b>Written for this page:</b> the mission phases, the wedge, V, line and column shapes, the leader-follower steering, the radio and GPS models, and the scenario scripts. The search area is abstract. This is a browser simulation, not a flight result: the largest formation TurtleShield has flown in simulation is the 8 aircraft in Evidence below. The same seed always gives the same run.</p>
+    </div>
   </div>
 </section>
 
@@ -244,7 +289,7 @@
   <div class="w">
     <p class="idx">05 · Turtle Eyes</p>
     <h2 id="te" class="rv">Supervises. Never decides.</h2>
-    <p class="lede rv">Turtle Eyes is the console operators run a TurtleShield team from. The decision log in the live simulation above is drawn in its visual language. Three choices define it, and each is deliberate.</p>
+    <p class="lede rv">Turtle Eyes is the console operators run a TurtleShield team from. The console beside the live mission above is Turtle Eyes supervising that swarm: status, groups, the event log, one aircraft’s telemetry, and the decisions it leaves to a person. Nothing changes phase until someone holds the button down. Three choices define it, and each is deliberate.</p>
     <div class="notes three">
       <div class="rv"><h3>Outside the decision loop.</h3><p>The swarm does not wait for the console to act, so losing the console does not stop a mission while the vehicles can still hear each other. The operator can pause, stop or recall every vehicle at any time.</p></div>
       <div class="rv"><h3>Air-gapped by default.</h3><p>It carries its own maps and runs on a rugged laptop with no internet connection. A Rust trusted core handles credentials, roles and the audit log.</p></div>

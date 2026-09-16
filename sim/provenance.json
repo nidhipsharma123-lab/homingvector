@@ -14,9 +14,14 @@
   "core/world/belief.cpp": "5292deb4b4b5a8638af0953416d5579e272d082d53ecf419e6fe1f307bff5d1d",
   "core/common/time.cpp": "22c60584c6cbf05033494fc41528b85bca1bfcb488e332e4aeadfe28aaa4b5ed",
   "core/common/log.cpp": "8aac78c12ea336749b708134926f17f6fb26274cdebb6bb67f1bc1ed3c07a0da",
-  "core/world/track_fusion.cpp": "5f09e39af4e40d9d31e0b83a67d7c00e54cbeaa141d528203f0d60bd41121127"
+  "core/world/track_fusion.cpp": "5f09e39af4e40d9d31e0b83a67d7c00e54cbeaa141d528203f0d60bd41121127",
+  "core/task/formation.cpp": "cc9a94501f857d36bf0b418aeaa56131fde8b45c65145af223e88a5bb062b2c5",
+  "core/task/separation.cpp": "c4327ecbbb52604b9c39a43e41392b33884bed55dd4ae271aa568d06eadd09c1",
+  "core/task/shared_assign.cpp": "5fc5a6727cc3b83c07ba8f1d3cbb7c186f0297a610bd0a119f3a8aa352255f80",
+  "core/common/geodesy.cpp": "371b9102249e84ecc1a82519d67e59b7d67d996ba4eb999111d48cf26559cce4"
  },
  "harness_sha256": "6d5bef1637dba3fe1c3796fb726eb28600c36526fc9ec11a4743244e2de710e7",
- "wasm_sha256": "453a8fde0dbafdbfc9d0e4fcb27c35f81b9d4c0ca47ca819c67f9af73be78b62",
- "wasm_bytes": 430834
+ "mission_sha256": "39c05ca64c35e4eb547eae2dfc4985c7b76a61110b765282e00f87144fb92988",
+ "wasm_sha256": "02b0226e373681a8ffba7dfa0095d3f5bcabaf404a4f54db5be7c41bdbdd0dc3",
+ "wasm_bytes": 546853
 }

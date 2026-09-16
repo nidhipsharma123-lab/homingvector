@@ -162,7 +162,7 @@ if (matchMedia('(pointer: fine)').matches && !RM) {
   const start = () => {
     if (started) return; started = true;
     if (!('WebAssembly' in window) || !('Worker' in window)) { $('#rig-fallback').hidden = false; $('.rig-body').hidden = true; $('.tools').hidden = true; return; }
-    import('./live.js').then(m => m.startLive({ watch, cue, RM })).catch(() => { $('#rig-fallback').hidden = false; });
+    import('./mission.js').then(m => m.startLive({ watch, cue, RM })).catch(() => { $('#rig-fallback').hidden = false; });
   };
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); start(); } }, { rootMargin: '600px 0px' });
