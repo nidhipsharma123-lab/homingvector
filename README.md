@@ -29,6 +29,27 @@ an unknown key, a derivation that raises, a missing source file, an empty result
 where zero was not the asserted value, or an exemption with no reason recorded.
 An unchecked figure is not a passing figure.
 
+### Known gap: prose that DECOMPOSES a keyed figure
+
+The gate checks keyed cells, and it checks prose that RESTATES the same value.
+It does **not** yet check prose that stands in an arithmetic relationship to a
+keyed figure. The live case:
+
+    <td data-figure="defects">145</td>
+    <td class="n">67 closed, 78 still not closed: 42 open and 36 fixed but not yet proven</td>
+
+On 2026-09-16 the corpus moved 145 → 147. The gate caught the keyed cell. Had
+only that cell been fixed, the page would have shown a correct **147** beside a
+breakdown still summing perfectly to **145** — and the breakdown is the half a
+reader believes, because it looks worked-through. That is the same defect as the
+stale prose copy, one level up: two copies of a fact, only one of them keyed.
+
+The rule to build: for a keyed figure, find sibling prose carrying two or more
+numbers and require the decomposition to reconcile (67 + 80 = 147, 44 + 36 = 80).
+Written down here rather than built, because the gate's real boundary is not
+"figures" — it is **any assertion that can go stale**, and this is the next class.
+Found by nidhip-41 on a page they had personally verified hours earlier.
+
 Two figures cannot be re-derived and are handled explicitly rather than skipped:
 
 - `nav_error_without_gps` is exempt by name, because it comes from a written
