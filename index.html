@@ -347,7 +347,7 @@ svg,canvas,video{display:block}
 </section>
 
 <section class="bridge" aria-label="A note before the details">
-  <p class="rv">Everything above is CGI. The software behind it has flown 742 missions in simulation and none on a real aircraft yet. <a href="#status">Here is exactly where we are.</a></p>
+  <p class="rv">Everything above is CGI. The software behind it has flown 768 missions in simulation and none on a real aircraft yet. <a href="#status">Here is exactly where we are.</a></p>
 </section>
 
 <section class="product" id="turtleshield" aria-labelledby="ts">
@@ -413,15 +413,15 @@ svg,canvas,video{display:block}
       <p>We haven’t flown a real aircraft yet. Everything on this page comes from simulation, or from a real flight controller wired to a simulator. You should hear that from us before anything else.</p>
       <p>Here is what the simulator has shown so far. We keep every failure, because that is where the lessons are.</p>
       <table class="ledger">
-        <caption class="vh">Results from simulation, as of 15 September 2026</caption>
+        <caption class="vh">Results from simulation, as of 16 September 2026</caption>
         <tbody>
-          <tr><th scope="row">Test missions flown in simulation</th><td class="v">742</td><td class="n">531 passed, 141 failed, 70 skipped</td></tr>
-          <tr><th scope="row">Orders from our software accepted by the autopilot</th><td class="v">2,000+</td><td class="n">After the base station handed over</td></tr>
-          <tr><th scope="row">Aircraft in tight formation</th><td class="v">8</td><td class="n">6 of 6 runs passed. Closest approach 33.25 m against a 30 m limit.</td></tr>
-          <tr><th scope="row">Position error without GPS</th><td class="v">396–750 m &rarr; 25.5–39.0 m</td><td class="n">After one day of fixes. Still not good enough to rely on.</td></tr>
-          <tr><th scope="row">Core files changed to add a second autopilot</th><td class="v">0</td><td class="n">ArduPilot tested standing still only</td></tr>
-          <tr><th scope="row">Problems written down with their causes</th><td class="v">103</td><td class="n">47 still open</td></tr>
-          <tr class="zero"><th scope="row">Flights on a real aircraft</th><td class="v">0</td><td class="n">The first is planned for month 3</td></tr>
+          <tr><th scope="row">Test missions flown in simulation</th><td class="v" data-fig="missions_total">768</td><td class="n">555 passed, 141 failed, 72 skipped, across 114 campaigns</td></tr>
+          <tr><th scope="row">Orders from our software accepted by the autopilot</th><td class="v" data-fig="orders_accepted_min">2,000+</td><td class="n">After the base station handed over</td></tr>
+          <tr><th scope="row">Aircraft in tight formation</th><td class="v" data-fig="formation_max_fw">8</td><td class="n">All six runs passed the separation check. That check measures distance in three dimensions, so side-by-side spacing is still unmeasured. We treat it as an open defect, not a result.</td></tr>
+          <tr><th scope="row">Position error without GPS</th><td class="v" data-fig="gps_denied_error_range">396–750 m &rarr; 25.5–39.0 m</td><td class="n">After one day of fixes. Still not good enough to rely on.</td></tr>
+          <tr><th scope="row">Core files changed by the two adapter commits</th><td class="v" data-fig="core_files_adapter_commits">0</td><td class="n">Other work did change the core in the same period. ArduPilot has only been tested standing still.</td></tr>
+          <tr><th scope="row">Problems written up with their causes</th><td class="v" data-fig="defects_logged">145</td><td class="n">67 closed, 78 still not closed: 42 open and 36 fixed but not yet proven</td></tr>
+          <tr class="zero"><th scope="row">Flights on a real aircraft</th><td class="v" data-fig="real_flights">0</td><td class="n">The first is planned for month 3</td></tr>
         </tbody>
       </table>
       <p>Still open: navigation without GPS isn’t accurate enough yet, each vehicle uses about 33 times the radio capacity we budget for, and some backup behaviours are written and tested but not yet switched on. The next twelve months are built to close those.</p>
