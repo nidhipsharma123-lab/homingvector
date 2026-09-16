@@ -392,10 +392,15 @@ svg,canvas,video{display:block}
         <svg width="26" height="26" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="none" stroke="#f2f0ea" stroke-width="1.5"/><circle cx="20" cy="20" r="6" fill="none" stroke="#f2f0ea" stroke-width="1.5"/><path d="M20 0V10M20 30V40M0 20H10M30 20H40" stroke="#f2f0ea" stroke-width="1.5"/></svg>
         <div><b>TURTLE EYES</b><small>PERSISTENT OVERWATCH</small></div>
       </div>
+      <!-- A half-declared tab pattern is WORSE than plain buttons: role=tab promises arrow-key
+           navigation, so a screen reader announces "tab, 1 of 3", the user presses Arrow and
+           nothing happens. These need aria-controls, a real tabpanel, and a roving tabindex
+           (selected tab 0, the rest -1) so Tab reaches the set and Arrow moves within it.
+           Found by turtleshield-fc (A071-A074); their patch landed only the hold-control half. -->
       <div class="c-tabs" role="tablist" aria-label="Console mode">
-        <button role="tab" aria-selected="true" data-mode="0">Targeting</button>
-        <button role="tab" aria-selected="false" data-mode="1">Surveillance</button>
-        <button role="tab" aria-selected="false" data-mode="2">Simulation</button>
+        <button role="tab" id="tab-0" aria-controls="cpanel" aria-selected="true" tabindex="0" data-mode="0">Targeting</button>
+        <button role="tab" id="tab-1" aria-controls="cpanel" aria-selected="false" tabindex="-1" data-mode="1">Surveillance</button>
+        <button role="tab" id="tab-2" aria-controls="cpanel" aria-selected="false" tabindex="-1" data-mode="2">Simulation</button>
       </div>
       <div class="c-meta"><span class="mock">MOCK</span><span class="clkc" data-clock>--:--:--Z</span></div>
     </div>
@@ -404,16 +409,21 @@ svg,canvas,video{display:block}
         <div class="c-h">CONNECTED &middot; 9/9</div>
         <div id="vlist"></div>
       </aside>
-      <div class="c-map">
+      <!-- id=cpanel is what the tabs' aria-controls points at. It must exist: a dangling
+           aria-controls is the same defect as the half-landed patch, and one mode's map plus
+           its caption really is the region each tab governs. aria-labelledby tracks selection. -->
+      <div class="c-map" id="cpanel" role="tabpanel" aria-labelledby="tab-0">
         <svg id="tmap" viewBox="0 0 640 440" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Drawn map showing vehicles moving in the selected mode"></svg>
-        <div class="c-cap"><span id="cmode">TARGETING: find something of interest and keep eyes on it.</span><span class="c-leg"><span><i>&#9650;</i>AIR</span><span><i>&#9632;</i>GROUND</span><span><i>&#9670;</i>SURFACE</span><span><i style="color:#e3a82b">&#9671;</i>TRACK</span><span><i>&#9633;</i>HOME</span></span></div>
+        <!-- #cmode is written once per mode change, not per frame, so it is safe as a live
+             region: it announces the switch a sighted user sees, and nothing else. -->
+        <div class="c-cap"><span id="cmode" aria-live="polite">TARGETING: find something of interest and keep eyes on it.</span><span class="c-leg"><span><i>&#9650;</i>AIR</span><span><i>&#9632;</i>GROUND</span><span><i>&#9670;</i>SURFACE</span><span><i style="color:#e3a82b">&#9671;</i>TRACK</span><span><i>&#9633;</i>HOME</span></span></div>
       </div>
       <div class="c-right">
         <p class="c-note"><b>Operations console ready.</b> Type an order in plain English. Orders are shown on the map and need one hold-to-confirm.</p>
         <div class="c-order"><span class="pr">&gt;</span><span id="otext"></span><i class="caret"></i></div>
         <button class="hold" id="hold" disabled><span>Hold to confirm</span></button>
         <p class="c-hint" id="ohint" aria-live="polite">&nbsp;</p>
-        <div class="c-log"><div class="c-h" style="padding-left:0">ORDER LOG</div><ol id="olog"></ol></div>
+        <div class="c-log"><div class="c-h" style="padding-left:0">ORDER LOG</div><ol id="olog" role="log" aria-label="Order log"></ol></div>
       </div>
     </div>
     <div class="c-foot"><span>VEHICLES <b>9</b></span><span>MESH PEERS <b>8</b></span><span>REJECTED/S <b>0</b></span><span>ALERTS <b>1</b></span></div>
@@ -616,12 +626,31 @@ if(mq.addEventListener) mq.addEventListener('change',function(){current=-1; stor
 
   var mode=0, vt=0, holdUntil=0, homeUntil=0, bias=[0,0];
   var MODES=['TARGETING: find something of interest and keep eyes on it.','SURVEILLANCE: keep watch over an area, shared out between whoever is up.','SIMULATION: rehearse the mission before anyone flies. Nothing is in the air.'];
-  $$('.c-tabs button').forEach(function(b){
-    b.addEventListener('click',function(){
-      mode=+b.dataset.mode;
-      $$('.c-tabs button').forEach(function(o){o.setAttribute('aria-selected',o===b)});
-      $('#cmode').textContent=MODES[mode];
-      Ltrack.setAttribute('opacity',mode===0?1:0); Lsect.setAttribute('opacity',mode===1?1:0); Lsim.setAttribute('opacity',mode===2?1:0);
+  /* Keyboard support for the tablist. Everything routes through selectTab so aria-selected, the
+     caption, the roving tabindex and the SVG layer opacities cannot drift apart -- a second code
+     path that sets some of those is how a widget ends up announcing one mode and drawing another. */
+  var TABS=$$('.c-tabs button');
+  function selectTab(b,focus){
+    mode=+b.dataset.mode;
+    TABS.forEach(function(o){
+      var on = o===b;
+      o.setAttribute('aria-selected',on);
+      o.tabIndex = on ? 0 : -1;          // roving: Tab reaches the set, Arrow moves within it
+    });
+    $('#cpanel').setAttribute('aria-labelledby', b.id);
+    $('#cmode').textContent=MODES[mode];
+    Ltrack.setAttribute('opacity',mode===0?1:0); Lsect.setAttribute('opacity',mode===1?1:0); Lsim.setAttribute('opacity',mode===2?1:0);
+    if(focus) b.focus();
+  }
+  TABS.forEach(function(b){
+    b.addEventListener('click',function(){ selectTab(b,false) });
+    b.addEventListener('keydown',function(e){
+      var i=TABS.indexOf(b), n=TABS.length, t=null;
+      if(e.key==='ArrowRight'||e.key==='ArrowDown') t=TABS[(i+1)%n];
+      else if(e.key==='ArrowLeft'||e.key==='ArrowUp') t=TABS[(i-1+n)%n];
+      else if(e.key==='Home') t=TABS[0];
+      else if(e.key==='End') t=TABS[n-1];
+      if(t){ e.preventDefault(); selectTab(t,true) }
     });
   });
   var rLen=river.getTotalLength(), dLen=road.getTotalLength();
