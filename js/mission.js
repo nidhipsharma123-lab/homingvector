@@ -72,7 +72,10 @@ export function startLive({ watch, cue, RM }) {
   const start = () => { prev = cur = null; trails.length = 0; lastTrailT = -1e9; dlog.textContent = ''; selected = -1; rosterBuilt = 0; pendingId = 0; clearTimeout(demoTimer); demoTimer = null; worker.postMessage({ type: 'init', scenario, seed, at: atOnce }); if (atOnce) setTimeout(() => addLine(`Fast-forwarded to T+${Math.floor(atOnce / 60)}:${String(Math.floor(atOnce % 60)).padStart(2, '0')}; decisions on the way were confirmed by the demo operator`, 'op'), 400); atOnce = 0; phaseRibbon(); };
   worker.postMessage({ type: 'speed', v: SPEED[speedKey] });
   start();
-  watch(cv, v => worker.postMessage({ type: 'visible', on: v }), false);
+  // Its own observer, not the shared scroll watcher: this module loads lazily, and a scroll-driven check
+  // registered after the last scroll never fires -- a visitor arriving at #live without scrolling again
+  // got a frozen map (found by missionkeys.mjs: 1 frame in 30 s).
+  new IntersectionObserver(es => worker.postMessage({ type: 'visible', on: es.some(e => e.isIntersecting) })).observe(cv);
 
   // ---------------- scenario selector (radio group, arrow keys move)
   const scen = $$('.scen [role="radio"]');
