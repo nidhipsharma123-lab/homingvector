@@ -2,678 +2,454 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Homingvector</title>
-<meta name="description" content="Homingvector builds autonomy for contested environments: TurtleShield keeps teams of drones, ground robots and boats on mission when GPS is jammed and the radio cuts out, and Turtle Eyes is the operator's console.">
+<meta name="description" content="Homingvector is building TurtleShield, an AI that keeps drones, ground robots and boats working as one team when GPS is jammed and the radio drops out, and Turtle Eyes, its ground control station.">
 <meta property="og:title" content="Homingvector">
-<meta property="og:description" content="Autonomy for contested environments. TurtleShield and Turtle Eyes.">
-<meta name="theme-color" content="#0a0b09">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230a0b09'/%3E%3Ccircle cx='40' cy='24' r='12' fill='none' stroke='%23ff5a1f' stroke-width='5'/%3E%3Cpath d='M8 56 L33 31' stroke='%23e8e3d5' stroke-width='6'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Big+Shoulders+Stencil+Display:wght@700;900&family=Martian+Mono:wght@400;600&display=swap" rel="stylesheet">
+<meta property="og:description" content="When GPS goes dark, the mission doesn't. TurtleShield AI and the Turtle Eyes GCS.">
+<meta property="og:image" content="media/hero-poster.jpg">
+<meta name="theme-color" content="#070707">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23070707'/%3E%3Cpath d='M40 5H59V24' fill='none' stroke='%23ff4a2b' stroke-width='4.5' stroke-linecap='square'/%3E%3Cpath d='M24 59H5V40' fill='none' stroke='%23ff4a2b' stroke-width='4.5' stroke-linecap='square'/%3E%3Cpath d='M53 10 L4 33 L26 31 Z' fill='%23f2f0ea'/%3E%3Cpath d='M51.5 13.5 L27.5 35.5 L33 59 Z' fill='%23f2f0ea'/%3E%3C/svg%3E">
+<link rel="preload" href="fonts/HostGrotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+@font-face{font-family:"Host Grotesk";src:url(fonts/HostGrotesk-latin.woff2) format("woff2");font-weight:300 800;font-style:normal;font-display:swap}
+@font-face{font-family:"IBM Plex Mono";src:url(fonts/IBMPlexMono-400-latin.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"IBM Plex Mono";src:url(fonts/IBMPlexMono-500-latin.woff2) format("woff2");font-weight:500;font-style:normal;font-display:swap}
 :root{
-  --bg:#0a0b09; --bg-2:#10120e; --panel:#151812; --line:#23271f; --line-2:#394033;
-  --bone:#e8e3d5; --dim:#aaa895; --mute:#7f7e6e; --sig:#ff5a1f; --ok:#a9b774; --warn:#e3a82b;
-  --display:"Big Shoulders Stencil Display", Impact, "Arial Narrow", sans-serif;
-  --sans:"Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono:"Martian Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-  --gut:clamp(16px,4vw,56px);
+  --bg:#070707; --bg2:#0e0e0d; --fg:#f2f0ea; --g1:#a6a49d; --g2:#6f6e69; --line:#232321; --red:#ff4a2b;
+  --sans:"Host Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --gut:clamp(20px,5vw,72px);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{overflow-x:clip;scroll-behavior:smooth;background:var(--bg)}
-body{background:var(--bg);color:var(--bone);font-family:var(--sans);font-size:18px;line-height:1.55;overflow-x:clip;-webkit-font-smoothing:antialiased}
-::selection{background:var(--sig);color:var(--bg)}
+html{background:var(--bg);-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:clamp(17px,1.15vw,19px);line-height:1.55;overflow-x:clip;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 a{color:inherit}
-button{font:inherit}
-:focus-visible{outline:2px solid var(--sig);outline-offset:3px}
-.wrap{max-width:1500px;margin:0 auto}
+button{font:inherit;color:inherit}
+svg,canvas,video{display:block}
+:focus-visible{outline:2px solid var(--red);outline-offset:4px}
+.skip{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip:focus{position:static;width:auto;height:auto;clip:auto;display:block;padding:14px var(--gut);background:var(--fg);color:var(--bg);font-weight:600}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.w{max-width:1440px;margin:0 auto;padding-left:var(--gut);padding-right:var(--gut)}
 
-/* panel with orange corner marks (top-left, bottom-right) painted inside the frame */
-.frame{border:1px solid var(--line-2);background:
-  linear-gradient(var(--sig),var(--sig)) 0 0/16px 2px no-repeat,
-  linear-gradient(var(--sig),var(--sig)) 0 0/2px 16px no-repeat,
-  linear-gradient(var(--sig),var(--sig)) 100% 100%/16px 2px no-repeat,
-  linear-gradient(var(--sig),var(--sig)) 100% 100%/2px 16px no-repeat,
-  var(--bg-2)}
+/* ---------- header ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px 24px;padding:14px var(--gut);border-bottom:1px solid var(--line)}
+.mark{display:inline-flex;align-items:center;gap:12px;text-decoration:none;padding:8px 0}
+.mark b{font-weight:700;font-size:14.5px;letter-spacing:.17em;text-transform:uppercase}
+.top ul{display:flex;gap:clamp(16px,2.6vw,40px);list-style:none;font-size:15px}
+.top ul a{display:inline-block;text-decoration:none;color:var(--g1);padding:12px 0}
+.top ul a:hover{color:var(--fg)}
 
-/* ---------- strip + nav ---------- */
-.strip{display:flex;justify-content:space-between;gap:16px;padding:8px var(--gut);border-bottom:1px solid var(--line);font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
-.strip b{color:var(--bone);font-weight:400}
-.strip .live{white-space:nowrap}
-.strip .live::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ok);margin-right:8px;vertical-align:1px}
-.nav{display:flex;align-items:center;gap:28px;padding:16px var(--gut);border-bottom:1px solid var(--line)}
-.brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-stretch:125%;font-weight:800;font-size:14px;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
-.nav .links{display:flex;align-items:center;gap:26px;margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase}
-.nav .links a{text-decoration:none;color:var(--dim)}
-.nav .links a:hover{color:var(--bone)}
-.btn{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;padding:12px 18px;border:1px solid var(--line-2);color:var(--bone);background:transparent;transition:background .15s,border-color .15s,color .15s;white-space:nowrap}
-.btn:hover{border-color:var(--bone)}
-.btn.pri{background:var(--sig);border-color:var(--sig);color:var(--bg);font-weight:600}
-.btn.pri:hover{background:var(--bone);border-color:var(--bone)}
-.nav .links a.btn{color:var(--bone);padding:9px 14px}
+/* ---------- hero + film ---------- */
+.hero{max-width:1440px;margin:0 auto;padding:clamp(48px,8vw,120px) var(--gut) clamp(36px,4vw,60px)}
+.hero h1{font-weight:500;font-size:clamp(44px,8vw,146px);line-height:.95;letter-spacing:-.047em;max-width:11.5ch}
+.hero-foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px 60px;margin-top:clamp(28px,3.5vw,52px)}
+.hero-foot p{font-size:clamp(18px,1.5vw,23px);line-height:1.45;color:var(--g1);max-width:46ch}
+.hero-foot p b{color:var(--fg);font-weight:500}
+.cta{display:flex;flex-wrap:wrap;gap:10px 28px}
+.go{display:inline-flex;align-items:center;gap:12px;text-decoration:none;font-size:16px;border-bottom:1px solid var(--g2);padding:12px 0;white-space:nowrap}
+.go:hover{border-color:var(--fg)}
+.film{margin:0;border-top:1px solid var(--line)}
+.film-v{width:100%;aspect-ratio:16/9;max-height:90vh;object-fit:cover;background:#0b0a09}
+.film-cap{max-width:1440px;margin:0 auto;padding:18px var(--gut) 0;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px 40px}
+.film-steps{list-style:none;display:flex;flex-wrap:wrap;gap:6px 26px;font-size:15px;color:var(--g1)}
+.film-steps li{display:flex;gap:8px;align-items:baseline;transition:color .3s}
+.film-steps li span{font-family:var(--mono);font-size:12.5px}
+.film-steps li.on{color:var(--fg)}
+.film-steps li.on span{color:var(--red)}
+.film-note{max-width:1440px;margin:0 auto;padding:10px var(--gut) clamp(70px,9vw,120px);font-size:14px;color:var(--g1)}
+.ctrl{background:transparent;border:1px solid #3a3a37;font-size:14.5px;padding:10px 18px;border-radius:999px;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;gap:10px}
+.ctrl:hover{border-color:var(--g1)}
+.ctrl:disabled{opacity:.35;cursor:default}
 
-/* ---------- hero ---------- */
-.hero{padding:clamp(40px,6vw,84px) var(--gut) clamp(56px,7vw,96px)}
-.hero-grid{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:clamp(32px,4.5vw,72px);align-items:center}
-.over{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:26px}
-.over i{width:28px;height:2px;background:var(--sig);flex:none}
-.mega{font-family:var(--display);font-weight:900;text-transform:uppercase;line-height:.86;font-size:clamp(64px,10.2vw,192px);letter-spacing:-.005em}
-.mega span{display:block}
-.mega .b{display:flex;align-items:center;gap:.1em;color:transparent;-webkit-text-stroke:2px var(--bone);margin-top:.06em}
-.mega .b svg{width:.58em;height:.58em;flex:none}
-.hero-lede{font-size:clamp(19px,1.5vw,23px);line-height:1.45;color:var(--dim);max-width:36ch;margin-top:30px}
-.hero-lede b{color:var(--bone);font-weight:600}
-.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
-.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:40px;border-top:1px solid var(--line-2)}
-.facts div{padding:14px 14px 0 0}
-.facts dt{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
-.facts dd{font-size:15px;font-weight:600;margin-top:4px}
+/* ---------- story ---------- */
+.story{border-top:1px solid var(--line)}
+.story-grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)}
+.left{padding:0 clamp(28px,4vw,72px) 0 var(--gut)}
+.chapter{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:10vh 0}
+.clock{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:13px;color:var(--g1)}
+.clock i{width:7px;height:7px;border-radius:50%;background:var(--g2);transition:background .3s}
+.chapter.on .clock i{background:var(--red)}
+.chapter h2{font-weight:500;font-size:clamp(34px,3.5vw,62px);line-height:1.03;letter-spacing:-.035em;margin-top:18px;max-width:13ch}
+.c0 h2{font-size:clamp(40px,4.4vw,80px);max-width:12ch}
+.chapter p{color:var(--g1);font-size:clamp(17px,1.3vw,20px);max-width:38ch;margin-top:20px}
+.chapter p b{color:var(--fg);font-weight:500}
+.chapter .hint{display:inline-flex;align-items:center;gap:10px;margin-top:36px;color:var(--fg);font-size:15px}
+.hint.mob{display:none}
+.car-nav{display:none}
+.view{position:sticky;top:0;height:100vh;align-self:start;display:flex;flex-direction:column;border-left:1px solid var(--line);background:#0b0a09}
+.view-gl{position:relative;flex:1;min-height:0;overflow:hidden}
+.story-v{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#0b0a09}
+.view-cap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 20px;padding:13px 20px;border-top:1px solid var(--line);font-size:13.5px;color:var(--g1)}
+.view-cap b{color:var(--fg);font-weight:500;display:inline-flex;align-items:center;gap:8px}
+.view-cap b::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--red)}
 
-.hud-head,.hud-legend{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 18px;padding:10px 14px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase}
-.hud-head{border-bottom:1px solid var(--line-2)}
-.hud-head .sim{color:var(--warn)}
-.hud-legend{border-top:1px solid var(--line-2);justify-content:flex-start;color:var(--dim)}
-.hud-legend span{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
-.lg{display:inline-block;width:11px;height:11px;flex:none;background:var(--bone)}
-.lg.fw{clip-path:polygon(100% 50%,0 0,25% 50%,0 100%)}
-.lg.usv{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
-.lg.obj{background:none;border:2px solid var(--sig);border-radius:50%}
-.lg.unc{background:rgba(255,90,31,.18);border:1.5px solid var(--sig);border-radius:50%;width:13px;height:13px}
-.sk-box{position:relative;height:clamp(380px,46vh,460px);background:#0c0e0b}
-.sk-box canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:crosshair;touch-action:manipulation}
-.hud-ctl{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-top:1px solid var(--line-2)}
-.inject{padding:12px 14px 14px;border-right:1px solid var(--line-2)}
-.cap{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);margin-bottom:10px}
-.sws{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.sw{display:grid;grid-template-columns:auto minmax(0,1fr);gap:1px 10px;align-items:center;text-align:left;background:var(--panel);border:1px solid var(--line-2);color:var(--bone);padding:9px 10px;cursor:pointer;font-family:var(--mono);transition:border-color .15s}
-.sw:hover{border-color:var(--dim)}
-.sw-k{grid-row:1/3;width:32px;height:16px;border:1px solid var(--line-2);background:#0b0c0a;position:relative}
-.sw-k::after{content:"";position:absolute;top:2px;left:2px;width:10px;height:10px;background:var(--mute);transition:left .15s,background .15s}
-.sw[aria-pressed="true"]{border-color:var(--sig)}
-.sw[aria-pressed="true"] .sw-k::after{left:18px;background:var(--sig)}
-.sw.mom .sw-k::after{left:10px}
-.sw.mom:active .sw-k::after{background:var(--sig)}
-.sw-l{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase}
-.sw-s{font-size:8.5px;letter-spacing:.14em;color:var(--mute);text-transform:uppercase}
-.sw-s::before{content:attr(data-off)}
-.sw[aria-pressed="true"] .sw-s{color:var(--sig)}
-.sw[aria-pressed="true"] .sw-s::before{content:attr(data-on)}
-.tele{padding:12px 14px;font-family:var(--mono);font-size:10.5px;background:#0c0e0b}
-.ro{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding-bottom:9px;margin-bottom:8px;border-bottom:1px solid var(--line-2)}
-.ro small{display:block;color:var(--mute);font-size:8.5px;letter-spacing:.16em}
-.ro b{font-size:14px;font-weight:600;color:var(--ok)}
-.ro b.bad{color:var(--sig)}
-#simlog{min-height:6.2em;color:var(--dim)}
-#simlog li{list-style:none;padding:2px 0;line-height:1.45}
-#simlog li span{color:var(--mute);margin-right:6px}
-.tele .fine{margin-top:8px;padding-top:7px;border-top:1px dashed var(--line-2);color:var(--mute);font-size:9px}
+/* ---------- bridge ---------- */
+.bridge{max-width:1440px;margin:0 auto;padding:clamp(90px,12vw,180px) var(--gut);border-top:1px solid var(--line)}
+.bridge p{font-size:clamp(26px,3.3vw,54px);line-height:1.14;letter-spacing:-.026em;max-width:30ch}
+.bridge a{color:var(--g1);text-underline-offset:6px;text-decoration-thickness:1px}
+.bridge a:hover{color:var(--fg)}
 
-/* ---------- band ---------- */
-.band{border-block:1px solid var(--line);background:var(--bg-2);overflow:hidden;white-space:nowrap;font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);padding:13px 0}
-.band-track{display:inline-flex;animation:mq 70s linear infinite}
-.band-track span{padding:0 18px}
-.band-track b{color:var(--sig);font-weight:400;padding-left:36px}
-@keyframes mq{to{transform:translateX(-50%)}}
+/* ---------- products ---------- */
+.product{max-width:1440px;margin:0 auto;padding:clamp(64px,8vw,120px) var(--gut) clamp(100px,12vw,180px);border-top:1px solid var(--line)}
+.p-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:10px 40px}
+.p-head h2{font-weight:500;font-size:clamp(52px,9.2vw,168px);line-height:.92;letter-spacing:-.055em}
+.p-head p{font-size:15px;color:var(--g1)}
+.p-head p b{color:var(--red);font-weight:500}
+.p-lede{font-size:clamp(22px,2.25vw,34px);line-height:1.3;letter-spacing:-.015em;max-width:36ch;margin-top:clamp(26px,3vw,44px)}
+.notes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(28px,3.5vw,56px) clamp(28px,6vw,110px);margin-top:clamp(56px,7vw,96px)}
+.notes div{border-top:1px solid var(--line);padding-top:22px}
+.notes h3{font-weight:500;font-size:clamp(21px,1.7vw,26px);letter-spacing:-.015em;line-height:1.2}
+.notes p{color:var(--g1);font-size:16.5px;margin-top:10px;max-width:46ch}
+.notes.three{grid-template-columns:repeat(3,minmax(0,1fr))}
 
-/* ---------- sections ---------- */
-.sec{padding:clamp(80px,10vw,150px) var(--gut);border-top:1px solid var(--line)}
-.sh{display:flex;align-items:center;gap:16px;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:clamp(34px,4vw,56px);color:var(--dim)}
-.sh-n{color:var(--sig)}
-.sh-r{flex:1;height:10px;background:repeating-linear-gradient(90deg,var(--line-2) 0 1px,transparent 1px 14px) 0 0/100% 6px no-repeat,linear-gradient(var(--line-2),var(--line-2)) 0 100%/100% 1px no-repeat}
-.h2{font-stretch:108%;font-weight:700;font-size:clamp(34px,4.7vw,76px);line-height:1.04;letter-spacing:-.022em;max-width:18ch}
-.h2 em{font-style:normal;color:var(--dim)}
-.body{font-size:clamp(17px,1.25vw,19px);color:var(--dim);max-width:52ch}
-.body b{color:var(--bone);font-weight:600}
-.lead{font-size:clamp(19px,1.6vw,24px);line-height:1.42;max-width:36ch}
-.chip{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;border:1px solid currentColor;padding:4px 8px;white-space:nowrap;line-height:1.3}
-.chip::before{content:"";width:6px;height:6px;background:currentColor;flex:none}
-.chip.bad{color:var(--sig)} .chip.warn{color:var(--warn)} .chip.ok{color:var(--ok)}
-.fineprint{font-family:var(--mono);font-size:10.5px;line-height:1.65;color:var(--mute);margin-top:16px;max-width:64ch}
-
-/* threat */
-.threat{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(32px,6vw,110px);align-items:start}
-.threat .body{margin-top:26px}
-.bh{display:flex;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line-2);font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
-.brow{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:13px 16px;border-bottom:1px solid var(--line)}
-.brow>span:first-child{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
-.board p{padding:14px 16px 18px;font-size:15px;color:var(--dim)}
-
-/* products */
-.ptitle{font-family:var(--display);font-weight:900;text-transform:uppercase;font-size:clamp(64px,12.5vw,220px);line-height:.86;letter-spacing:-.005em}
-.ptitle sup{font-family:var(--mono);font-size:max(13px,.12em);font-weight:600;color:var(--sig);border:1px solid var(--sig);padding:.2em .4em;vertical-align:top;position:relative;top:.55em;margin-left:.25em;letter-spacing:.12em}
-.prod-intro{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(30px,6vw,100px);margin-top:clamp(30px,4vw,50px);align-items:start}
-.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,3vw,40px);margin-top:clamp(50px,6vw,80px);align-items:start}
-.arch{padding:18px}
-.layer{display:grid;grid-template-columns:minmax(110px,170px) minmax(0,1fr);gap:14px;align-items:baseline;border:1px solid var(--line-2);background:var(--panel);padding:14px 16px}
-.layer b{font-family:var(--display);font-weight:900;font-size:clamp(22px,2vw,30px);letter-spacing:.03em;text-transform:uppercase}
-.layer span{font-size:14.5px;color:var(--dim)}
-.layer.hot{border-color:var(--sig);background:#1b120c}
-.layer.hot b{color:var(--sig)}
-.layer.hot span{color:var(--bone)}
-.conn{width:1px;height:18px;background:var(--line-2);margin-left:32px}
-.sph{display:flex;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line-2);font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
-.spec dl div{display:grid;grid-template-columns:minmax(110px,180px) minmax(0,1fr);gap:16px;padding:12px 16px;border-bottom:1px solid var(--line)}
-.spec dl div:last-child{border-bottom:0}
-.spec dt{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);padding-top:3px}
-.spec dd{font-size:15.5px;line-height:1.45}
-.spec dd.st{color:var(--warn)}
-.spec.wide{margin-top:clamp(40px,5vw,60px)}
-.spec.wide dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
-.spec.wide dl div:nth-child(odd){border-right:1px solid var(--line)}
-.spec.wide dl div:nth-last-child(2){border-bottom:0}
-.fms{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2vw,24px);margin-top:clamp(24px,3vw,40px)}
-.fm{padding:20px 20px 24px}
-.fm-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}
-.fm-h>span:first-child{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--sig)}
-.fm h3{font-family:var(--display);font-weight:900;text-transform:uppercase;font-size:clamp(30px,2.8vw,44px);line-height:.95;letter-spacing:.01em}
-.fm strong{display:block;font-size:17px;font-weight:600;line-height:1.3;margin-top:14px}
-.fm p{font-size:15px;color:var(--dim);margin-top:8px}
-.honest{margin-top:clamp(28px,3vw,40px);display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:15.5px;color:var(--dim)}
-
-/* principle */
-.idea{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(30px,6vw,110px);align-items:center}
-.idea .body{margin-top:26px}
-.kcard{padding:18px}
-.kcard svg{display:block;width:100%;height:auto;background:#0c0e0b;border:1px solid var(--line)}
-.krow{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;margin:16px 0 6px;color:var(--dim)}
-.krow #klab{color:var(--bone);font-weight:600}
-.kcard output{display:block;font-size:19px;line-height:1.3;min-height:2.6em;margin-top:10px}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:30px;background:transparent;cursor:ew-resize}
-input[type=range]::-webkit-slider-runnable-track{height:4px;background:var(--line-2)}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:26px;margin-top:-11px;background:var(--sig);border:0}
-input[type=range]::-moz-range-track{height:4px;background:var(--line-2)}
-input[type=range]::-moz-range-thumb{width:14px;height:26px;border:0;border-radius:0;background:var(--sig)}
-.zero-row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(24px,4vw,70px);align-items:center;margin-top:clamp(80px,10vw,140px);padding-top:40px;border-top:1px solid var(--line-2)}
-.big0{font-family:var(--display);font-weight:900;font-size:clamp(150px,22vw,340px);line-height:.8;color:transparent;-webkit-text-stroke:2px var(--sig)}
-.zero-row h3{font-stretch:108%;font-weight:700;font-size:clamp(26px,2.8vw,42px);line-height:1.1;letter-spacing:-.015em;max-width:22ch}
-.zero-row .body{margin-top:18px}
-
-/* turtle eyes console */
-.console{margin:clamp(40px,5vw,60px) 11px 0;border:1px solid #3a372b;background:#0e0d0a;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;border-radius:6px;overflow:hidden;box-shadow:0 0 0 10px #12140f,0 0 0 11px var(--line-2)}
-.c-top{display:flex;align-items:center;gap:16px;padding:8px 14px;border-bottom:1px solid var(--line)}
+/* ---------- turtle eyes console ---------- */
+.console{margin-top:clamp(40px,5vw,64px);border:1px solid #33322d;background:#0e0d0a;font-family:var(--mono);font-size:11px;letter-spacing:.03em;border-radius:10px;overflow:hidden}
+.c-top{display:flex;align-items:center;gap:16px;padding:8px 14px;border-bottom:1px solid #26251f}
 .c-logo{display:flex;gap:10px;align-items:center;white-space:nowrap}
-.c-logo b{font-stretch:112%;font-weight:700;font-size:14px;letter-spacing:.14em}
-.c-logo small{display:block;font-size:7.5px;color:#8d8570;letter-spacing:.2em}
+.c-logo b{font-family:var(--sans);font-weight:600;font-size:14px;letter-spacing:.1em}
+.c-logo small{display:block;font-size:8px;color:#8d8570;letter-spacing:.2em}
 .c-tabs{display:flex;gap:2px;margin-left:14px}
-.c-tabs button{color:#a39b84;background:none;border:0;border-bottom:2px solid transparent;padding:10px 14px;cursor:pointer;text-transform:uppercase;letter-spacing:.16em;font-size:10.5px;white-space:nowrap}
-.c-tabs button:hover{color:var(--bone)}
-.c-tabs button[aria-selected="true"]{color:var(--bone);background:#211f19;border-bottom-color:var(--bone)}
+.c-tabs button{color:#a39b84;background:none;border:0;border-bottom:2px solid transparent;padding:12px 14px;cursor:pointer;text-transform:uppercase;letter-spacing:.14em;font-family:var(--mono);font-size:11px;white-space:nowrap;min-height:44px}
+.c-tabs button:hover{color:var(--fg)}
+.c-tabs button[aria-selected="true"]{color:var(--fg);background:#211f19;border-bottom-color:var(--fg)}
 .c-meta{margin-left:auto;display:flex;gap:12px;align-items:center;white-space:nowrap}
-.mock{background:var(--bone);color:#111;padding:5px 9px;font-weight:600;letter-spacing:.14em}
+.mock{background:var(--fg);color:#111;padding:5px 9px;font-weight:500;letter-spacing:.14em}
 .c-body{display:grid;grid-template-columns:220px minmax(0,1fr) 280px;min-height:470px}
-.c-left{border-right:1px solid var(--line);padding:10px 0;overflow:hidden}
-.c-h{color:#9c947c;letter-spacing:.18em;font-size:9.5px;padding:0 12px 8px;border-bottom:1px solid var(--line)}
+.c-left{border-right:1px solid #26251f;padding:10px 0;overflow:hidden}
+.c-h{color:#a39b84;letter-spacing:.16em;font-size:10px;padding:0 12px 8px;border-bottom:1px solid #26251f}
 .veh{padding:8px 12px;border-bottom:1px solid #1d1c16;border-left:3px solid transparent;display:grid;grid-template-columns:1fr auto;gap:2px 8px}
-.veh b{font-size:12.5px;letter-spacing:.06em;font-weight:700}
-.veh .st{color:var(--ok);font-size:9px;letter-spacing:.12em}
-.veh .sub{color:#877f69;font-size:9px}
-.veh.warn{border-left-color:var(--warn)} .veh.warn .st{color:var(--warn)}
-.veh.dr .sub:first-of-type{color:var(--warn)}
-.c-map{display:flex;flex-direction:column;border-right:1px solid var(--line);background:#15140f;min-width:0}
-.c-map svg{display:block;width:100%;flex:1;min-height:340px}
-.c-cap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;padding:8px 12px;border-top:1px solid var(--line);background:#0e0d0a;font-size:10px;letter-spacing:.06em;color:var(--bone)}
-.c-leg{display:flex;flex-wrap:wrap;gap:4px 12px;color:#9c947c}
+.veh b{font-family:var(--sans);font-size:13px;letter-spacing:.04em;font-weight:600}
+.veh .st{color:#b3be7c;font-size:9.5px;letter-spacing:.1em}
+.veh .sub{color:#958d77;font-size:9.5px}
+.veh.warn{border-left-color:#e3a82b} .veh.warn .st{color:#e3a82b}
+.veh.dr .sub:first-of-type{color:#e3a82b}
+.c-map{display:flex;flex-direction:column;border-right:1px solid #26251f;background:#15140f;min-width:0}
+.c-map svg{width:100%;flex:1;min-height:340px}
+.c-cap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;padding:8px 12px;border-top:1px solid #26251f;background:#0e0d0a;font-size:10.5px;color:var(--fg)}
+.c-leg{display:flex;flex-wrap:wrap;gap:4px 12px;color:#a39b84}
 .c-leg i{font-style:normal;margin-right:4px}
 .c-right{padding:12px;display:flex;flex-direction:column;gap:10px}
-.c-note{border-left:2px solid #6b6552;background:#1a1913;padding:9px 11px;font-family:var(--sans);font-size:13px;letter-spacing:0;line-height:1.4;color:#cfc6ad}
-.c-note b{color:var(--bone)}
-.c-order{border:1px solid #3a372b;background:#12110d;min-height:64px;padding:10px;font-size:11.5px;line-height:1.5;color:var(--bone);letter-spacing:.02em}
-.c-order .pr{color:var(--ok);margin-right:6px}
-.caret{display:inline-block;width:7px;height:13px;background:var(--bone);vertical-align:-2px;margin-left:2px;animation:blink 1s steps(1) infinite}
+.c-note{border-left:2px solid #6b6552;background:#1a1913;padding:9px 11px;font-family:var(--sans);font-size:13.5px;letter-spacing:0;line-height:1.4;color:#d6cdb4}
+.c-note b{color:var(--fg)}
+.c-order{border:1px solid #3a372b;background:#12110d;min-height:64px;padding:10px;font-size:12px;line-height:1.5;color:var(--fg)}
+.c-order .pr{color:#b3be7c;margin-right:6px}
+.caret{display:inline-block;width:7px;height:13px;background:var(--fg);vertical-align:-2px;margin-left:2px;animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
-.hold{--p:0;position:relative;overflow:hidden;background:#1d1c16;color:var(--bone);border:1px solid var(--bone);padding:13px;cursor:pointer;letter-spacing:.2em;text-transform:uppercase;font-size:10.5px;user-select:none;-webkit-user-select:none;touch-action:none}
-.hold::before{content:"";position:absolute;inset:0;background:var(--bone);transform:scaleX(var(--p));transform-origin:left}
-.hold span{position:relative;mix-blend-mode:difference;color:var(--bone)}
-.hold:disabled{opacity:.35;cursor:not-allowed}
+.hold{--p:0;position:relative;overflow:hidden;background:#1d1c16;color:var(--fg);border:1px solid var(--fg);padding:13px;min-height:44px;cursor:pointer;letter-spacing:.18em;text-transform:uppercase;font-family:var(--mono);font-size:11px;user-select:none;-webkit-user-select:none;touch-action:none;border-radius:6px}
+.hold::before{content:"";position:absolute;inset:0;background:var(--fg);transform:scaleX(var(--p));transform-origin:left}
+.hold span{position:relative;mix-blend-mode:difference;color:var(--fg)}
+.hold:disabled{opacity:.4;cursor:not-allowed}
 .hold.rel::before{transition:transform .25s}
-.c-hint{color:#9c947c;font-size:9.5px;min-height:1.4em;letter-spacing:.08em}
-.c-log{border-top:1px solid var(--line);padding-top:8px;flex:1}
-#olog li{list-style:none;padding:5px 0;border-bottom:1px dashed #2a2820;line-height:1.45;color:#b9b099}
-#olog li em{font-style:normal;margin:0 6px;letter-spacing:.12em}
-#olog li em.ok{color:var(--ok)} #olog li em.no{color:var(--warn)}
-.c-foot{display:flex;gap:6px 22px;padding:7px 14px;border-top:1px solid var(--line);color:#8d8570;font-size:9.5px;letter-spacing:.14em;flex-wrap:wrap}
-.c-foot b{color:var(--bone);font-weight:400}
-.te-note{margin-top:26px}
+.c-hint{color:#a39b84;font-size:10px;min-height:1.4em;letter-spacing:.06em}
+.c-log{border-top:1px solid #26251f;padding-top:8px;flex:1}
+#olog li{list-style:none;padding:5px 0;border-bottom:1px dashed #2a2820;line-height:1.45;color:#c2b9a2}
+#olog li em{font-style:normal;margin:0 6px;letter-spacing:.1em}
+#olog li em.ok{color:#b3be7c} #olog li em.no{color:#e3a82b}
+.c-foot{display:flex;gap:6px 22px;padding:8px 14px;border-top:1px solid #26251f;color:#958d77;font-size:10px;letter-spacing:.12em;flex-wrap:wrap}
+.c-foot b{color:var(--fg);font-weight:400}
+.c-note-out{font-size:14.5px;color:var(--g1);margin-top:16px;max-width:70ch}
 
-/* evidence */
-.record{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(34px,5vw,90px);margin-top:clamp(40px,5vw,70px);align-items:start}
-.ev-intro{margin-top:24px}
-.colhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-bottom:12px;min-height:26px}
-.row{display:grid;grid-template-columns:minmax(150px,250px) minmax(0,1fr);gap:22px;padding:22px 0 24px;border-top:1px solid var(--line-2);align-items:start}
-.row .n{font-family:var(--display);font-weight:900;font-size:clamp(50px,5.2vw,82px);line-height:.84;white-space:nowrap}
-.row h3{font-size:clamp(18px,1.45vw,21px);font-weight:600;line-height:1.25}
-.row p{font-family:var(--mono);font-size:11px;line-height:1.65;color:var(--mute);margin-top:8px}
-.notyet{padding:24px 24px 16px}
-.notyet .zero{display:flex;gap:18px;align-items:flex-end}
-.notyet .zero b{font-family:var(--display);font-weight:900;font-size:clamp(130px,13vw,210px);line-height:.8;color:var(--sig)}
-.notyet .zero span{font-size:clamp(18px,1.5vw,22px);line-height:1.25;padding-bottom:8px;max-width:17ch;font-weight:600}
-.notyet ul{margin-top:22px}
-.notyet li{list-style:none;position:relative;padding:12px 0 12px 26px;border-top:1px solid var(--line);font-size:15.5px;line-height:1.45;color:var(--dim)}
-.notyet li::before{content:"";position:absolute;left:2px;top:21px;width:10px;height:2px;background:var(--sig)}
+/* ---------- status letter (light) ---------- */
+.status{background:var(--fg);color:#111110}
+.status .w{padding-top:clamp(96px,12vw,180px);padding-bottom:clamp(96px,12vw,180px)}
+.letter{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(30px,6vw,110px);align-items:start}
+.letter h2{font-weight:500;font-size:clamp(40px,5.4vw,92px);line-height:.98;letter-spacing:-.045em}
+.letter .body p{font-size:clamp(18px,1.4vw,21px);line-height:1.55;color:#2f2e2b;max-width:58ch}
+.letter .body p+p{margin-top:1.1em}
+.ledger{width:100%;border-collapse:collapse;margin:clamp(28px,3vw,40px) 0;font-size:16px}
+.ledger th,.ledger td{text-align:left;vertical-align:top;padding:15px 18px 15px 0;border-top:1px solid #cdc9bf}
+.ledger tr:last-child th,.ledger tr:last-child td{border-bottom:1px solid #cdc9bf}
+.ledger th{font-weight:500;width:36%}
+.ledger td.v{font-family:var(--mono);font-weight:500;white-space:nowrap}
+.ledger td.n{color:#55534e}
+.ledger tr.zero td.v{color:#b8290f}
+.sig{margin-top:2.2em;font-size:19px;font-weight:500}
+.sig span{display:block;color:#55534e;font-size:15px;font-weight:400}
 
-/* authority */
-.chain{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:clamp(40px,5vw,60px);border:1px solid var(--line-2)}
-.chain div{padding:24px 20px 28px;border-right:1px solid var(--line-2);font-family:var(--display);font-weight:700;font-size:clamp(26px,2.7vw,42px);line-height:.98;text-transform:uppercase;background:var(--bg-2)}
-.chain div:last-child{border-right:0;background:var(--sig);color:var(--bg)}
-.chain small{display:block;font-family:var(--mono);font-size:10px;font-weight:400;letter-spacing:.16em;margin-bottom:16px;color:var(--mute)}
-.chain div:last-child small{color:var(--bg)}
-.line-body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(24px,4vw,70px);margin-top:32px;max-width:1100px;color:var(--dim)}
+/* ---------- next ---------- */
+.next{max-width:1440px;margin:0 auto;padding:clamp(64px,8vw,120px) var(--gut) clamp(100px,13vw,190px)}
+.next h2{font-weight:500;font-size:clamp(34px,4.2vw,68px);letter-spacing:-.035em;line-height:1.04;max-width:20ch}
+.tl{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(20px,3vw,44px);margin-top:clamp(56px,7vw,96px)}
+.tl li{border-top:1px solid var(--g2);padding-top:22px}
+.tl .mo{font-family:var(--mono);font-size:13px;color:var(--red)}
+.tl h3{font-weight:500;font-size:clamp(20px,1.7vw,26px);line-height:1.22;letter-spacing:-.015em;margin-top:10px}
+.tl p{color:var(--g1);font-size:16px;margin-top:10px}
 
-/* programme */
-.gantt{margin-top:clamp(40px,5vw,64px);border:1px solid var(--line-2);background:var(--bg-2)}
-.g-row{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);border-bottom:1px solid var(--line)}
-.g-row:last-child{border-bottom:0}
-.g-lab{padding:16px 18px;border-right:1px solid var(--line-2)}
-.g-lab .m{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--sig)}
-.g-lab h3{font-size:clamp(17px,1.4vw,20px);font-weight:700;line-height:1.25;margin-top:6px}
-.g-lab p{font-size:14.5px;color:var(--dim);margin-top:6px}
-.g-track{display:flex;align-items:center;padding:0 18px}
-.g-bar{height:12px;width:calc(var(--m) / 12 * 100%);background:linear-gradient(90deg,var(--line-2),var(--sig))}
-.g-scale .g-lab{padding:10px 18px;font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
-.g-scale .g-track{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));padding:10px 18px;font-family:var(--mono);font-size:9.5px;color:var(--mute)}
-.g-scale .g-track span{border-left:1px solid var(--line-2);padding-left:4px}
-
-/* contact */
-.contact{background:var(--bg-2)}
-.mega2{font-family:var(--display);font-weight:900;text-transform:uppercase;font-size:clamp(72px,13vw,240px);line-height:.88}
-.mega2 span{color:var(--sig)}
-.contact-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(30px,6vw,100px);margin-top:44px;align-items:end}
-.contact p{font-size:clamp(17px,1.35vw,20px);max-width:44ch;color:var(--dim)}
-.contact p a{color:var(--bone);text-decoration-color:var(--sig);text-underline-offset:3px}
-.mail{display:inline-block;font-size:clamp(20px,2.6vw,38px);font-weight:600;font-stretch:108%;color:var(--bone);text-decoration:none;border-bottom:2px solid var(--sig);overflow-wrap:anywhere;line-height:1.3}
-.mail:hover{color:var(--sig)}
-.li{margin-top:24px}
-.cwrap{display:flex;flex-direction:column;align-items:flex-start}
-.foot{display:flex;flex-wrap:wrap;gap:10px 36px;justify-content:space-between;margin-top:clamp(64px,8vw,110px);padding-top:18px;border-top:1px solid var(--line-2);font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+/* ---------- contact ---------- */
+.contact{max-width:1440px;margin:0 auto;padding:clamp(90px,12vw,180px) var(--gut) 36px;border-top:1px solid var(--line)}
+.contact h2{font-weight:500;font-size:clamp(48px,8vw,140px);line-height:.94;letter-spacing:-.05em;max-width:12ch}
+.contact-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(30px,6vw,100px);margin-top:clamp(36px,4vw,60px);align-items:end}
+.contact-row p{color:var(--g1);max-width:44ch}
+.contact-row p a{color:var(--fg);text-underline-offset:3px;text-decoration-color:var(--g2)}
+.reach{display:flex;flex-direction:column;align-items:flex-start}
+.mail{font-size:clamp(22px,2.6vw,40px);letter-spacing:-.02em;text-decoration:none;border-bottom:1px solid var(--g2);padding-bottom:6px;overflow-wrap:anywhere;line-height:1.25}
+.mail:hover{border-color:var(--red)}
+.li{margin-top:16px;color:var(--g1);font-size:16px;padding:12px 0;text-decoration:none}
+.li:hover{color:var(--fg)}
+.legal{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 30px;margin-top:clamp(80px,10vw,140px);padding-top:20px;border-top:1px solid var(--line);font-size:13.5px;color:var(--g1)}
 
 /* reveal */
-.js .rv{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+.js .rv{opacity:0;transform:translateY(16px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
 .js .rv.in{opacity:1;transform:none}
 
 /* ---------- responsive ---------- */
 @media (max-width:1100px){
-  .hero-grid{grid-template-columns:1fr}
   .c-body{grid-template-columns:minmax(0,1fr) 260px}
   .c-left{display:none}
-  .record,.two{grid-template-columns:1fr}
 }
-@media (max-width:760px){
-  body{font-size:17px}
-  .strip .mid{display:none}
-  .nav .links a:not(.btn){display:none}
-  .mega{font-size:20vw}
-  .facts{grid-template-columns:1fr 1fr}
-  .hud-ctl{grid-template-columns:1fr}
-  .inject{border-right:0;border-bottom:1px solid var(--line-2)}
-  .sk-box{height:380px}
-  .threat,.prod-intro,.idea,.contact-grid,.line-body{grid-template-columns:1fr}
-  .ptitle{font-size:13vw}
-  .layer{grid-template-columns:1fr;gap:4px}
-  .spec dl div{grid-template-columns:1fr;gap:4px}
-  .spec.wide dl{grid-template-columns:1fr}
-  .spec.wide dl div:nth-child(odd){border-right:0}
-  .spec.wide dl div:nth-last-child(2){border-bottom:1px solid var(--line)}
-  .fms{grid-template-columns:1fr}
-  .zero-row{grid-template-columns:1fr}
-  .console{margin-left:10px;margin-right:10px}
+@media (max-width:999px){
+  .story-grid{grid-template-columns:1fr}
+  .left{display:contents}
+  .c0{order:1;min-height:0;padding:clamp(56px,10vw,90px) var(--gut) clamp(24px,5vw,40px)}
+  .view{order:2;position:relative;height:auto;border-left:0;border-top:1px solid var(--line)}
+  .view-gl{flex:none;height:min(64vh,560px)}
+  .chapters{order:3;display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:18px var(--gut) 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-padding-left:var(--gut)}
+  .chapters::-webkit-scrollbar{display:none}
+  .chapters .chapter{flex:0 0 min(86%,520px);min-height:0;scroll-snap-align:start;justify-content:flex-start;padding:22px;border:1px solid var(--line);border-radius:16px;background:var(--bg2)}
+  .chapters .chapter h2{font-size:clamp(28px,7.4vw,40px);max-width:none}
+  .chapters .chapter p{font-size:16.5px;margin-top:14px}
+  .car-nav{order:4;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px var(--gut) 40px}
+  .car-nav span{font-family:var(--mono);font-size:13px;color:var(--g1)}
+  .hint.desk{display:none}
+  .hint.mob{display:inline-flex}
+  .notes,.notes.three{grid-template-columns:1fr}
+  .letter{grid-template-columns:1fr}
+  .tl{grid-template-columns:1fr 1fr}
+  .contact-row{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .top{flex-wrap:wrap}
+  .top nav{width:100%}
+  .top ul{justify-content:space-between;gap:6px}
+  .film-v{aspect-ratio:auto;height:58vh}
+  .tl{grid-template-columns:1fr}
   .c-top{flex-wrap:wrap;gap:6px}
   .c-tabs{margin-left:0;order:3;width:100%}
-  .c-tabs button{padding:9px 9px;font-size:9.5px;letter-spacing:.1em}
+  .c-tabs button{padding:10px 8px;font-size:10px;letter-spacing:.08em}
   .c-meta .clkc{display:none}
   .c-body{grid-template-columns:1fr}
-  .c-map{border-right:0;border-bottom:1px solid var(--line)}
-  .c-map svg{min-height:300px}
-  .row{grid-template-columns:1fr;gap:10px}
-  .chain{grid-template-columns:1fr}
-  .chain div{border-right:0;border-bottom:1px solid var(--line-2)}
-  .chain div:last-child{border-bottom:0}
-  .g-row{grid-template-columns:1fr}
-  .g-lab{border-right:0;border-bottom:1px solid var(--line)}
-  .g-track{padding:14px 18px}
-  .g-scale .g-lab{display:none}
-  .g-scale .g-track span{font-size:0}
-  .g-scale .g-track span:nth-child(3n){font-size:9px}
+  .c-map{border-right:0;border-bottom:1px solid #26251f}
+  .c-map svg{min-height:280px}
+  .ledger,.ledger tbody,.ledger tr,.ledger th,.ledger td{display:block;width:auto}
+  .ledger tr{border-top:1px solid #cdc9bf;padding:14px 0}
+  .ledger tr:last-child{border-bottom:1px solid #cdc9bf}
+  .ledger th,.ledger td,.ledger tr:last-child th,.ledger tr:last-child td{border:0;padding:2px 0}
 }
 @media (prefers-reduced-motion:reduce){
-  .band-track,.caret{animation:none}
   .js .rv{transition:none}
-  html{scroll-behavior:auto}
+  .caret{animation:none}
 }
 </style>
 </head>
 <body>
 <script>document.documentElement.classList.add('js')</script>
+<a class="skip" href="#main">Skip to content</a>
 
-<div class="strip">
-  <span><b>Homingvector</b> // Autonomy for contested environments</span>
-  <span class="mid">Distribution: public</span>
-  <span class="live" data-clock>--:--:--Z</span>
-</div>
-
-<nav class="nav" aria-label="Main">
-  <a class="brand" href="#top">
-    <svg width="24" height="24" viewBox="0 0 64 64" aria-hidden="true"><circle cx="40" cy="24" r="12" fill="none" stroke="#ff5a1f" stroke-width="5"/><path d="M6 58 L32 32" stroke="#e8e3d5" stroke-width="6"/></svg>
-    Homingvector
+<header class="top" id="top">
+  <a class="mark" href="#top" aria-label="Homingvector, back to top">
+    <svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true"><path d="M40 5H59V24" fill="none" stroke="#ff4a2b" stroke-width="4.5" stroke-linecap="square"/><path d="M24 59H5V40" fill="none" stroke="#ff4a2b" stroke-width="4.5" stroke-linecap="square"/><path d="M53 10 L4 33 L26 31 Z" fill="currentColor"/><path d="M51.5 13.5 L27.5 35.5 L33 59 Z" fill="currentColor"/></svg>
+    <b>Homingvector</b>
   </a>
-  <div class="links">
-    <a href="#shield">TurtleShield</a>
-    <a href="#eyes">Turtle Eyes</a>
-    <a href="#evidence">Evidence</a>
-    <a href="#programme">Programme</a>
-    <a class="btn" href="#contact">Contact</a>
-  </div>
-</nav>
-
-<header class="hero" id="top">
-  <div class="wrap hero-grid">
-    <div>
-      <div class="over"><i></i>Autonomy for contested environments</div>
-      <h1 class="mega"><span>Homing</span><span class="b"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="64" cy="36" r="24" fill="none" stroke="#ff5a1f" stroke-width="9"/><path d="M6 94 L46 54" stroke="#ff5a1f" stroke-width="10"/><path d="M26 50 L48 52 L50 74" fill="none" stroke="#ff5a1f" stroke-width="9"/></svg>Vector</span></h1>
-      <p class="hero-lede">Software that keeps a team of drones, ground robots and boats <b>on mission when GPS is jammed, the radio cuts out, and nobody at base can reach them.</b></p>
-      <div class="hero-cta"><a class="btn pri" href="#shield">TurtleShield &rarr;</a><a class="btn" href="#eyes">Turtle Eyes</a></div>
-      <dl class="facts">
-        <div><dt>Domains</dt><dd>Air, ground, surface</dd></div>
-        <div><dt>Coordination</dt><dd>No central brain</dd></div>
-        <div><dt>Authority</dt><dd>A person decides</dd></div>
-      </dl>
-    </div>
-    <div class="frame">
-      <div class="hud-head"><span>Resilience demonstrator / 9 vehicles</span><span class="sim">Browser sketch, not flight code</span></div>
-      <div class="sk-box"><canvas id="sim" aria-label="An animated sketch of nine vehicles holding a ring around an objective. Use the switches below to jam GPS, cut the radio or lose a vehicle."></canvas></div>
-      <div class="hud-legend"><span><i class="lg fw"></i>Aircraft</span><span><i class="lg"></i>Ground robot</span><span><i class="lg usv"></i>Boat</span><span><i class="lg obj"></i>Objective</span><span><i class="lg unc"></i>Position confidence</span></div>
-      <div class="hud-ctl">
-        <div class="inject">
-          <div class="cap">Inject a condition</div>
-          <div class="sws">
-            <button class="sw" id="b-jam" aria-pressed="false"><span class="sw-k"></span><span class="sw-l">Jam GPS</span><span class="sw-s" data-off="Standby" data-on="Active"></span></button>
-            <button class="sw" id="b-cut" aria-pressed="false"><span class="sw-k"></span><span class="sw-l">Cut radio</span><span class="sw-s" data-off="Standby" data-on="Active"></span></button>
-            <button class="sw mom" id="b-lose"><span class="sw-k"></span><span class="sw-l">Lose one</span><span class="sw-s" data-off="One-shot"></span></button>
-            <button class="sw mom" id="b-reset"><span class="sw-k"></span><span class="sw-l">Reset</span><span class="sw-s" data-off="Restore all"></span></button>
-          </div>
-        </div>
-        <div class="tele" aria-live="polite">
-          <div class="ro">
-            <div><small>GPS</small><b id="ro-gps">OK</b></div>
-            <div><small>LINKS UP</small><b id="ro-links">–</b></div>
-            <div><small>VEHICLES</small><b id="ro-fleet">9/9</b></div>
-          </div>
-          <ol id="simlog"></ol>
-          <div class="fine">Click the picture to move the objective.</div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <nav aria-label="Main">
+    <ul>
+      <li><a href="#turtleshield">TurtleShield AI</a></li>
+      <li><a href="#turtleeyes">Turtle Eyes GCS</a></li>
+      <li><a href="#status">Status</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
 </header>
 
-<div class="band" aria-hidden="true"><div class="band-track">
-  <b>//</b><span>GNSS denied</span><b>//</b><span>Comms degraded</span><b>//</b><span>Base unreachable</span><b>//</b><span>Mission continues</span><b>//</b><span>742 simulated missions</span><b>//</b><span>0 real flights, yet</span><b>//</b><span>A person decides</span>
-  <b>//</b><span>GNSS denied</span><b>//</b><span>Comms degraded</span><b>//</b><span>Base unreachable</span><b>//</b><span>Mission continues</span><b>//</b><span>742 simulated missions</span><b>//</b><span>0 real flights, yet</span><b>//</b><span>A person decides</span>
-</div></div>
+<main id="main">
+<section class="hero" aria-labelledby="h1">
+  <h1 id="h1">When GPS goes dark, the mission doesn’t.</h1>
+  <div class="hero-foot">
+    <p>We’re building <b>TurtleShield</b>, an AI that keeps drones, ground robots and boats working as one team when GPS is jammed and the radio drops out, and <b>Turtle Eyes</b>, the ground control station its operators use.</p>
+    <div class="cta"><a class="go" href="#film">Watch the film</a><a class="go" href="#story">Fly the mission yourself</a></div>
+  </div>
+</section>
 
-<main>
+<figure class="film" id="film">
+  <video class="film-v" id="filmv" autoplay muted loop playsinline preload="auto" poster="media/hero-poster.jpg" aria-describedby="film-desc">
+    <source src="media/hero-film.webm" type="video/webm">
+    <source src="media/hero-film.mp4" type="video/mp4">
+  </video>
+  <figcaption class="film-cap">
+    <ol class="film-steps" aria-label="What the film shows">
+      <li class="on"><span>0:00</span>Five aircraft, one AI</li>
+      <li><span>0:10</span>Air, ground and water</li>
+      <li><span>0:15</span>GPS jammed</li>
+      <li><span>0:18</span>Radio drops</li>
+      <li><span>0:21</span>Aircraft lost</li>
+      <li><span>0:26</span>A person decides</li>
+    </ol>
+    <button class="ctrl" id="film-toggle" type="button" aria-pressed="true">Pause film</button>
+  </figcaption>
+  <p class="film-note" id="film-desc">CGI of TurtleShield at work: five aircraft, two ground robots and two boats share one plan, keep going through GPS jamming and radio loss, cover for a lost aircraft, and stop to let a person decide. CGI rendered in Blender, not flight footage.</p>
+</figure>
 
-<section class="sec" id="threat">
-  <div class="wrap">
-    <div class="sh rv"><span class="sh-n">01</span><span>Threat picture</span><span class="sh-r" aria-hidden="true"></span></div>
-    <div class="threat">
-      <div class="rv">
-        <h2 class="h2">Picture a dozen drones watching a border <em>at night.</em></h2>
-        <p class="body">Then someone jams GPS. The radio link gets patchy. The operator back at base loses contact. Each drone can usually keep itself in the air. <b>What falls apart is the team:</b> who watches which stretch, who follows what was spotted, and who fills the gap when one goes down.</p>
+<section class="story" id="story" aria-label="Fly the mission yourself">
+  <div class="story-grid">
+    <div class="left">
+      <div class="chapter c0 on" data-ch="0">
+        <span class="clock"><i></i>T+00:00</span>
+        <h2>Step through the mission.</h2>
+        <p>Each step replays the moment in the film where it happens, and shows what <b>TurtleShield</b> does about it.</p>
+        <p class="hint desk">Scroll to advance the mission <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1v12M2 8l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></p>
+        <p class="hint mob">Swipe the cards below the picture</p>
       </div>
-      <div class="frame board rv">
-        <div class="bh"><span>Condition board</span><span>Contested</span></div>
-        <div class="brow"><span>GNSS</span><span class="chip bad">Jammed</span></div>
-        <div class="brow"><span>Radio link</span><span class="chip warn">Patchy, then gone</span></div>
-        <div class="brow"><span>Link to base</span><span class="chip bad">Lost</span></div>
-        <div class="brow"><span>Each drone</span><span class="chip ok">Still flying</span></div>
-        <div class="brow"><span>The team</span><span class="chip bad">Falls apart</span></div>
-        <p>This is what current conflicts look like. It is not rare any more.</p>
+      <div class="chapters" id="chapters">
+        <article class="chapter" data-ch="1">
+          <span class="clock"><i></i>T+00:40</span>
+          <h2>Nine machines. One AI on every one of them.</h2>
+          <p>Five aircraft, two ground robots and two boats, all running TurtleShield and watched from Turtle Eyes. No vehicle waits for base and none of them is the boss.</p>
+        </article>
+        <article class="chapter" data-ch="2">
+          <span class="clock"><i></i>T+04:12</span>
+          <h2>GPS goes dark.</h2>
+          <p>Every vehicle now tracks where it probably is, and how sure it is. The rings are that doubt. As they grow, the aircraft take looser positions instead of pretending nothing changed.</p>
+        </article>
+        <article class="chapter" data-ch="3">
+          <span class="clock"><i></i>T+06:30</span>
+          <h2>The radio drops.</h2>
+          <p>Direct links fail. Messages hop through whichever vehicles can still hear each other and wait until a path opens. Nothing depends on one link staying up.</p>
+        </article>
+        <article class="chapter" data-ch="4">
+          <span class="clock"><i></i>T+09:05</span>
+          <h2>One aircraft is lost.</h2>
+          <p>The others notice the gap and share its work between them. Nobody has to tell them.</p>
+        </article>
+        <article class="chapter" data-ch="5">
+          <span class="clock"><i></i>T+11:20</span>
+          <h2>It suggests. A person decides.</h2>
+          <p>TurtleShield can spot something, keep track of it and suggest a way to intercept. Then it stops and waits for the operator in Turtle Eyes. It contains no weapon code.</p>
+        </article>
       </div>
+      <div class="car-nav">
+        <button class="ctrl" id="car-prev" type="button">Previous</button>
+        <span id="car-pos" aria-live="polite">1 of 5</span>
+        <button class="ctrl" id="car-next" type="button">Next</button>
+      </div>
+    </div>
+    <div class="view">
+      <div class="view-gl">
+        <video class="story-v" id="storyv" muted playsinline preload="metadata" poster="media/hero-poster.jpg" aria-label="The part of the CGI film that matches the current step of the mission">
+          <source src="media/hero-film.webm" type="video/webm">
+          <source src="media/hero-film.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="view-cap"><span>CGI rendered in Blender, not flight footage.</span><b id="vstate" aria-live="polite">Formation holding</b></div>
     </div>
   </div>
 </section>
 
-<section class="sec" id="shield">
-  <div class="wrap">
-    <div class="sh rv"><span class="sh-n">02</span><span>Product / TurtleShield</span><span class="sh-r" aria-hidden="true"></span></div>
-    <h2 class="ptitle rv">TurtleShield<sup>AI</sup></h2>
-    <div class="prod-intro">
-      <p class="lead rv">It puts the whole team plan on every vehicle. No vehicle waits for base, and no vehicle is the boss. If the group gets split up, each part carries on by itself.</p>
-      <p class="body rv">Every drone has an autopilot that flies it very well. It has no idea what the other drones are doing. So today the teamwork usually runs from a laptop or server at base, and when that link is jammed, every vehicle is left waiting for orders. <b>We moved the teamwork onto the vehicles.</b></p>
-    </div>
+<section class="bridge" aria-label="A note before the details">
+  <p class="rv">Everything above is CGI. The software behind it has flown 742 missions in simulation and none on a real aircraft yet. <a href="#status">Here is exactly where we are.</a></p>
+</section>
 
-    <div class="two">
-      <div class="frame arch rv">
-        <div class="cap">Where it sits</div>
-        <div class="layer"><b>People</b><span>Set the mission, approve, pause, call everyone home</span></div>
-        <div class="conn" aria-hidden="true"></div>
-        <div class="layer hot"><b>TurtleShield</b><span>Runs on every vehicle and keeps the team working together</span></div>
-        <div class="conn" aria-hidden="true"></div>
-        <div class="layer"><b>Autopilot</b><span>Flies each vehicle: balance, steering, motors</span></div>
-        <div class="conn" aria-hidden="true"></div>
-        <div class="layer"><b>Vehicle</b><span>Planes, ground robots, boats</span></div>
-      </div>
-      <div class="frame spec rv">
-        <div class="sph"><span>Specification</span><span>TS-01</span></div>
-        <dl>
-          <div><dt>Runs on</dt><dd>Every vehicle, on a companion computer next to the autopilot</dd></div>
-          <div><dt>Built for</dt><dd>NVIDIA Jetson Orin with a Cube Orange flight controller</dd></div>
-          <div><dt>Autopilots</dt><dd>PX4 in all flying tests. ArduPilot tested standing still, in simulation.</dd></div>
-          <div><dt>Domains</dt><dd>Fixed-wing aircraft, ground robots, surface boats</dd></div>
-          <div><dt>Coordination</dt><dd>No central brain. Every vehicle carries the full plan.</dd></div>
-          <div><dt>Keeps working through</dt><dd>GPS jamming, radio loss, losing a vehicle</dd></div>
-          <div><dt>Authority</dt><dd>Finds, follows and suggests. A person decides. No weapon code.</dd></div>
-          <div><dt>Status</dt><dd class="st">Tested in simulation. First real flight planned for month 3.</dd></div>
-        </dl>
-      </div>
-    </div>
-
-    <div class="fms">
-      <article class="frame fm rv">
-        <div class="fm-h"><span>FM-01</span><span class="chip ok">Tested in simulation</span></div>
-        <h3>GPS jammed</h3>
-        <strong>They keep going on what they can still trust.</strong>
-        <p>Each vehicle works out where it probably is, and how sure it is, and plans around that.</p>
-      </article>
-      <article class="frame fm rv">
-        <div class="fm-h"><span>FM-02</span><span class="chip ok">Tested in simulation</span></div>
-        <h3>Radio cut</h3>
-        <strong>Messages find another way through.</strong>
-        <p>Vehicles pass messages along for each other and hold them until a path opens up again.</p>
-      </article>
-      <article class="frame fm rv">
-        <div class="fm-h"><span>FM-03</span><span class="chip ok">Tested in simulation</span></div>
-        <h3>A vehicle is lost</h3>
-        <strong>Someone else picks up its job.</strong>
-        <p>The rest of the group notices the gap and shares out the work again, without being told.</p>
-      </article>
-    </div>
-    <p class="honest rv"><span class="chip warn">Status</span><span>All of this has been tested in simulation. None of it has flown on a real aircraft yet.</span></p>
+<section class="product" id="turtleshield" aria-labelledby="ts">
+  <div class="p-head rv"><h2 id="ts">TurtleShield</h2><p><b>The AI we’re building.</b> Runs on every vehicle.</p></div>
+  <p class="p-lede rv">TurtleShield is the AI at the centre of Homingvector. Every drone already flies itself; what breaks under jamming is the team. TurtleShield takes the team out of the base station and puts it on every vehicle.</p>
+  <div class="notes">
+    <div class="rv"><h3>Keeps the drones you already own.</h3><p>It sits on top of the autopilot. Adding a second autopilot brand changed zero files in our core. That brand, ArduPilot, has only been tested standing still so far.</p></div>
+    <div class="rv"><h3>Air, ground and water, together.</h3><p>Fixed-wing aircraft, ground robots and surface boats share one plan and hand work to each other.</p></div>
+    <div class="rv"><h3>Built for the edge.</h3><p>Designed for an NVIDIA Jetson Orin next to a Cube Orange flight controller, with no base station in the loop.</p></div>
+    <div class="rv"><h3>Suggests. Never decides.</h3><p>It can spot something, keep track of it and suggest a way to intercept. A person makes the call. There is no weapon code.</p></div>
   </div>
 </section>
 
-<section class="sec" id="principle">
-  <div class="wrap">
-    <div class="sh rv"><span class="sh-n">03</span><span>Core principle</span><span class="sh-r" aria-hidden="true"></span></div>
-    <div class="idea">
-      <div class="rv">
-        <h2 class="h2">Know what you <em>don't know.</em></h2>
-        <p class="body">Most systems store a position as a dot on a map and trust it. Ours stores the dot and a circle around it that says how sure the vehicle is. <b>The worse the GPS, the bigger the circle, and the vehicle plans around the circle.</b></p>
+<section class="product" id="turtleeyes" aria-labelledby="te">
+  <div class="p-head rv"><h2 id="te">Turtle Eyes</h2><p><b>Ground control station (GCS)</b> for TurtleShield.</p></div>
+  <p class="p-lede rv">Turtle Eyes is the GCS operators use to run a TurtleShield team. Three modes, one click each. Orders go in as plain English. Nothing moves until a person holds the button down.</p>
+
+  <div class="console rv" id="console">
+    <div class="c-top">
+      <div class="c-logo">
+        <svg width="26" height="26" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="none" stroke="#f2f0ea" stroke-width="1.5"/><circle cx="20" cy="20" r="6" fill="none" stroke="#f2f0ea" stroke-width="1.5"/><path d="M20 0V10M20 30V40M0 20H10M30 20H40" stroke="#f2f0ea" stroke-width="1.5"/></svg>
+        <div><b>TURTLE EYES</b><small>PERSISTENT OVERWATCH</small></div>
       </div>
-      <div class="frame kcard rv">
-        <svg viewBox="0 0 420 300" role="img" aria-label="An aircraft with a confidence circle that grows as GPS quality drops">
-          <defs><pattern id="kg" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="#e8e3d5" stroke-opacity=".07"/></pattern></defs>
-          <rect width="420" height="300" fill="url(#kg)"/>
-          <rect id="kspot" x="138" y="108" width="84" height="84" fill="none" stroke="#e8e3d5" stroke-width="1.5" stroke-dasharray="6 5"/>
-          <circle id="kc" cx="180" cy="150" r="24" fill="#ff5a1f" fill-opacity=".14" stroke="#ff5a1f" stroke-width="2"/>
-          <path d="M180 138 L190 160 L180 155 L170 160Z" fill="#e8e3d5"/>
-          <g id="knb" opacity="0" style="transition:opacity .3s">
-            <path d="M306 142 C 320 112, 336 86, 352 70" fill="none" stroke="#e8e3d5" stroke-width="1.5"/>
-            <path d="M340 68 L353 69 L349 82" fill="none" stroke="#e8e3d5" stroke-width="1.5"/>
-            <rect x="360" y="22" width="44" height="50" fill="none" stroke="#e8e3d5" stroke-width="1.5" stroke-dasharray="4 4"/>
-            <path d="M382 34 L392 56 L382 51 L372 56Z" fill="#e8e3d5"/>
-            <text x="352" y="94" font-family="Martian Mono, monospace" font-size="9" fill="#aaa895">NEIGHBOUR</text>
-          </g>
-        </svg>
-        <div class="krow"><label for="gpsq">GPS quality</label><span id="klab">GPS good</span></div>
-        <input type="range" id="gpsq" min="0" max="100" value="90">
-        <output id="kout" for="gpsq">Takes a tight, precise spot.</output>
-        <p class="fineprint">Dashed box: the spot it takes. Orange circle: how sure it is of its own position.</p>
+      <div class="c-tabs" role="tablist" aria-label="Console mode">
+        <button role="tab" aria-selected="true" data-mode="0">Targeting</button>
+        <button role="tab" aria-selected="false" data-mode="1">Surveillance</button>
+        <button role="tab" aria-selected="false" data-mode="2">Simulation</button>
+      </div>
+      <div class="c-meta"><span class="mock">MOCK</span><span class="clkc" data-clock>--:--:--Z</span></div>
+    </div>
+    <div class="c-body">
+      <aside class="c-left" aria-label="Connected vehicles">
+        <div class="c-h">CONNECTED &middot; 9/9</div>
+        <div id="vlist"></div>
+      </aside>
+      <div class="c-map">
+        <svg id="tmap" viewBox="0 0 640 440" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Drawn map showing vehicles moving in the selected mode"></svg>
+        <div class="c-cap"><span id="cmode">TARGETING: find something of interest and keep eyes on it.</span><span class="c-leg"><span><i>&#9650;</i>AIR</span><span><i>&#9632;</i>GROUND</span><span><i>&#9670;</i>SURFACE</span><span><i style="color:#e3a82b">&#9671;</i>TRACK</span><span><i>&#9633;</i>HOME</span></span></div>
+      </div>
+      <div class="c-right">
+        <p class="c-note"><b>Operations console ready.</b> Type an order in plain English. Orders are shown on the map and need one hold-to-confirm.</p>
+        <div class="c-order"><span class="pr">&gt;</span><span id="otext"></span><i class="caret"></i></div>
+        <button class="hold" id="hold" disabled><span>Hold to confirm</span></button>
+        <p class="c-hint" id="ohint" aria-live="polite">&nbsp;</p>
+        <div class="c-log"><div class="c-h" style="padding-left:0">ORDER LOG</div><ol id="olog"></ol></div>
       </div>
     </div>
+    <div class="c-foot"><span>VEHICLES <b>9</b></span><span>MESH PEERS <b>8</b></span><span>REJECTED/S <b>0</b></span><span>ALERTS <b>1</b></span></div>
+  </div>
+  <p class="c-note-out">Drawn for this page. The real Turtle Eyes runs on sample data today and says MOCK in the corner, same as this one. Try holding the button.</p>
 
-    <div class="zero-row rv">
-      <div class="big0" aria-hidden="true">0</div>
-      <div>
-        <h3>changes to our core software when we added a second autopilot brand.</h3>
-        <p class="body">Armies rarely buy all their drones from one maker, and they change suppliers. So TurtleShield sits on top of the autopilot. Adding a new kind of vehicle means writing a small adapter. The part that does the thinking stays exactly the same, and customers keep the drones they already own.</p>
-        <p class="fineprint">The second brand, ArduPilot, has only been tested standing still in simulation so far. All our flying tests use the first, PX4.</p>
-      </div>
+  <div class="notes three">
+    <div class="rv"><h3>Offline by default.</h3><p>It carries its own maps and runs on a rugged laptop in the field.</p></div>
+    <div class="rv"><h3>Locked down.</h3><p>Operators see only what they need. Engineering controls sit behind a separate login.</p></div>
+    <div class="rv"><h3>Where to go, what to watch.</h3><p>Nothing more. Pause, stop or call every vehicle home at any time.</p></div>
+  </div>
+</section>
+
+<section class="status" id="status" aria-labelledby="st">
+  <div class="w letter">
+    <h2 id="st" class="rv">Where we actually are.</h2>
+    <div class="body rv">
+      <p>We haven’t flown a real aircraft yet. Everything on this page comes from simulation, or from a real flight controller wired to a simulator. You should hear that from us before anything else.</p>
+      <p>Here is what the simulator has shown so far. We keep every failure, because that is where the lessons are.</p>
+      <table class="ledger">
+        <caption class="vh">Results from simulation, as of 15 September 2026</caption>
+        <tbody>
+          <tr><th scope="row">Test missions flown in simulation</th><td class="v">742</td><td class="n">531 passed, 141 failed, 70 skipped</td></tr>
+          <tr><th scope="row">Orders from our software accepted by the autopilot</th><td class="v">2,000+</td><td class="n">After the base station handed over</td></tr>
+          <tr><th scope="row">Aircraft in tight formation</th><td class="v">8</td><td class="n">6 of 6 runs passed. Closest approach 33.25 m against a 30 m limit.</td></tr>
+          <tr><th scope="row">Position error without GPS</th><td class="v">396–750 m &rarr; 25.5–39.0 m</td><td class="n">After one day of fixes. Still not good enough to rely on.</td></tr>
+          <tr><th scope="row">Core files changed to add a second autopilot</th><td class="v">0</td><td class="n">ArduPilot tested standing still only</td></tr>
+          <tr><th scope="row">Problems written down with their causes</th><td class="v">103</td><td class="n">47 still open</td></tr>
+          <tr class="zero"><th scope="row">Flights on a real aircraft</th><td class="v">0</td><td class="n">The first is planned for month 3</td></tr>
+        </tbody>
+      </table>
+      <p>Still open: navigation without GPS isn’t accurate enough yet, each vehicle uses about 33 times the radio capacity we budget for, and some backup behaviours are written and tested but not yet switched on. The next twelve months are built to close those.</p>
+      <p class="sig">Nidhip Sharma<span>Founder, Homingvector</span></p>
     </div>
   </div>
 </section>
 
-<section class="sec" id="eyes">
-  <div class="wrap">
-    <div class="sh rv"><span class="sh-n">04</span><span>Product / Turtle Eyes</span><span class="sh-r" aria-hidden="true"></span></div>
-    <h2 class="ptitle rv">Turtle Eyes</h2>
-    <div class="prod-intro">
-      <p class="lead rv">What the operator sees. Three modes, one click each. Orders go in as plain English and nothing moves until a person holds the button down.</p>
-      <p class="body rv">Built for a rugged laptop in the field, with its own maps and no internet needed. <b>It tells vehicles where to go and what to watch. Nothing more.</b></p>
-    </div>
-
-    <div class="console rv" id="console">
-      <div class="c-top">
-        <div class="c-logo">
-          <svg width="26" height="26" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="none" stroke="#e8e3d5" stroke-width="1.5"/><circle cx="20" cy="20" r="6" fill="none" stroke="#e8e3d5" stroke-width="1.5"/><path d="M20 0V10M20 30V40M0 20H10M30 20H40" stroke="#e8e3d5" stroke-width="1.5"/></svg>
-          <div><b>TURTLE EYES</b><small>PERSISTENT OVERWATCH</small></div>
-        </div>
-        <div class="c-tabs" role="tablist" aria-label="Console mode">
-          <button role="tab" aria-selected="true" data-mode="0">Targeting</button>
-          <button role="tab" aria-selected="false" data-mode="1">Surveillance</button>
-          <button role="tab" aria-selected="false" data-mode="2">Simulation</button>
-        </div>
-        <div class="c-meta"><span class="mock">MOCK</span><span class="clkc" data-clock>--:--:--Z</span></div>
-      </div>
-      <div class="c-body">
-        <aside class="c-left">
-          <div class="c-h">CONNECTED &middot; 9/9</div>
-          <div id="vlist"></div>
-        </aside>
-        <div class="c-map">
-          <svg id="tmap" viewBox="0 0 640 440" preserveAspectRatio="xMidYMid slice" aria-label="Drawn map showing vehicles moving in the selected mode"></svg>
-          <div class="c-cap"><span id="cmode">TARGETING: find something of interest and keep eyes on it.</span><span class="c-leg"><span><i>&#9650;</i>AIR</span><span><i>&#9632;</i>GROUND</span><span><i>&#9670;</i>SURFACE</span><span><i style="color:#e3a82b">&#9671;</i>TRACK</span><span><i>&#9633;</i>HOME</span></span></div>
-        </div>
-        <aside class="c-right">
-          <p class="c-note"><b>Operations console ready.</b> Type an order in plain English. Orders are shown on the map and need one hold-to-confirm.</p>
-          <div class="c-order"><span class="pr">&gt;</span><span id="otext"></span><i class="caret"></i></div>
-          <button class="hold" id="hold" disabled><span>Hold to confirm</span></button>
-          <p class="c-hint" id="ohint">&nbsp;</p>
-          <div class="c-log"><div class="c-h" style="padding-left:0">ORDER LOG</div><ol id="olog"></ol></div>
-        </aside>
-      </div>
-      <div class="c-foot"><span>VEHICLES <b>9</b></span><span>MESH PEERS <b>8</b></span><span>REJECTED/S <b>0</b></span><span>ALERTS <b>1</b></span></div>
-    </div>
-    <p class="fineprint te-note">Drawn for this page. The real Turtle Eyes runs on sample data today and says MOCK in the corner, same as this one.</p>
-
-    <div class="frame spec wide rv">
-      <div class="sph"><span>Specification</span><span>TE-01</span></div>
-      <dl>
-        <div><dt>Modes</dt><dd>Targeting, surveillance, simulation. One click each.</dd></div>
-        <div><dt>Orders</dt><dd>Plain English, shown on the map, one hold-to-confirm</dd></div>
-        <div><dt>Network</dt><dd>Works with no internet and carries its own maps</dd></div>
-        <div><dt>Hardware</dt><dd>Built to run on a rugged laptop in the field</dd></div>
-        <div><dt>Access</dt><dd>Operators see only what they need. Engineering controls sit behind a separate login.</dd></div>
-        <div><dt>Control</dt><dd>Pause, stop, or call every vehicle home at any time</dd></div>
-        <div><dt>Scope</dt><dd>Tells vehicles where to go and what to watch. Nothing more.</dd></div>
-        <div><dt>Status</dt><dd class="st">Running on sample data today</dd></div>
-      </dl>
-    </div>
-  </div>
+<section class="next" aria-labelledby="nx">
+  <h2 id="nx" class="rv">The next twelve months, out of the simulator and into the air.</h2>
+  <ol class="tl">
+    <li class="rv"><span class="mo">Month 3</span><h3>First real flight with TurtleShield in charge</h3><p>A safety pilot on standby, every bench check done first.</p></li>
+    <li class="rv"><span class="mo">Month 6</span><h3>Three aircraft in formation, in real wind</h3><p>Radio use brought down to budget. Real numbers replace simulated ones.</p></li>
+    <li class="rv"><span class="mo">Month 9</span><h3>Flying without GPS, against a jamming rig</h3><p>Backup behaviours switched on. Our core idea, tested for real.</p></li>
+    <li class="rv"><span class="mo">Month 10</span><h3>A five-aircraft field trial, run by an outsider</h3><p>Operated through Turtle Eyes and signed off by someone who watched.</p></li>
+  </ol>
 </section>
 
-<section class="sec" id="evidence">
-  <div class="wrap">
-    <div class="sh rv"><span class="sh-n">05</span><span>Evidence / as of 15 Sep 2026</span><span class="sh-r" aria-hidden="true"></span></div>
-    <h2 class="h2 rv">What we've proven. <em>And what we haven't.</em></h2>
-    <p class="body ev-intro rv">We keep every failure, because that is where the lessons are. Everything on the left happened in simulation, with the same autopilot software that flies real aircraft.</p>
-
-    <div class="record">
-      <div>
-        <div class="colhead rv"><span>Demonstrated in simulation</span><span class="chip ok">Measured</span></div>
-        <div class="row rv"><div class="n" data-count="742">742</div><div><h3>test missions flown in simulation</h3><p>531 passed, 141 failed, 70 were skipped. Every failure is kept on record.</p></div></div>
-        <div class="row rv"><div class="n" data-count="2000" data-suf="+">2,000+</div><div><h3>orders from our software, accepted by the autopilot</h3><p>Our software commanding simulated aircraft after the base station handed over, counted across recorded runs.</p></div></div>
-        <div class="row rv"><div class="n" data-count="8">8</div><div><h3>aircraft in tight formation, kept safely apart</h3><p>6 out of 6 runs passed. Closest approach 33.25 m against a 30 m limit, measured from the simulator's true positions.</p></div></div>
-        <div class="row rv"><div class="n" data-count="90" data-suf="%+">90%+</div><div><h3>less position error without GPS, after one day of fixes</h3><p>Average error went from 396–750 m down to 25.5–39.0 m. Still not accurate enough to rely on.</p></div></div>
-        <div class="row rv"><div class="n" data-count="103">103</div><div><h3>problems written down, with their causes</h3><p>47 of them are still open.</p></div></div>
-      </div>
-      <div class="rv">
-        <div class="colhead"><span>Not yet demonstrated</span><span class="chip bad">Read this first</span></div>
-        <div class="frame notyet">
-          <div class="zero"><b>0</b><span>flights on a real aircraft.</span></div>
-          <ul>
-            <li>Everything so far is simulation, or a real flight controller wired to a simulator.</li>
-            <li>The biggest group flown together: 8 aircraft in simulation, 11 with a real flight controller in the loop.</li>
-            <li>Navigation without GPS has improved fast, and is still not accurate enough to rely on.</li>
-            <li>Each vehicle uses about 33 times the radio capacity we budget for.</li>
-            <li>Some backup behaviours are written and tested, and not yet switched on in the flying software.</li>
-          </ul>
-        </div>
-      </div>
+<section class="contact" id="contact" aria-labelledby="ct">
+  <h2 id="ct" class="rv">Build this with us.</h2>
+  <div class="contact-row">
+    <p class="rv">We’re raising a pre-seed round to take TurtleShield from simulation to a field trial that someone outside the company signs off. If you fly drones, build them, or back the people who do, write to us. Founded by <a href="https://www.linkedin.com/in/nidhip-sharma/" target="_blank" rel="noopener">Nidhip Sharma</a>.</p>
+    <div class="reach rv">
+      <a class="mail" id="mail" href="#contact">nidhip.sharma.123 [at] gmail.com</a>
+      <a class="li" href="https://www.linkedin.com/in/nidhip-sharma/" target="_blank" rel="noopener">LinkedIn &nearr;</a>
     </div>
   </div>
-</section>
-
-<section class="sec" id="authority">
-  <div class="wrap">
-    <div class="sh rv"><span class="sh-n">06</span><span>Human authority</span><span class="sh-r" aria-hidden="true"></span></div>
-    <h2 class="h2 rv">The software finds and follows. <em>A person decides.</em></h2>
-    <div class="chain rv">
-      <div><small>01 &rarr;</small>Spot something</div>
-      <div><small>02 &rarr;</small>Keep track of it</div>
-      <div><small>03 &rarr;</small>Suggest a way to intercept</div>
-      <div><small>04</small>A person decides</div>
-    </div>
-    <div class="line-body rv">
-      <p>TurtleShield contains no weapon code. It stops at a suggestion, and a person takes it from there.</p>
-      <p>An operator can pause the mission, stop it, or call every vehicle home at any time.</p>
-    </div>
-  </div>
-</section>
-
-<section class="sec" id="programme">
-  <div class="wrap">
-    <div class="sh rv"><span class="sh-n">07</span><span>Programme / next 12 months</span><span class="sh-r" aria-hidden="true"></span></div>
-    <h2 class="h2 rv">Out of the simulator, into the air, <em>with someone watching.</em></h2>
-    <div class="gantt rv">
-      <div class="g-row g-scale" aria-hidden="true"><div class="g-lab">Milestone</div><div class="g-track"><span>M1</span><span>M2</span><span>M3</span><span>M4</span><span>M5</span><span>M6</span><span>M7</span><span>M8</span><span>M9</span><span>M10</span><span>M11</span><span>M12</span></div></div>
-      <div class="g-row"><div class="g-lab"><div class="m">MONTH 3</div><h3>First real flight with our software in charge</h3><p>A safety pilot on standby, every bench safety check done first.</p></div><div class="g-track"><i class="g-bar" style="--m:3"></i></div></div>
-      <div class="g-row"><div class="g-lab"><div class="m">MONTH 6</div><h3>Three aircraft in formation, in real wind</h3><p>Radio use brought down to budget. Real numbers replace simulated ones.</p></div><div class="g-track"><i class="g-bar" style="--m:6"></i></div></div>
-      <div class="g-row"><div class="g-lab"><div class="m">MONTH 9</div><h3>Flying without GPS, against a jamming rig</h3><p>Backup behaviours switched on. Our core idea, tested for real.</p></div><div class="g-track"><i class="g-bar" style="--m:9"></i></div></div>
-      <div class="g-row"><div class="g-lab"><div class="m">MONTH 10</div><h3>A five-aircraft field trial, run by an outsider</h3><p>Operated through Turtle Eyes, with jamming and radio trouble, and signed off by someone who watched.</p></div><div class="g-track"><i class="g-bar" style="--m:10"></i></div></div>
-    </div>
-  </div>
-</section>
-
-<section class="sec contact" id="contact">
-  <div class="wrap">
-    <div class="sh rv"><span class="sh-n">08</span><span>Contact</span><span class="sh-r" aria-hidden="true"></span></div>
-    <div class="mega2 rv">Work<br>with us<span>.</span></div>
-    <div class="contact-grid">
-      <p class="rv">Homingvector is raising a pre-seed round to take TurtleShield from simulation to a witnessed field trial. Founded by <a href="https://www.linkedin.com/in/nidhip-sharma/" target="_blank" rel="noopener">Nidhip Sharma</a>, who wrote TurtleShield and the testing system behind it. If you fly drones, build them, or fund the people who do, write to us.</p>
-      <div class="cwrap rv">
-        <a class="mail" id="mail" href="#contact">nidhip.sharma.123 [at] gmail.com</a>
-        <a class="btn li" href="https://www.linkedin.com/in/nidhip-sharma/" target="_blank" rel="noopener">LinkedIn / nidhip-sharma &nearr;</a>
-      </div>
-    </div>
-    <div class="foot">
-      <span>&copy; 2026 Homingvector / India</span>
-      <span>Performance figures come from simulation unless stated otherwise</span>
-      <span>No cookies</span>
-    </div>
-  </div>
+  <div class="legal"><span>&copy; 2026 Homingvector, India</span><span>Performance figures are from simulation unless stated otherwise.</span><span>No cookies, no trackers.</span></div>
 </section>
 </main>
 
@@ -691,15 +467,6 @@ tickClock(); setInterval(tickClock,1000);
 /* email, assembled here so it is not sitting in the HTML for scrapers */
 (function(){var u='nidhip.sharma.123',d='gmail.com',a=$('#mail');a.textContent=u+'@'+d;a.href='mailto:'+u+'@'+d+'?subject=Homingvector';})();
 
-/* counters */
-function countUp(n){
-  var end=+n.dataset.count, suf=n.dataset.suf||'';
-  function fmt(v){return Math.round(v).toLocaleString('en-IN')+suf}
-  if(RM){n.textContent=fmt(end);return}
-  var t0=performance.now(), D=1500;
-  (function f(){var k=Math.max(0,Math.min(1,(performance.now()-t0)/D)), e=1-Math.pow(1-k,3); n.textContent=fmt(end*e); if(k<1) requestAnimationFrame(f)})();
-}
-
 /* visibility by plain rect checks on scroll */
 var watchers=[];
 function watch(el,fn,once){watchers.push({el:el,fn:fn,once:once,last:null,done:false})}
@@ -712,181 +479,65 @@ function checkViews(){
     else { var vis=r.top<h && r.bottom>0; if(vis!==w.last){w.last=vis; w.fn(vis)} }
   });
 }
-var viewQueued=false;
-function queueViews(){ if(viewQueued) return; viewQueued=true; requestAnimationFrame(function(){viewQueued=false; checkViews()}) }
-window.addEventListener('scroll',queueViews,{passive:true});
-window.addEventListener('resize',queueViews);
-$$('.rv').forEach(function(x){watch(x,function(){x.classList.add('in'); $$('[data-count]',x).forEach(countUp)},true)});
+var queued=false;
+function queue(){ if(queued) return; queued=true; requestAnimationFrame(function(){queued=false; checkViews(); story()}) }
+window.addEventListener('scroll',queue,{passive:true});
+window.addEventListener('resize',queue);
+window.__watch=watch;
+$$('.rv').forEach(function(x){watch(x,function(){x.classList.add('in')},true)});
 
-/* ================= hero sketch ================= */
+/* ================= film ================= */
 (function(){
-  var cv=$('#sim'), ctx=cv.getContext('2d');
-  var INK='#e8e3d5', SIG='#ff5a1f';
-  var W=0,H=0,R=80;
-  var st={jam:false,cut:false,t:0,orbit:0,cx:null,cy:null,tx:null,ty:null,moved:false,packets:[],pk:0,t0:performance.now(),lastMoveLog:0,nOk:0,nLinks:0};
-  var fleet=[], i;
-  for(i=0;i<5;i++) fleet.push({k:'fw',off:i/5*Math.PI*2});
-  for(i=0;i<2;i++) fleet.push({k:'ugv',ph:i*Math.PI});
-  for(i=0;i<2;i++) fleet.push({k:'usv',ph:i*2.6});
-  fleet.forEach(function(v,n){v.n=n;v.alive=true;v.dead=0;v.sig=4;v.jx=0;v.jy=0;v.x=0;v.y=0;v.hd=0});
-
-  /* spacing budget so no two things ever touch. Worst case is jammed aircraft:
-     ring R+2.2*22, circle 1.2*22+3, jitter .35*22, so R+85.5 from the objective. Boats get their own lane. */
-  var RING_OUT=90, RING_BELOW=86, LANE=36;
-  function home(){return [W*.5, R+RING_OUT]}
-  function clampT(){
-    var mx=Math.min(W/2,R+RING_OUT), myT=R+RING_OUT, myB=Math.max(myT,H-LANE-34-R-RING_BELOW);
-    st.tx=Math.min(Math.max(st.tx,mx),W-mx); st.ty=Math.min(Math.max(st.ty,myT),myB);
-  }
-  function resize(){
-    var r=cv.getBoundingClientRect(), d=Math.min(window.devicePixelRatio||1,2);
-    W=r.width; H=r.height;
-    cv.width=Math.round(W*d); cv.height=Math.round(H*d); ctx.setTransform(d,0,0,d,0,0);
-    R=Math.max(40,Math.min((H-246)/2, W/2-RING_OUT, 110));
-    if(!st.moved||st.tx===null){var h=home(); st.tx=h[0]; st.ty=h[1]}
-    clampT();
-    if(st.cx===null){st.cx=st.tx; st.cy=st.ty}
-  }
-  function keep(a,b){var s=Math.sin((a+1)*12.9898+(b+1)*78.233)*43758.5453;return (s-Math.floor(s))<.34}
-
-  var links=[];
-  function step(dt){
-    st.t+=dt; st.orbit+=dt*(RM?.08:.24);
-    var f=Math.min(1,dt*1.8); st.cx+=(st.tx-st.cx)*f; st.cy+=(st.ty-st.cy)*f;
-    var fws=fleet.filter(function(v){return v.k==='fw'&&v.alive});
-    fws.forEach(function(v,k){var want=k/fws.length*Math.PI*2, d=want-v.off; d=Math.atan2(Math.sin(d),Math.cos(d)); v.off+=d*Math.min(1,dt*1.1)});
-    fleet.forEach(function(v){
-      if(!v.alive){v.dead+=dt; return}
-      var tgt=st.jam?(v.k==='fw'?22:v.k==='ugv'?13:17):4;
-      v.sig+=(tgt-v.sig)*Math.min(1,dt*(st.jam?.45:1.3));
-      v.jx+=(Math.random()-.5)*dt*70; v.jy+=(Math.random()-.5)*dt*70;
-      var lim=v.sig*.35, m=Math.hypot(v.jx,v.jy); if(m>lim){v.jx*=lim/m; v.jy*=lim/m}
-      var px,py,a,r;
-      if(v.k==='fw'){a=st.orbit+v.off; r=R+v.sig*2.2; px=st.cx+Math.cos(a)*r; py=st.cy+Math.sin(a)*r; v.hd=a+Math.PI/2}
-      else if(v.k==='ugv'){a=-st.orbit*.5+v.ph; r=R*.62+v.sig*.5; px=st.cx+Math.cos(a)*r; py=st.cy+Math.sin(a)*r}
-      else {px=W/2+Math.sin(st.t*.15)*Math.max(0,W/2-130)+(v.ph?64:-64); py=H-LANE}
-      v.x=px+v.jx; v.y=py+v.jy;
-    });
-    var alive=fleet.filter(function(v){return v.alive});
-    links=[];
-    for(var p=0;p<alive.length;p++) for(var q=p+1;q<alive.length;q++){
-      var A=alive[p],B=alive[q];
-      if(Math.hypot(A.x-B.x,A.y-B.y)<R*1.9) links.push({a:A,b:B,ok:!st.cut||keep(A.n,B.n)});
-    }
-    var live=links.filter(function(l){return l.ok});
-    st.nOk=live.length; st.nLinks=links.length;
-    st.pk+=dt;
-    if(st.pk>.1 && live.length){st.pk=0; var L=live[Math.floor(Math.random()*live.length)]; st.packets.push({a:L.a,b:L.b,t:0,rev:Math.random()<.5})}
-    st.packets=st.packets.filter(function(k){k.t+=dt*1.5; return k.t<1 && k.a.alive && k.b.alive});
-  }
-
-  function glyph(v){
-    ctx.save(); ctx.translate(v.x,v.y);
-    ctx.globalAlpha=v.alive?1:Math.max(0,1-v.dead/1.2);
-    if(!v.alive){ctx.strokeStyle=SIG;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(-7,-7);ctx.lineTo(7,7);ctx.moveTo(7,-7);ctx.lineTo(-7,7);ctx.stroke();ctx.restore();return}
-    ctx.fillStyle=INK;
-    if(v.k==='fw'){ctx.rotate(v.hd);ctx.beginPath();ctx.moveTo(11,0);ctx.lineTo(-7,-7);ctx.lineTo(-3,0);ctx.lineTo(-7,7);ctx.closePath();ctx.fill()}
-    else if(v.k==='ugv'){ctx.fillRect(-6,-6,12,12)}
-    else {ctx.rotate(Math.PI/4);ctx.fillRect(-6,-6,12,12)}
-    ctx.restore();
-  }
-
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    var avg=0,c=0; fleet.forEach(function(v){if(v.k==='fw'&&v.alive){avg+=v.sig;c++}}); avg=c?avg/c:4;
-    ctx.save(); ctx.setLineDash([2,7]); ctx.strokeStyle='rgba(232,227,213,.22)'; ctx.lineWidth=1.2;
-    ctx.beginPath(); ctx.arc(st.cx,st.cy,R+avg*2.2,0,Math.PI*2); ctx.stroke(); ctx.restore();
-    ctx.save(); ctx.translate(st.cx,st.cy); ctx.strokeStyle=SIG; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.arc(0,0,9,0,Math.PI*2); ctx.stroke();
-    ctx.rotate(st.t*.6); for(var k=0;k<4;k++){ctx.rotate(Math.PI/2);ctx.beginPath();ctx.moveTo(13,0);ctx.lineTo(20,0);ctx.stroke()}
-    ctx.restore();
-    links.forEach(function(l){
-      ctx.save();
-      if(l.ok){ctx.strokeStyle='rgba(232,227,213,.36)';ctx.lineWidth=1}
-      else {ctx.strokeStyle='rgba(232,227,213,.12)';ctx.setLineDash([3,5]);ctx.lineWidth=1}
-      ctx.beginPath(); ctx.moveTo(l.a.x,l.a.y); ctx.lineTo(l.b.x,l.b.y); ctx.stroke(); ctx.restore();
-    });
-    ctx.fillStyle=SIG;
-    st.packets.forEach(function(p){var t=p.rev?1-p.t:p.t; ctx.fillRect(p.a.x+(p.b.x-p.a.x)*t-2, p.a.y+(p.b.y-p.a.y)*t-2, 4, 4)});
-    fleet.forEach(function(v){
-      if(!v.alive) return;
-      ctx.save(); ctx.beginPath(); ctx.arc(v.x,v.y,v.sig*1.2+3,0,Math.PI*2);
-      if(st.jam||v.sig>6){ctx.fillStyle='rgba(255,90,31,.12)';ctx.fill();ctx.strokeStyle='rgba(255,90,31,.95)'}
-      else ctx.strokeStyle='rgba(232,227,213,.3)';
-      ctx.lineWidth=1.2; ctx.stroke(); ctx.restore();
-    });
-    fleet.forEach(glyph);
-  }
-
-  var logEl=$('#simlog');
-  function log(msg){
-    var s=Math.floor((performance.now()-st.t0)/1000), li=document.createElement('li'), sp=document.createElement('span');
-    sp.textContent='T+'+pad(Math.floor(s/60))+':'+pad(s%60); li.appendChild(sp); li.appendChild(document.createTextNode(msg));
-    logEl.insertBefore(li,logEl.firstChild); while(logEl.children.length>3) logEl.removeChild(logEl.lastChild);
-  }
-  var WORDS=['none','one','two','three','four','five'];
-  $('#b-jam').addEventListener('click',function(){
-    st.jam=!st.jam; this.setAttribute('aria-pressed',st.jam);
-    log(st.jam?'GPS jammed. Circles grow and aircraft take looser spots.':'GPS back. Circles shrink and spots tighten.');
-  });
-  $('#b-cut').addEventListener('click',function(){
-    st.cut=!st.cut; this.setAttribute('aria-pressed',st.cut);
-    log(st.cut?'Radio cut. Messages hop through whoever can still hear.':'Radio back. Every link carries traffic again.');
-  });
-  $('#b-lose').addEventListener('click',function(){
-    var fws=fleet.filter(function(v){return v.k==='fw'&&v.alive});
-    if(fws.length<=2){log('Two aircraft left. Holding there.');return}
-    var v=fws[Math.floor(Math.random()*fws.length)];
-    v.alive=false; v.dead=0;
-    log('Aircraft lost. The other '+WORDS[fws.length-1]+' spread out to cover the gap, untold.');
-  });
-  $('#b-reset').addEventListener('click',function(){
-    var k=0;
-    fleet.forEach(function(v){v.alive=true; v.dead=0; if(v.k==='fw'){v.off=(k++)/5*Math.PI*2}});
-    st.jam=false; st.cut=false; st.moved=false; $('#b-jam').setAttribute('aria-pressed','false'); $('#b-cut').setAttribute('aria-pressed','false');
-    var h=home(); st.tx=h[0]; st.ty=h[1]; clampT();
-    log('Reset. Nine vehicles on the mesh, ring held.');
-  });
-  cv.addEventListener('click',function(e){
-    var r=cv.getBoundingClientRect(); st.tx=e.clientX-r.left; st.ty=e.clientY-r.top; st.moved=true; clampT();
-    var now=performance.now(); if(now-st.lastMoveLog>2500){st.lastMoveLog=now; log('New objective. The ring moves with it.')}
-  });
-
-  var roG=$('#ro-gps'), roL=$('#ro-links'), roF=$('#ro-fleet');
-  setInterval(function(){
-    roG.textContent=st.jam?'JAMMED':'OK'; roG.className=st.jam?'bad':'';
-    roL.textContent=st.nOk+'/'+st.nLinks; roL.className=st.cut?'bad':'';
-    var n=fleet.filter(function(v){return v.alive}).length; roF.textContent=n+'/9'; roF.className=n<9?'bad':'';
-  },250);
-
-  var running=true, last=performance.now();
-  function loop(){
-    var t=performance.now(), dt=Math.max(0,Math.min(.05,(t-last)/1000)); last=t;
-    if(running){step(dt); draw()}
-    requestAnimationFrame(loop);
-  }
-  window.addEventListener('resize',resize);
-  watch(cv,function(v){running=v; last=performance.now()},false);
-  resize(); for(var w=0;w<30;w++) step(1/30);
-  log('Nine vehicles on the mesh. Ring held around the objective.');
-  requestAnimationFrame(loop);
+  var v=$('#filmv'), steps=$$('.film-steps li'), btn=$('#film-toggle'), userPaused=false, CUE=[0,10,15,18.6,21,26];
+  function upd(){ var t=v.currentTime||0, idx=0; CUE.forEach(function(s,i){ if(t>=s) idx=i }); steps.forEach(function(li,i){ li.classList.toggle('on',i===idx) }) }
+  function setBtn(){ btn.textContent=v.paused?'Play film':'Pause film'; btn.setAttribute('aria-pressed',String(!v.paused)) }
+  v.addEventListener('timeupdate',upd); v.addEventListener('play',setBtn); v.addEventListener('pause',setBtn);
+  btn.addEventListener('click',function(){ if(v.paused){ userPaused=false; var p=v.play(); if(p&&p.catch) p.catch(function(){}) } else { userPaused=true; v.pause() } });
+  if(RM){ v.removeAttribute('autoplay'); v.pause(); userPaused=true }
+  watch(v,function(vis){ if(userPaused) return; if(vis){ var p=v.play(); if(p&&p.catch) p.catch(function(){}) } else v.pause() },false);
+  setBtn(); upd();
 })();
 
-/* ================= know what you don't know ================= */
-(function(){
-  var q=$('#gpsq'), c=$('#kc'), spot=$('#kspot'), nb=$('#knb'), out=$('#kout'), lab=$('#klab');
-  var LAB=['GPS good','GPS shaky','GPS gone'];
-  var OUT=['Takes a tight, precise spot.','Takes a looser spot, with room to spare.','Holds back and hands the job to a better-placed neighbour.'];
-  function upd(){
-    var v=+q.value, r=16+(100-v)*1.0, s=v>66?0:v>30?1:2;
-    c.setAttribute('r',r.toFixed(1));
-    var side=Math.min(r*2+22,280); spot.setAttribute('x',(180-side/2).toFixed(1)); spot.setAttribute('y',(150-side/2).toFixed(1));
-    spot.setAttribute('width',side.toFixed(1)); spot.setAttribute('height',side.toFixed(1));
-    spot.style.opacity=s===2?0:1; nb.setAttribute('opacity',s===2?1:0);
-    lab.textContent=LAB[s]; out.textContent=OUT[s];
+/* ================= story video: loops the film segment for the current step ================= */
+var SEG=[[0,10],[10,15],[15,18.6],[18.6,21],[21,26],[26,32]], sv=$('#storyv'), svVisible=false;
+function svPlay(){ if(RM) return; var p=sv.play(); if(p&&p.catch) p.catch(function(){}) }
+function playSeg(n){
+  var s=SEG[n]||SEG[0];
+  function seek(){ try{ sv.currentTime=RM?Math.min(s[0]+1.5,s[1]-.1):s[0] }catch(e){} }
+  if(sv.readyState>=1) seek(); else sv.addEventListener('loadedmetadata',function h(){ sv.removeEventListener('loadedmetadata',h); seek() });
+  if(svVisible) svPlay();
+}
+sv.addEventListener('timeupdate',function(){ var s=SEG[Math.max(current,0)]; if(sv.currentTime>=s[1]-.06||sv.currentTime<s[0]-.6){ try{ sv.currentTime=s[0] }catch(e){} } });
+watch($('.view'),function(v){ svVisible=v; if(v) svPlay(); else sv.pause() },false);
+
+/* ================= story controller ================= */
+var STATES=['Formation holding','Nine vehicles linked','GPS jammed','Radio degraded','Aircraft lost','Awaiting operator'];
+var chapters=$$('[data-ch]'), cards=$$('#chapters .chapter'), car=$('#chapters'), vstate=$('#vstate'), carPos=$('#car-pos');
+var mq=window.matchMedia('(max-width: 999px)'), current=-1;
+window.__chapter=0;
+function setChapter(n){
+  if(n===current) return; current=n; window.__chapter=n;
+  chapters.forEach(function(c){c.classList.toggle('on',+c.dataset.ch===n)});
+  vstate.textContent=STATES[n];
+  playSeg(n);
+}
+function cardIndex(){ var w=cards[0].getBoundingClientRect().width+12; return Math.max(0,Math.min(cards.length-1,Math.round(car.scrollLeft/w))) }
+function story(){
+  if(mq.matches){
+    var i=cardIndex(); carPos.textContent=(i+1)+' of '+cards.length;
+    $('#car-prev').disabled=i===0; $('#car-next').disabled=i===cards.length-1;
+    setChapter(+cards[i].dataset.ch);
+  } else {
+    var mid=window.innerHeight*.5, best=0, bd=1e9;
+    chapters.forEach(function(c){var r=c.getBoundingClientRect(), d=Math.abs((r.top+r.bottom)/2-mid); if(d<bd){bd=d; best=+c.dataset.ch}});
+    setChapter(best);
   }
-  q.addEventListener('input',upd); upd();
-})();
+}
+car.addEventListener('scroll',queue,{passive:true});
+function go(step){ var w=cards[0].getBoundingClientRect().width+12; car.scrollTo({left:(cardIndex()+step)*w,behavior:RM?'auto':'smooth'}) }
+$('#car-prev').addEventListener('click',function(){go(-1)});
+$('#car-next').addEventListener('click',function(){go(1)});
+if(mq.addEventListener) mq.addEventListener('change',function(){current=-1; story()});
 
 /* ================= Turtle Eyes console ================= */
 (function(){
@@ -909,18 +560,17 @@ $$('.rv').forEach(function(x){watch(x,function(){x.classList.add('in'); $$('[dat
   });
   var river=el('path',{d:'M-10 398 C 110 352 210 424 320 368 S 520 282 650 322',fill:'none',stroke:'#2b3a3f','stroke-width':10,'stroke-linecap':'round'});
   var road=el('path',{d:'M-10 214 L 170 236 L 300 208 L 430 170 L 650 196',fill:'none',stroke:'#5a543b','stroke-width':1.5,'stroke-dasharray':'7 5'});
-
   var Ltrack=g(), Lsect=g({opacity:0}), Lsim=g({opacity:0});
   [Ltrack,Lsect,Lsim].forEach(function(L){L.style.transition='opacity .5s'});
   for(var s=0;s<5;s++){
-    el('rect',{x:190+s*82,y:48,width:82,height:340,fill:s%2?'#e8e3d5':'#a9b774','fill-opacity':.04,stroke:'#a9b774','stroke-opacity':.5,'stroke-dasharray':'4 4'},Lsect);
+    el('rect',{x:190+s*82,y:48,width:82,height:340,fill:s%2?'#f2f0ea':'#b3be7c','fill-opacity':.04,stroke:'#b3be7c','stroke-opacity':.5,'stroke-dasharray':'4 4'},Lsect);
   }
   var eightD=''; for(var j=0;j<=120;j++){var u=j/120*Math.PI*2; eightD+=(j?'L':'M')+(320+200*Math.sin(u)).toFixed(1)+' '+(210+108*Math.sin(2*u)).toFixed(1)}
-  el('path',{d:eightD,fill:'none',stroke:'#e8e3d5','stroke-opacity':.4,'stroke-dasharray':'3 6'},Lsim);
+  el('path',{d:eightD,fill:'none',stroke:'#f2f0ea','stroke-opacity':.4,'stroke-dasharray':'3 6'},Lsim);
   var trk=g({transform:'translate(330 215)'},Ltrack);
   el('path',{d:'M0 -9 L9 0 L0 9 L-9 0Z',fill:'none',stroke:'#e3a82b','stroke-width':2},trk);
   var homeMark=g({transform:'translate(46 396)'});
-  el('rect',{x:-8,y:-8,width:16,height:16,fill:'none',stroke:'#e8e3d5','stroke-opacity':.8},homeMark);
+  el('rect',{x:-8,y:-8,width:16,height:16,fill:'none',stroke:'#f2f0ea','stroke-opacity':.8},homeMark);
 
   var V=[
     {n:'FIXED-01',k:'fw',nav:'GNSS OK',bat:91},{n:'FIXED-02',k:'fw',nav:'GNSS OK',bat:88},
@@ -933,8 +583,8 @@ $$('.rv').forEach(function(x){watch(x,function(){x.classList.add('in'); $$('[dat
   V.forEach(function(v,i){
     v.i=i; v.x=320; v.y=220; v.hd=0;
     v.g=el('g',{},vg);
-    if(v.k==='fw') el('path',{d:'M9 0 L-6 -6 L-2 0 L-6 6Z',fill:'#e8e3d5'},v.g);
-    else if(v.k==='ugv') el('rect',{x:-5,y:-5,width:10,height:10,fill:'#a9b774'},v.g);
+    if(v.k==='fw') el('path',{d:'M9 0 L-6 -6 L-2 0 L-6 6Z',fill:'#f2f0ea'},v.g);
+    else if(v.k==='ugv') el('rect',{x:-5,y:-5,width:10,height:10,fill:'#b3be7c'},v.g);
     else el('rect',{x:-5,y:-5,width:10,height:10,fill:'#8fb3bd',transform:'rotate(45)'},v.g);
     var row=document.createElement('div'); row.className='veh'+(v.warn?' warn':'')+(v.dr?' dr':'');
     row.innerHTML='<b></b><span class="st"></span><span class="sub"></span><span class="sub"></span>';
@@ -988,7 +638,6 @@ $$('.rv').forEach(function(x){watch(x,function(){x.classList.add('in'); $$('[dat
   }
   requestAnimationFrame(frame);
 
-  /* orders */
   var ORDERS=['take the swarm of 5 fixed wing to 50.68, 9.05','HAWK-02 orbit 50.69, 9.04 radius 400','send the ground vehicles to 50.68, 9.06 in column','bring anything below 30% fuel home','hold everything'];
   var oi=0, cur='', typer=null, idle=null, started=false;
   var otext=$('#otext'), hold=$('#hold'), hint=$('#ohint'), olog=$('#olog');
@@ -1045,8 +694,9 @@ $$('.rv').forEach(function(x){watch(x,function(){x.classList.add('in'); $$('[dat
   watch($('#console'),function(v){visible=v; last=performance.now(); if(v&&!started){started=true; typeNext()}},false);
 })();
 
-checkViews(); setTimeout(checkViews,150);
+checkViews(); story(); setTimeout(function(){checkViews(); story()},150);
 })();
 </script>
+
 </body>
 </html>
