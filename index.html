@@ -354,7 +354,7 @@ svg,canvas,video{display:block}
   <div class="p-head rv"><h2 id="ts">TurtleShield</h2><p><b>The AI we’re building.</b> Runs on every vehicle.</p></div>
   <p class="p-lede rv">TurtleShield is the AI at the centre of Homingvector. Every drone already flies itself; what breaks under jamming is the team. TurtleShield takes the team out of the base station and puts it on every vehicle.</p>
   <div class="notes">
-    <div class="rv"><h3>Keeps the drones you already own.</h3><p>It sits on top of the autopilot. Neither commit that added a second autopilot brand changed a file in our coordination core, though other work did change the core around the same time. That brand, ArduPilot, has only been tested standing still so far.</p></div>
+    <div class="rv"><h3>Keeps the drones you already own.</h3><p>It sits on top of the autopilot. Neither commit that added a second autopilot brand changed a file in our coordination core, though a separate terrain-following change did touch the core in the same period. That brand, ArduPilot, has only been tested standing still so far.</p></div>
     <div class="rv"><h3>Air, ground and water, together.</h3><p>Fixed-wing aircraft, ground robots and surface boats share one plan and hand work to each other.</p></div>
     <div class="rv"><h3>Built for the edge.</h3><p>Designed for an NVIDIA Jetson Orin next to a Cube Orange flight controller, with no base station in the loop.</p></div>
     <div class="rv"><h3>Suggests. Never decides.</h3><p>It can spot something, keep track of it and suggest a way to intercept. A person makes the call. There is no weapon code.</p></div>
@@ -419,7 +419,7 @@ svg,canvas,video{display:block}
           <tr><th scope="row">Orders from our software accepted by the autopilot</th><td class="v">2,000+</td><td class="n">Counted once from recorded runs after the base station handed over. The logs behind it are not all kept, so unlike the other figures here we cannot recount it today.</td></tr>
           <tr><th scope="row">Aircraft in tight formation</th><td class="v" data-figure="formation_fleet_max">8</td><td class="n">All six runs passed the separation check. That check measures distance in three dimensions, so side-by-side spacing is still unmeasured. We treat it as an open defect, not a result.</td></tr>
           <tr><th scope="row">Position error without GPS</th><td class="v" data-figure="nav_error_without_gps">396–750 m &rarr; 25.5–39.0 m</td><td class="n">After one day of fixes. Still not good enough to rely on.</td></tr>
-          <tr><th scope="row">Core files changed by the two adapter commits</th><td class="v" data-figure="autopilot_core_files_per_commit">0</td><td class="n">Other work did change the core in the same period. ArduPilot has only been tested standing still.</td></tr>
+          <tr><th scope="row">Core files changed by the two adapter commits</th><td class="v" data-figure="autopilot_core_files_per_commit">0</td><td class="n">The core edits in that period belong to a separate terrain-following change, not to the adapter. ArduPilot has only been tested standing still.</td></tr>
           <tr><th scope="row">Problems written up with their causes</th><td class="v" data-figure="defects">145</td><td class="n">67 closed, 78 still not closed: 42 open and 36 fixed but not yet proven</td></tr>
           <tr class="zero"><th scope="row">Flights on a real aircraft</th><td class="v" data-figure="real_flights">0</td><td class="n">The first is planned for month 3</td></tr>
         </tbody>
