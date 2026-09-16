@@ -246,6 +246,91 @@ UNMARKED_FIGURES = {
 }
 
 
+# SOME TRUE NUMBERS MUST NOT BE PUBLISHED BARE.
+#
+# 33.25 m was on this page as "closest approach ... against a 30 m limit" and it
+# is an accurate number. It is also a THREE-DIMENSIONAL minimum, which is not
+# what a reader understands by "closest approach". B-148 (SEV1, open): the
+# campaign the claim rested on, 20260915_112210Z_commonleg_fleets568_x6, has NO
+# min_sep_horiz_m COLUMN AT ALL, so the horizontal component was never measured
+# for those runs -- it is not that the figure understated the risk, it is that
+# the quantity needed to defend it does not exist. Measured on 2026-09-16 with
+# two independent instruments agreeing to 0.13 m: a 3D minimum of 40.29 m with
+# 1.49 m of actual horizontal separation at the same instant, airborne at 99.2 m.
+# A reader told "40.29 m against a 30 m limit" concludes there was 10 m of margin
+# while the aircraft were a metre and a half apart side by side.
+#
+# It was withdrawn from the page deliberately. This is what stops it coming back
+# by accident, in a redesign, from an old draft, or from someone re-deriving it
+# as a "correct" figure -- because it IS correct, and that is the trap.
+FORBIDDEN_VALUES = {
+    "33.25": "B-148 (SEV1, open): a 3D minimum quoted as separation. Correcting "
+             "the number would PRESERVE the error, because the metric does not "
+             "measure what its name implies. Measured 2026-09-16, two instruments "
+             "agreeing to 0.13 m: a 3D minimum of 40.29 m with 1.49 m of actual "
+             "horizontal separation at the same instant, airborne at 99.2 m -- a "
+             "reader told '40.29 m against a 30 m limit' concludes 10 m of margin "
+             "while the aircraft are a metre and a half apart side by side. And "
+             "the campaign this figure came from has no min_sep_horiz_m column at "
+             "all, so the quantity needed to defend it was never recorded.",
+    "36.27": "The same B-148 caveat -- the 8-aircraft worst 3D minimum. Listed so "
+             "nobody re-derives it as the 'right' replacement for 33.25: both are "
+             "3D minima and neither measures side-by-side spacing.",
+    "closest approach": "The phrase itself reads as horizontal separation to a "
+                        "non-specialist, whatever number follows it.",
+}
+
+
+# A FIGURE RESTATED IN PROSE IS A SECOND COPY THAT CAN GO STALE ALONE.
+#
+# This is not hypothetical, it is how 742 survived on this page long enough to be
+# read: the mission count appeared BOTH in the bridge line above the Status
+# section AND in the Status table itself. Update one and the other is still
+# wrong, and a gate that only checks the keyed cell reports the page as clean.
+# turtleshield-36 named the same defect in their own checker as "prose outside
+# the ledger no longer scanned: the second stale copy survives", and a probe
+# confirmed my gate had it too -- keyed cell at 768, prose saying 742, zero
+# failures reported.
+#
+# Anchored on a PHRASE rather than a whole sentence, so rewording does not
+# silently kill the check. If the anchor is absent the claim is simply gone and
+# there is nothing to verify; if it is present, the number attached to it must
+# equal the derived value. That lets the sentence be deleted deliberately
+# without fighting the gate, while making a stale duplicate impossible.
+PROSE_CLAIMS = {
+    "missions": dict(
+        regex=r"([\d,]+)\s+missions\s+in\s+simulation",
+        anchor="missions in simulation",
+        why="the bridge line restates the mission count above the Status table",
+    ),
+}
+
+
+def value_appears(token, text):
+    """Is this value CLAIMED on the page, as opposed to coincidentally present?
+
+    THE DISTINCTIVE-VALUE RULE, which nidhip-41's null case forced. A substring
+    scan for a short number matches everything: "2" hits 2026, 2,000 and "2
+    apples", so a strict check built on it fails every page it is given. So:
+
+      * a phrase matches case-insensitively as a phrase
+      * a number must be DISTINCTIVE -- a decimal, or three or more digits
+      * and it must stand alone: 33.25 must NOT match inside 133.259
+
+    A bare one- or two-digit number is never evidence of a claim. That is a
+    deliberate false-negative: this check exists to catch a specific withdrawn
+    figure returning, and a rule that fires on "8" would be switched off within
+    a day, which protects nothing.
+    """
+    token = token.strip()
+    if not re.search(r"\d", token):
+        return token.lower() in text.lower()
+    digits = re.sub(r"\D", "", token)
+    if len(digits) < 3 and "." not in token:
+        return False
+    return re.search(r"(?<![\d.])" + re.escape(token) + r"(?![\d.])", text) is not None
+
+
 def page_figures(page_path):
     if not os.path.exists(page_path):
         raise Missing(f"{page_path} does not exist")
@@ -309,6 +394,50 @@ def check(repo, page_path, verbose=True):
                 "passing figure -- give it a derivation or an explicit exemption.")
             if verbose:
                 print(f"  UNKNOWN   {key:<28} {shown}")
+
+    # Prose restatements of a derived figure: the second copy that goes stale.
+    for key, spec in sorted(PROSE_CLAIMS.items()):
+        if spec["anchor"].lower() not in page_text.lower():
+            if verbose:
+                print(f"  gone      {'prose: ' + key:<28} (anchor absent, no claim to check)")
+            continue
+        if key not in DERIVATIONS:
+            failures.append(f"prose claim {key!r} has no derivation to check against")
+            continue
+        try:
+            derived = DERIVATIONS[key](repo)
+        except Exception as exc:                          # noqa: BLE001
+            failures.append(f"prose claim {key!r}: could not derive it ({exc})")
+            continue
+        hits = re.findall(spec["regex"], page_text)
+        if not hits:
+            failures.append(
+                f"prose claim {key!r}: the anchor {spec['anchor']!r} is on the page "
+                "but no number could be read from it -- the check has gone blind, "
+                "which is worse than it failing.")
+            continue
+        for hit in hits:
+            if normalise(hit) != normalise(derived):
+                failures.append(
+                    f"prose claim {key!r}: prose says {hit!r}, repo says {derived!r} "
+                    f"({spec['why']}). A figure restated in prose is a second copy "
+                    "that goes stale on its own.")
+                if verbose:
+                    print(f"  MISMATCH  {'prose: ' + key:<28} prose={hit!r} repo={derived!r}")
+                break
+        else:
+            if verbose:
+                print(f"  ok        {'prose: ' + key:<28} {hits[0]} (agrees with the table)")
+
+    # Withdrawn figures that must not return. Checked by value, not by marker,
+    # because a figure that comes back will not come back wearing a data-figure
+    # attribute -- it will arrive in prose, in a redesign, or from an old draft.
+    for token, reason in sorted(FORBIDDEN_VALUES.items()):
+        if value_appears(token, page_text):
+            failures.append(
+                f"WITHDRAWN VALUE {token!r} is back on the page. {reason}")
+            if verbose:
+                print(f"  WITHDRAWN {token:<28} must not be published")
 
     # Figures carrying no marker, whose CAVEAT is what gets gated.
     for label, spec in sorted(UNMARKED_FIGURES.items()):
@@ -421,6 +550,33 @@ def self_test(repo):
     case("a stale verdict tally is caught",
          f'<td data-figure="missions">{real}</td>'
          '<p>1 passed, 2 failed, 3 skipped, across 4 campaigns</p>', True, "verdict tally")
+    # THE SECOND STALE COPY. A probe proved this gate missed it before the rule
+    # existed: keyed cell correct, prose stale, zero failures reported.
+    case("a stale PROSE copy of a correct keyed figure is caught",
+         f'<td data-figure="missions">{real}</td>'
+         '<p>has flown 742 missions in simulation</p>' + tail,
+         True, "second copy")
+    case("prose agreeing with the table passes",
+         f'<td data-figure="missions">{real}</td>'
+         f'<p>has flown {real} missions in simulation</p>' + tail, False)
+    case("a deleted prose sentence is not a failure",
+         f'<td data-figure="missions">{real}</td>' + tail, False)
+    case("an anchor present with no readable number is caught, not skipped",
+         f'<td data-figure="missions">{real}</td>'
+         '<p>many missions in simulation</p>' + tail, True, "gone blind")
+
+    # WITHDRAWN VALUES, and the null case that makes the rule usable.
+    case("a withdrawn figure returning is caught",
+         f'<td data-figure="missions">{real}</td>'
+         '<p>closest approach 33.25 m against a 30 m limit</p>' + tail,
+         True, "WITHDRAWN VALUE")
+    case("the withdrawn value inside a LONGER number is not a false positive",
+         f'<td data-figure="missions">{real}</td>'
+         '<p>a reading of 133.259 units</p>' + tail, False)
+    case("a bare short number is never treated as a claim",
+         f'<td data-figure="missions">{real}</td>'
+         '<p>8 aircraft, 2 boats, in 2026</p>' + tail, False)
+
     # THE UNMARKED FIGURE: its caveat is the gate, and it needs no marker.
     case("an unmarked un-recountable figure WITH its caveat passes",
          f'<td data-figure="missions">{real}</td>'
