@@ -435,7 +435,7 @@ svg,canvas,video{display:block}
           <tr><th scope="row">Aircraft in tight formation</th><td class="v" data-figure="formation_fleet_max">8</td><td class="n">All six runs passed the separation check. That check measures distance in three dimensions, so side-by-side spacing is still unmeasured. We treat it as an open defect, not a result.</td></tr>
           <tr><th scope="row">Position error without GPS</th><td class="v" data-figure="nav_error_without_gps">396–750 m &rarr; 25.5–39.0 m</td><td class="n">After one day of fixes. Still not good enough to rely on.</td></tr>
           <tr><th scope="row">Core files changed by the two adapter commits</th><td class="v" data-figure="autopilot_core_files_per_commit">0</td><td class="n">The core edits in that period belong to a separate terrain-following change, not to the adapter. ArduPilot has only been tested standing still.</td></tr>
-          <tr><th scope="row">Problems written up with their causes</th><td class="v" data-figure="defects">148</td><td class="n">67 closed, 81 still not closed: 45 open and 36 fixed but not yet proven</td></tr>
+          <tr><th scope="row">Problems written up with their causes</th><td class="v" data-figure="defects">149</td><td class="n">67 closed, 82 still not closed: 46 open and 36 fixed but not yet proven</td></tr>
           <tr class="zero"><th scope="row">Flights on a real aircraft</th><td class="v" data-figure="real_flights">0</td><td class="n">The first is planned for month 3</td></tr>
         </tbody>
       </table>
@@ -705,6 +705,32 @@ if(mq.addEventListener) mq.addEventListener('change',function(){current=-1; stor
   hold.addEventListener('keydown',function(e){if((e.key===' '||e.key==='Enter')&&!e.repeat) startHold(e)});
   hold.addEventListener('keyup',function(e){if(e.key===' '||e.key==='Enter') endHold()});
   hold.addEventListener('contextmenu',function(e){e.preventDefault()});
+
+  /* A HOLD MUST NOT COMPLETE ITSELF. holdFrame() advances on wall-clock time, and endHold() was
+     reachable only from events delivered to this button. Press Space and alt-tab away and no keyup
+     is ever delivered: holding stays true, rAF keeps running because the page is still visible,
+     and the order confirms about a second later with nobody holding it. The page promises
+     "Nothing moves until a person holds the button down" -- these three lines are what make that
+     sentence true. Pointer holds already had pointerleave/pointercancel as backstops; a key press
+     had only keyup on the element. Found by turtleshield-fc. */
+  hold.addEventListener('blur',endHold);
+  window.addEventListener('blur',endHold);
+  document.addEventListener('visibilitychange',function(){if(document.hidden) endHold()});
+
+  /* Screen readers in browse mode (NVDA, JAWS) activate a button with a SYNTHETIC CLICK -- no
+     pointerdown, no keydown, no keyup -- so the hold gesture is unreachable and the order could
+     never be confirmed at all. Keep the DELIBERATENESS rather than the gesture: two activations.
+     Note that keyboard Space/Enter on a <button> also produces a click with detail 0, so detail
+     alone would arm this after a too-early keyboard release; the recent-gesture guard excludes it. */
+  var armed='', lastGesture=0;
+  hold.addEventListener('pointerdown',function(){lastGesture=performance.now()});
+  hold.addEventListener('keydown',function(){lastGesture=performance.now()});
+  hold.addEventListener('click',function(e){
+    if(hold.disabled||e.detail!==0) return;
+    if(performance.now()-lastGesture<1500) return;
+    if(armed===cur){armed=''; confirmOrder(); return}
+    armed=cur; hint.textContent='activate again to confirm this order';
+  });
 
   watch($('#console'),function(v){visible=v; last=performance.now(); if(v&&!started){started=true; typeNext()}},false);
 })();
