@@ -82,12 +82,12 @@ export async function startHud({ RM }) {
     if (!RM && focus) { const want = Math.max(0, Math.min(100, focus[1] * 100)); posX += (want - posX) * .06; }
     const m = map(), d = Math.min(devicePixelRatio || 1, 2);
     if (!live) return;
-    ctx.fillStyle = '#081012'; ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.fillStyle = '#0b0d10'; ctx.fillRect(0, 0, cv.width, cv.height);
     ctx.drawImage(v, m.ox, m.oy, m.w, m.h);
     for (const [k, u, vv, r] of row) {
       const x = m.ox + u * m.w, y = m.oy + vv * m.h, s = Math.max(22 * d, r * m.h * 1.7);
       const lost = V[k].name === E.lostVehicle && t >= E.lost, hot = k === selected || k === hover;
-      const col = lost ? '#ff4a2b' : hot ? '#c6f032' : 'rgba(236,231,218,.85)';
+      const col = lost || hot ? '#ff4632' : 'rgba(233,229,220,.85)';
       bracket(x, y, s, col, (hot ? 2 : 1.25) * d);
     }
     if (selected >= 0 && Math.floor(t * 4) % 2 === 0) say(selected, t);   // keep the state line current, cheaply

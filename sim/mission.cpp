@@ -74,7 +74,7 @@ enum UState { U_READY, U_ACTIVE, U_LEFT, U_REJOIN, U_COMMLOST, U_LOST, U_LANDED 
 
 struct V2 { double x, y; };
 constexpr V2 BASE{2000, 2000}, ASSEMBLE{5600, 3800}, W1{9500, 5200}, W2{13500, 5400}, W3{17000, 7000},
-             RDV{15600, 11000}, W4{9000, 9000}, FOB{15200, 2600}, HARBOR{15000, 12600},
+             W4{9000, 9000}, FOB{15200, 2600}, HARBOR{15000, 12600},
              GSTAGE{18200, 3600}, SSTAGE{18200, 11400};
 constexpr double AREA_X0 = 19000, AREA_X1 = 25200, AREA_Y0 = 3000, AREA_Y1 = 11000, AREA_YM = 7000;
 constexpr double WATER_X0 = 14200, WATER_Y0 = 9000;            // water: x > WATER_X0 and y > WATER_Y0
@@ -109,6 +109,11 @@ struct Mission {
   std::vector<std::pair<std::string, std::string>> pending_log;
   double slot_err_sum = 0; long slot_err_n = 0; int sep_yields = 0;
   bool landing = false; double last_land = -1e9;
+  struct Zone { double x0, y0, x1, y1; };
+  std::vector<Zone> zones;                 // jamming zones drawn by the visitor
+  V2 rdv{15600, 11000};                    // rendezvous point, movable by the visitor before the rendezvous
+  struct RingCache { double cx = 0, cy = 0, radius = 0, t = -1e9; size_t n = 0; std::vector<std::pair<int, V2>> slots; };
+  std::vector<RingCache> rings;
 } M;
 
 // ------------------------------------------------------------------ log (grouped per step)
@@ -141,7 +146,11 @@ void flush_log() {
 double dist(double ax, double ay, double bx, double by) { return std::hypot(ax - bx, ay - by); }
 double wrap(double a) { return std::remainder(a, 2 * PI); }
 bool flying(const Uav& a) { return a.alive && (a.st == U_ACTIVE || a.st == U_LEFT || a.st == U_REJOIN || a.st == U_COMMLOST); }
-bool in_gps_zone(double x, double y) { return M.gps_global || (M.gps_zone && x > GPS_X0 && x < GPS_X1 && y > GPS_Y0 && y < GPS_Y1); }
+bool in_gps_zone(double x, double y) {
+  if (M.gps_global || (M.gps_zone && x > GPS_X0 && x < GPS_X1 && y > GPS_Y0 && y < GPS_Y1)) return true;
+  for (auto& z : M.zones) if (x > z.x0 && x < z.x1 && y > z.y0 && y < z.y1) return true;
+  return false;
+}
 GeoPoint geo(double x, double y, double z) { return M.frame.FromEnu(Eigen::Vector3d(x, y, z), AltitudeFrame::kRelativeHomeM); }
 const CapabilityProfile* profile_of(const Uav& a) { return a.kind == K_AIR ? &M.plane : a.kind == K_GND ? &M.rover : &M.boat; }
 
@@ -166,11 +175,11 @@ void reset(int scenario, uint64_t seed) {
     case 3: break;
     case 4: script(P_LAUNCH, 0, E_GPSZONE, 0); break;
     case 5: script(P_TRANSIT, 30, E_RADIO_ON, 0); script(P_TRANSIT, 60, E_CUT, 6); script(P_SEARCH, 40, E_RADIO_OFF, 0); break;
-    case 6: script(P_TRANSIT, 70, E_LOSE, 0); script(P_SEARCH, 60, E_LOSE, 3); script(P_SEARCH, 110, E_LOSE, 13);
-            script(P_SEARCH, 90, E_LOSE, 71); break;                                   // a ground robot too
+    case 6: script(P_TRANSIT, 70, E_LOSE, 0); script(P_SEARCH, 140, E_LOSE, -1); script(P_SEARCH, 190, E_LOSE, -1);
+            script(P_SEARCH, 240, E_LOSE, -2); break;                                  // a working ground robot too
     default: script(P_LAUNCH, 0, E_GPSZONE, 0); script(P_TRANSIT, 25, E_RADIO_ON, 0); script(P_TRANSIT, 45, E_CUT, 6);
-             script(P_TRANSIT, 90, E_LEAVE, 4); script(P_SEARCH, 20, E_RADIO_OFF, 0); script(P_SEARCH, 70, E_LOSE, 3);
-             script(P_SEARCH, 100, E_LOSE, 72); script(P_REFORM, 5, E_FORM, 0); break;
+             script(P_TRANSIT, 90, E_LEAVE, 4); script(P_SEARCH, 20, E_RADIO_OFF, 0); script(P_SEARCH, 150, E_LOSE, -1);
+             script(P_SEARCH, 175, E_LOSE, -2); script(P_REFORM, 5, E_FORM, 0); break;
   }
   M.n = M.nfw + M.nugv + M.nusv;
   for (int i = 0; i < M.n; ++i) {
@@ -290,16 +299,40 @@ void orbit(Uav& a, V2 c, double r) {
 // ring slots from the PRODUCT's PlanRing, rotating slower than cruise so aircraft can catch them
 void ring_targets(const std::vector<int>& ids, V2 c) {
   if (ids.empty()) return;
+  // PlanRing is re-run once a simulated second (or when membership changes) and its slots are rotated
+  // analytically in between -- the same geometry, without re-planning 70 aircraft ten times a second.
+  double omega = TUNE[5] * CRUISE;
+  Mission::RingCache* rc = nullptr;
+  for (auto& r : M.rings) if (r.cx == c.x && r.cy == c.y) rc = &r;
+  if (!rc) { M.rings.push_back({}); rc = &M.rings.back(); rc->cx = c.x; rc->cy = c.y; }
+  bool fresh = M.t - rc->t < 1.0 && rc->n == ids.size();
+  if (fresh) {
+    double da = omega / rc->radius * (M.t - rc->t);
+    for (int i : ids) {
+      V2 base{-1, -1}; bool found = false;
+      for (auto& sl : rc->slots) if (sl.first == i) { base = sl.second; found = true; break; }
+      if (!found) { orbit(M.u[i], c, rc->radius); continue; }
+      double ang0 = std::atan2(base.y - c.y, base.x - c.x), ang = ang0 - da;   // clockwise, as planned
+      double ex = c.x + std::cos(ang) * rc->radius, ey = c.y + std::sin(ang) * rc->radius;
+      Uav& a = M.u[i]; a.sx = ex; a.sy = ey;
+      double d = dist(a.x, a.y, ex, ey), lead = ang + .35;
+      if (d > TUNE[3]) steer(a, ex, ey, CRUISE + std::min(9.0, d * .01));
+      else steer(a, c.x + std::cos(lead) * rc->radius, c.y + std::sin(lead) * rc->radius, TUNE[5] * CRUISE + d * TUNE[4]);
+    }
+    return;
+  }
   std::vector<T::AssignAgent> ag;
   for (int i : ids) { T::AssignAgent x; x.id = (T::AgentId)(i + 1); x.position = geo(M.u[i].x, M.u[i].y, 0); ag.push_back(x); }
   T::RingConfig cfg; cfg.min_chord_m = 260; cfg.radius_m = std::max(700.0, T::MinRadiusForAgents((int)ids.size(), 260) + 60);
   cfg.align_to_fleet = false; cfg.phase_offset_rad = std::fmod(M.t * TUNE[5] * CRUISE / cfg.radius_m, 2 * PI);
   T::RingPlan plan = T::PlanRing(ag, geo(c.x, c.y, 0), cfg);
+  rc->t = M.t; rc->n = ids.size(); rc->radius = cfg.radius_m; rc->slots.clear();
   if (!plan.ok) { for (int i : ids) orbit(M.u[i], c, cfg.radius_m); return; }
   for (int i : ids) {
     const T::RingSlot* s = plan.For((T::AgentId)(i + 1));
     if (!s) { orbit(M.u[i], c, cfg.radius_m); continue; }
     Eigen::Vector3d e = M.frame.ToEnu(s->point);
+    rc->slots.push_back({i, V2{e.x(), e.y()}});
     double ang = std::atan2(e.y() - c.y, e.x() - c.x) + .35;
     Uav& a = M.u[i]; a.sx = e.x(); a.sy = e.y();
     double d = dist(a.x, a.y, e.x(), e.y());
@@ -384,8 +417,10 @@ void build_lanes() {
   for (double y = 7300; y <= 8800; y += 300) lane(y, g0, T::kDomainAir);                        // A: land lanes
   for (double y = 9300; y <= 10800; y += 300) lane(y, g0, T::kDomainAir);                       // A: water lanes
   for (double y = 3300; y <= 6800; y += 320) lane(y, g1, T::kDomainAir);                        // B: land lanes
-  for (int k = 0; k < M.nugv; ++k) station(AREA_X0 + 800 + k * 950, 3700 + (k % 2) * 1600, g1, T::kDomainGround | T::kDomainAir);
-  for (int k = 0; k < M.nusv; ++k) station(AREA_X0 + 1200 + k * 1400, 10300 - (k % 2) * 700, g0, T::kDomainSurface | T::kDomainAir);
+  // most stations need a vehicle ON the ground / water (product eligibility refuses aircraft); a few accept air too,
+  // which is where a loss can be covered across domains
+  for (int k = 0; k < M.nugv; ++k) station(AREA_X0 + 800 + k * 950, 3700 + (k % 2) * 1600, g1, k < 4 ? T::kDomainGround : (T::kDomainGround | T::kDomainAir));
+  for (int k = 0; k < M.nusv; ++k) station(AREA_X0 + 1200 + k * 1400, 10300 - (k % 2) * 700, g0, k < 3 ? T::kDomainSurface : (T::kDomainSurface | T::kDomainAir));
 }
 void allocate_lanes() {
   if (M.nfw == 1) return;
@@ -403,6 +438,8 @@ void allocate_lanes() {
       if (o.lane >= 0 && &M.lanes[o.lane] == &l) o.lane = -1;
     }
   }
+  bool open = false; for (auto& l : M.lanes) if (l.st == 0) { open = true; break; }
+  if (!open) return;                                     // nothing unowned: consensus would only re-confirm itself
   for (int gi = 0; gi < (M.do_split ? 2 : 1); ++gi) {
     std::vector<int> mem;
     for (int i : all_members(gi)) { Uav& a = M.u[i]; if (a.st == U_COMMLOST) continue; if (!a.ladder.permissions().may_accept_new_tasks) continue; mem.push_back(i); }
@@ -455,7 +492,7 @@ bool fly_search(int gi) {
   std::vector<int> relays;
   for (int i : all_members(gi)) {
     Uav& a = M.u[i]; a.sx = -1;
-    if (a.st == U_COMMLOST) { if (M.t - a.lost_link_at < 45) steer(a, a.x + std::cos(a.hd) * 1000, a.y + std::sin(a.hd) * 1000, a.kind == K_AIR ? CRUISE : 5); else if (a.kind == K_AIR) orbit(a, RDV, 900); continue; }
+    if (a.st == U_COMMLOST) { if (M.t - a.lost_link_at < 45) steer(a, a.x + std::cos(a.hd) * 1000, a.y + std::sin(a.hd) * 1000, a.kind == K_AIR ? CRUISE : 5); else if (a.kind == K_AIR) orbit(a, M.rdv, 900); continue; }
     if (a.st == U_REJOIN) a.st = U_ACTIVE;
     if (a.lane < 0 && M.nfw == 1) for (int k = 0; k < (int)M.lanes.size(); ++k) if (M.lanes[k].owner == i && M.lanes[k].st == 1) { a.lane = k; a.lane_leg = 0; break; }
     if (a.lane < 0 || M.lanes[a.lane].owner != i) {
@@ -505,7 +542,13 @@ void apply_event(int kind, int arg) {
     case E_RADIO_ON:  if (!M.radio_degraded) { M.radio_degraded = true; logf("EVENT  radio links degraded  range and delivery cut"); } break;
     case E_RADIO_OFF: if (M.radio_degraded) { M.radio_degraded = false; logf("EVENT  radio links recovered"); } break;
     case E_CUT:  if (arg >= 0 && arg < M.n && flying(M.u[arg])) { M.u[arg].radio_fault_until = M.t + 80; logf("EVENT  %s radio fault  80 s", nm(arg).c_str()); } break;
-    case E_LOSE: if (arg >= 0 && arg < M.n && flying(M.u[arg])) { M.u[arg].alive = false; M.u[arg].st = U_LOST; logf("EVENT  %s lost", nm(arg).c_str()); } break;
+    case E_LOSE:
+      if (arg == -1 || arg == -2) {                        // pick the first vehicle of that kind that is actually working
+        for (int i = 0; i < M.n; ++i) { const Uav& c = M.u[i]; if (!flying(c) || c.lane < 0 || M.lanes[c.lane].st != 2) continue;
+          if ((arg == -1 && c.kind == K_AIR && !M.lanes[c.lane].station) || (arg == -2 && c.kind == K_GND)) { arg = i; break; } }
+        if (arg < 0) break;
+      }
+      if (arg >= 0 && arg < M.n && flying(M.u[arg])) { M.u[arg].alive = false; M.u[arg].st = U_LOST; logf("EVENT  %s lost", nm(arg).c_str()); } break;
     case E_LEAVE: if (arg >= 0 && arg < M.nfw && M.u[arg].st == U_ACTIVE && M.g[M.u[arg].grp].leader != arg && M.phase < P_SEARCH) { M.u[arg].st = U_LEFT; M.u[arg].left_until = M.t + 40; logf("EVENT  %s leaves formation  sensor check, 40 s", nm(arg).c_str()); } break;
     case E_FORM: { int gi = (arg >= 0 && arg < M.nfw && M.split_done && M.phase < P_RENDEZVOUS) ? M.u[arg].grp : 0; Form f = M.g[gi].form;
                    if (f == F_SEARCH || f == F_RING) break;
@@ -519,9 +562,9 @@ void request(int id, const char* text) { if (M.pending == id) return; M.pending 
 void mission() {
   switch (M.phase) {
     case P_LAUNCH: {
-      for (int i = 0; i < M.n; ++i) if (M.u[i].st == U_READY) {
+      for (int i = M.nfw; i < M.n; ++i) if (M.u[i].st == U_READY) { M.u[i].st = U_ACTIVE; group_log(nm(i), M.u[i].kind == K_GND ? "ground robot online at FOB" : "boat online at harbour"); }
+      for (int i = 0; i < M.nfw; ++i) if (M.u[i].st == U_READY) {
         Uav& a = M.u[i];
-        if (a.kind != K_AIR) { a.st = U_ACTIVE; group_log(nm(i), a.kind == K_GND ? "ground robot online at FOB" : "boat online at harbour"); continue; }
         if (M.t - M.last_launch >= 1.2) { a.st = U_ACTIVE; a.spd = 18; a.target_alt = 150; M.last_launch = M.t; group_log(nm(i), "launched"); }
         break;
       }
@@ -577,12 +620,12 @@ void mission() {
     case P_RENDEZVOUS: {
       move_surface(false);
       std::vector<int> mem; for (int i = 0; i < M.nfw; ++i) if (flying(M.u[i]) && M.u[i].st != U_COMMLOST) mem.push_back(i);
-      ring_targets(mem, RDV);
-      for (int i = 0; i < M.nfw; ++i) if (M.u[i].st == U_COMMLOST) orbit(M.u[i], RDV, 1600);
+      ring_targets(mem, M.rdv);
+      for (int i = 0; i < M.nfw; ++i) if (M.u[i].st == U_COMMLOST) orbit(M.u[i], M.rdv, 1600);
       double err = 0; for (int i : mem) err += dist(M.u[i].x, M.u[i].y, M.u[i].sx, M.u[i].sy); err /= std::max<size_t>(1, mem.size());
       if ((err < 550 && M.t - M.phase_t0 > 25) || M.t - M.phase_t0 > 180) {
         for (int i = 0; i < M.nfw; ++i) M.u[i].grp = 0;
-        M.g[1].active = false; M.g[0].hold = false; M.g[0].path = {V2{RDV.x - 2500, RDV.y - 900}}; M.g[0].wp = 0; M.g[0].leader = -1;
+        M.g[1].active = false; M.g[0].hold = false; M.g[0].path = {V2{M.rdv.x - 2500, M.rdv.y - 900}}; M.g[0].wp = 0; M.g[0].leader = -1;
         set_form(0, F_WEDGE, "(groups merged)"); logf("RENDEZVOUS  Group A and Group B rejoined  %zu aircraft", mem.size());
         set_phase(P_REFORM);
       }
@@ -598,16 +641,16 @@ void mission() {
       move_surface(false);
       Group& G = M.g[0];
       if (G.wp >= 1 && G.form != F_COLUMN && M.nfw > 1) set_form(0, F_COLUMN, "(landing sequence)");
-      if (!M.landing) { if (fly_formation(0)) { M.landing = true; logf("LANDING SEQUENCE  three on approach, one landing every 3 s"); } }
+      if (!M.landing) { if (fly_formation(0)) { M.landing = true; logf("LANDING SEQUENCE  six on approach, one landing every 2 s"); } }
       if (M.landing) {
         std::vector<std::pair<double, int>> order;
         for (int i = 0; i < M.nfw; ++i) if (flying(M.u[i])) order.push_back({dist(M.u[i].x, M.u[i].y, BASE.x, BASE.y), i});
         std::sort(order.begin(), order.end());
         for (size_t r = 0; r < order.size(); ++r) {
           int i = order[r].second; Uav& a = M.u[i]; a.sx = -1;
-          if (r < 3) { steer(a, BASE.x, BASE.y, 22); a.target_alt = 0;
-            if (dist(a.x, a.y, BASE.x, BASE.y) < 300 && M.t - M.last_land >= 3.0) { a.st = U_LANDED; a.alt = 0; a.spd = 0; M.last_land = M.t; group_log(nm(i), "landed"); } }
-          else orbit(a, BASE, 1000 + 70 * (i % 7));
+          if (r < 6) { steer(a, BASE.x, BASE.y, 22); a.target_alt = 0;
+            if (dist(a.x, a.y, BASE.x, BASE.y) < 450 && M.t - M.last_land >= 2.0) { a.st = U_LANDED; a.alt = 0; a.spd = 0; M.last_land = M.t; group_log(nm(i), "landed"); } }
+          else orbit(a, BASE, 900 + 60 * (i % 6));
         }
       }
       for (int i = M.nfw; i < M.n; ++i) { Uav& a = M.u[i]; if (flying(a) && a.spd < .1 && dist(a.x, a.y, a.kind == K_GND ? FOB.x : HARBOR.x, a.kind == K_GND ? FOB.y : HARBOR.y) < 500) { a.st = U_LANDED; group_log(nm(i), a.kind == K_GND ? "back at FOB" : "back in harbour"); } }
@@ -657,6 +700,18 @@ __attribute__((export_name("m_init")))    void m_init(int scenario, double seed)
 __attribute__((export_name("m_step")))    void m_step(int k) { for (int i = 0; i < k; ++i) step(); }
 __attribute__((export_name("m_event")))   void m_event(int kind, int arg) { if (kind == 20) confirm(arg); else apply_event(kind, arg); }
 __attribute__((export_name("m_tune")))    void m_tune(int i, double v) { if (i >= 0 && i < 6) TUNE[i] = v; }
+__attribute__((export_name("m_zone")))    int m_zone(double x0, double y0, double x1, double y1) {
+  if (M.zones.size() >= 6) return 0;
+  Mission::Zone z{std::min(x0, x1), std::min(y0, y1), std::max(x0, x1), std::max(y0, y1)};
+  if (z.x1 - z.x0 < 300 || z.y1 - z.y0 < 300) return 0;
+  M.zones.push_back(z); logf("EVENT  jamming zone drawn  %.1f x %.1f km", (z.x1 - z.x0) / 1000, (z.y1 - z.y0) / 1000); return 1;
+}
+__attribute__((export_name("m_zones_clear"))) void m_zones_clear() { if (!M.zones.empty()) { M.zones.clear(); logf("EVENT  drawn jamming zones removed"); } }
+__attribute__((export_name("m_zones")))   double* m_zones() { static double z[1 + 6 * 4]; z[0] = (double)M.zones.size(); for (size_t i = 0; i < M.zones.size(); ++i) { z[1 + i * 4] = M.zones[i].x0; z[2 + i * 4] = M.zones[i].y0; z[3 + i * 4] = M.zones[i].x1; z[4 + i * 4] = M.zones[i].y1; } return z; }
+__attribute__((export_name("m_rdv")))     int m_rdv(double x, double y) {
+  if (M.phase >= P_RENDEZVOUS || x < 3000 || x > 26000 || y < 1500 || y > 13000) return 0;
+  M.rdv = V2{x, y}; logf("OPERATOR  rendezvous moved to %.1f km E, %.1f km N", x / 1000, y / 1000); return 1;
+}
 __attribute__((export_name("m_n")))       int m_n() { return M.n; }
 __attribute__((export_name("m_nlanes")))  int m_nlanes() { return (int)M.lanes.size(); }
 __attribute__((export_name("m_snapshot"))) double* m_snapshot() {
@@ -686,7 +741,7 @@ __attribute__((export_name("m_meta"))) double* m_meta() {
   std::memcpy(meta_buf, m, sizeof m); return meta_buf;
 }
 __attribute__((export_name("m_geom"))) double* m_geom() {
-  double gm[] = {BASE.x, BASE.y, ASSEMBLE.x, ASSEMBLE.y, W1.x, W1.y, W2.x, W2.y, W3.x, W3.y, RDV.x, RDV.y, W4.x, W4.y,
+  double gm[] = {BASE.x, BASE.y, ASSEMBLE.x, ASSEMBLE.y, W1.x, W1.y, W2.x, W2.y, W3.x, W3.y, M.rdv.x, M.rdv.y, W4.x, W4.y,
                  AREA_X0, AREA_Y0, AREA_X1, AREA_Y1, AREA_YM, GPS_X0, GPS_Y0, GPS_X1, GPS_Y1,
                  WATER_X0, WATER_Y0, FOB.x, FOB.y, HARBOR.x, HARBOR.y};
   std::memcpy(geom_buf, gm, sizeof gm); return geom_buf;

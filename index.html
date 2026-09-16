@@ -28,7 +28,7 @@
 <meta name="twitter:image" content="https://nidhipsharma123-lab.github.io/homingvector/brand/og-image-1200x630.png">
 <meta name="twitter:image:alt" content="The Homingvector mark, a broken V with a lock corner, above the line: Holds the mission when GPS and comms are gone.">
 <link rel="canonical" href="https://nidhipsharma123-lab.github.io/homingvector/">
-<meta name="theme-color" content="#0b1417">
+<meta name="theme-color" content="#0f1114">
 <meta name="color-scheme" content="dark">
 <link rel="icon" href="brand/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="brand/favicon-32.png" sizes="32x32" type="image/png">
@@ -74,17 +74,17 @@
     <span aria-hidden="true">FILM <b id="ft">T+00:00</b></span><span aria-hidden="true">CHAPTER <b id="fc">01</b></span><span id="fs" aria-hidden="true">FIVE AIRCRAFT, ONE AI</span>
     <span class="inshot" id="inshot" role="group" aria-label="Vehicles in this shot of the film"></span>
     <output class="veh-info" id="veh-info" aria-live="polite"></output>
-    <span class="strip-r" aria-hidden="true">SIMULATOR RENDER · NOT FLIGHT FOOTAGE</span>
+    <span class="strip-r" aria-hidden="true">CGI · NOT FLIGHT FOOTAGE</span>
   </div>
   <div class="hero-body">
     <p class="eyebrow">TurtleShield AI · Turtle Eyes</p>
     <h1 id="h1">Holds the mission when GPS and comms are gone.</h1>
     <div class="hero-foot">
-      <p id="film-desc">TurtleShield keeps drones, ground robots and boats working as one team when GPS is jammed and the radio drops out. Turtle Eyes is the console its operators supervise it from. The film is Rendered from the TurtleShield simulator, not flight footage.</p>
+      <p id="film-desc">TurtleShield keeps drones, ground robots and boats working as one team when GPS is jammed and the radio drops out. Turtle Eyes is the console its operators supervise it from. The film is CGI rendered in Blender, not flight footage.</p>
       <div class="cta"><a class="go mag" href="#live" data-cursor="engage">Break it yourself</a><button class="ctrl" id="film-toggle" type="button" aria-pressed="true">Pause film</button></div>
     </div>
     <ol class="film-steps" aria-label="What the film shows">
-      <li class="on"><span>0:00</span>Five aircraft, one AI</li>
+      <li class="on"><span>0:00</span>Seventy aircraft, one AI</li>
       <li><span>0:10</span>Air, ground and water</li>
       <li><span>0:15</span>GPS jammed</li>
       <li><span>0:18</span>Radio drops</li>
@@ -119,8 +119,8 @@
       <div class="chapters" id="chapters" tabindex="0" role="region" aria-label="Mission steps">
         <article class="chapter" data-ch="1">
           <span class="clock">T+00:40</span>
-          <h2>Nine machines. One AI on every one of them.</h2>
-          <p>Five aircraft, two ground robots and two boats, all running TurtleShield and watched from Turtle Eyes. No vehicle waits for base and none of them is the boss.</p>
+          <h2>Eighty machines. One AI on every one of them.</h2>
+          <p>Seventy fixed-wing aircraft in five wedges, six ground robots and four boats, all running TurtleShield and watched from Turtle Eyes. No vehicle waits for base and none of them is the boss. This is the fleet TurtleShield is built for; the largest formation flown in its simulator so far is 8 aircraft.</p>
         </article>
         <article class="chapter" data-ch="2">
           <span class="clock">T+04:12</span>
@@ -135,7 +135,7 @@
         <article class="chapter" data-ch="4">
           <span class="clock">T+09:05</span>
           <h2>One aircraft is lost.</h2>
-          <p>The others notice the silence, wait until its claim on the work has expired, then share that work between them. Nobody has to tell them.</p>
+          <p>A wedge leader goes down. Its thirteen followers re-slot into the neighbouring wedges, and the rest share its work once its claim has expired. Nobody has to tell them.</p>
         </article>
         <article class="chapter" data-ch="5">
           <span class="clock">T+11:20</span>
@@ -151,12 +151,12 @@
     </div>
     <div class="view">
       <div class="view-gl">
-        <video class="story-v" id="storyv" muted playsinline preload="metadata" poster="media/hero-poster.jpg" aria-label="The part of the simulator film that matches the current step of the mission">
+        <video class="story-v" id="storyv" muted playsinline preload="metadata" poster="media/hero-poster.jpg" aria-label="The part of the CGI film that matches the current step of the mission">
           <source src="media/hero-film.webm" type="video/webm">
           <source src="media/hero-film.mp4" type="video/mp4">
         </video>
       </div>
-      <div class="view-cap"><span>Rendered from the TurtleShield simulator, not flight footage.</span><b id="vstate" aria-live="polite">Formation holding</b></div>
+      <div class="view-cap"><span>CGI rendered in Blender, not flight footage.</span><b id="vstate" aria-live="polite">Formation holding</b></div>
     </div>
   </div>
 </section>
@@ -166,14 +166,14 @@
     <p class="idx">03 · Live</p>
     <div class="live-head">
       <h2 id="lv" class="rv">Fly the mission yourself.</h2>
-      <p class="rv">Twenty aircraft launch, assemble, fly in formation, split into two groups, search, meet again and come home. Introduce failures and watch the swarm keep going. The decisions that matter are made by TurtleShield’s own code, compiled from commit <code id="sim-sha">b04e493</code> and running in your browser. The formation shapes and the mission script around them are demonstration code written for this page.</p>
+      <p class="rv">Seventy fixed-wing aircraft, six ground robots and four boats. They launch, assemble, fly in formation, split, search land and water, meet again and come home. Draw jamming zones, cut links, destroy vehicles, move the rendezvous, rewind the timeline, and watch the swarm keep going. The decisions that matter are made by TurtleShield’s own code, compiled from commit <code id="sim-sha">2fe5908</code> and running in your browser. The formation shapes and the mission script are demonstration code written for this page.</p>
     </div>
   </div>
   <div class="mission" id="rig">
     <div class="scen" role="radiogroup" aria-label="Scenario">
       <button type="button" role="radio" aria-checked="false" data-scen="1"><span>01</span>Single UAV</button>
       <button type="button" role="radio" aria-checked="false" data-scen="2"><span>02</span>Formation flight</button>
-      <button type="button" role="radio" aria-checked="false" data-scen="3"><span>03</span>Swarm mission</button>
+      <button type="button" role="radio" aria-checked="false" data-scen="3"><span>03</span>Swarm 70 + 10</button>
       <button type="button" role="radio" aria-checked="false" data-scen="4"><span>04</span>GPS denied</button>
       <button type="button" role="radio" aria-checked="false" data-scen="5"><span>05</span>Comms loss</button>
       <button type="button" role="radio" aria-checked="false" data-scen="6"><span>06</span>UAV loss</button>
@@ -184,7 +184,13 @@
     </ol>
     <div class="theatre">
       <div class="map-col">
-        <canvas id="map" class="map" width="1600" height="960" tabindex="0" role="img" aria-label="Live map of the simulated swarm. Arrow keys select an aircraft; plus and minus zoom." aria-describedby="tool-hint"></canvas>
+        <canvas id="map" class="map" width="1600" height="960" tabindex="0" role="img" aria-label="Live map of the simulated swarm. With the map focused: Space plays or pauses, arrow keys select a vehicle, plus and minus zoom; see the keys listed below the controls." aria-describedby="tool-hint map-keys"></canvas>
+        <div class="timeline">
+          <label for="tl">Timeline</label>
+          <input type="range" id="tl" min="0" max="4200" step="10" value="0" aria-describedby="tl-note">
+          <output id="tl-out" for="tl">T+00:00</output>
+          <span class="vh" id="tl-note">Drag to rewind or jump ahead. Rewind is exact: the simulation restores its own saved state and replays your actions.</span>
+        </div>
         <div class="transport" role="toolbar" aria-label="Simulation controls">
           <button type="button" class="tool" data-act="play" aria-pressed="true">Pause</button>
           <button type="button" class="tool" data-act="step">Step 1 s</button>
@@ -192,6 +198,7 @@
           <span class="speed" role="radiogroup" aria-label="Simulation speed">
             <button type="button" class="tool" role="radio" aria-checked="false" data-speed="0.5">0.5×</button><button type="button" class="tool" role="radio" aria-checked="true" data-speed="1">1×</button><button type="button" class="tool" role="radio" aria-checked="false" data-speed="2">2×</button><button type="button" class="tool" role="radio" aria-checked="false" data-speed="4">4×</button>
           </span>
+          <button type="button" class="tool" data-act="zoomin" aria-label="Zoom in">Zoom +</button><button type="button" class="tool" data-act="zoomout" aria-label="Zoom out">Zoom −</button>
           <button type="button" class="tool" data-act="follow" aria-pressed="true">Follow swarm</button>
           <button type="button" class="tool" data-act="eng" aria-pressed="false">Engineering view</button>
         </div>
@@ -203,15 +210,20 @@
           <button type="button" class="tool" data-ev="leave">Selected leaves formation</button>
           <button type="button" class="tool" data-ev="lose">Lose selected UAV</button>
           <button type="button" class="tool" data-ev="form">Change formation</button>
+          <button type="button" class="tool" data-tool="zone" aria-pressed="false">Draw jamming zone</button>
+          <button type="button" class="tool" data-tool="rdv" aria-pressed="false">Move rendezvous</button>
+          <button type="button" class="tool" data-ev="clearzones">Clear zones</button>
         </div>
         <p class="tool-hint" id="tool-hint" aria-live="polite">Loading the TurtleShield core…</p>
+        <p class="map-keys" id="map-keys">Keys with the map focused: <kbd>Space</kbd> play · <kbd>←</kbd><kbd>→</kbd> select · <kbd>+</kbd><kbd>−</kbd> zoom · <kbd>E</kbd> engineering · <kbd>F</kbd> follow · <kbd>G</kbd> GPS · <kbd>R</kbd> radio · <kbd>C</kbd> cut · <kbd>L</kbd> lose · <kbd>V</kbd> leave formation · <kbd>T</kbd> formation · <kbd>Z</kbd> draw zone · <kbd>1</kbd>–<kbd>7</kbd> scenario</p>
       </div>
       <aside class="gcs" id="gcs" aria-label="Turtle Eyes console for the live mission">
         <div class="gcs-top"><b>TURTLE EYES</b><span>PERSISTENT OVERWATCH</span><span class="gcs-mode">SIMULATION</span><span id="sim-clock">T+00:00</span></div>
         <div class="gcs-grid">
           <section class="gcs-block" aria-labelledby="g-status"><h3 id="g-status">Swarm status</h3>
             <dl class="stat">
-              <div><dt>UAVs</dt><dd id="s-n">–</dd></div><div><dt>Active</dt><dd id="s-act">–</dd></div>
+              <div><dt>Fixed-wing</dt><dd id="s-fw">–</dd></div><div><dt>Ground</dt><dd id="s-gnd">–</dd></div><div><dt>Surface</dt><dd id="s-sea">–</dd></div>
+              <div><dt>Active</dt><dd id="s-act">–</dd></div><div><dt>Relays</dt><dd id="s-relay">–</dd></div>
               <div><dt>Rejoining</dt><dd id="s-rej">–</dd></div><div><dt>Comms lost</dt><dd id="s-cl">–</dd></div>
               <div><dt>Lost</dt><dd id="s-lost">–</dd></div><div><dt>Landed</dt><dd id="s-land">–</dd></div>
             </dl>
@@ -229,11 +241,11 @@
             <p class="hold-hint" id="hold-hint" aria-live="polite"></p>
             <label class="demo-op"><input type="checkbox" id="demo-op" checked> Demo operator confirms after 6 s</label>
           </section>
-          <section class="gcs-block" aria-labelledby="g-sel"><h3 id="g-sel">Selected UAV</h3>
+          <section class="gcs-block" aria-labelledby="g-sel"><h3 id="g-sel">Selected vehicle</h3>
             <dl class="tele" id="tele"><div><dt>ID</dt><dd>–</dd></div></dl>
           </section>
           <section class="gcs-block roster-b" aria-labelledby="g-roster"><h3 id="g-roster">Fleet</h3>
-            <div class="roster" id="roster" role="group" aria-label="Select a UAV"></div>
+            <div class="roster" id="roster" role="group" aria-label="Select a vehicle"></div>
           </section>
           <section class="gcs-block log-b" aria-labelledby="g-log"><h3 id="g-log">Event and order log</h3>
             <ol class="dlog" id="dlog" tabindex="0" aria-label="Event and order log"></ol>
@@ -243,14 +255,14 @@
       </aside>
     </div>
     <div class="rig-fallback" id="rig-fallback" hidden>
-      <p>This browser cannot run the live simulation (it needs WebAssembly and Web Workers). Below is a frame of it: twenty aircraft split into two groups over the search area, one group in formation, lanes assigned, one aircraft lost and its lane taken over.</p>
-      <img src="brand/sim-static.svg" alt="Diagram: a swarm of twenty aircraft split into Group A and Group B over an abstract search area, each flying an assigned lane; one lost aircraft and the lane another aircraft took over from it." width="1600" height="960">
+      <p>This browser cannot run the live simulation (it needs WebAssembly and Web Workers). Below is a frame of it: seventy aircraft split into two groups over the search area with ground robots and boats on their stations, lanes assigned, and a lost aircraft’s lane taken over.</p>
+      <img src="brand/sim-static.svg" alt="Diagram: seventy aircraft split into Group A and Group B over an abstract search area of land and water, ground robots and boats on stations, and a lost aircraft whose lane another aircraft took over." width="1600" height="960">
     </div>
   </div>
   <div class="w">
     <div class="live-note">
-      <p><b>TurtleShield code, unchanged:</b> which aircraft flies which search lane and who takes a lost aircraft’s lane (CBBA); when a silent aircraft counts as lost; what a degraded or cut-off aircraft may still do, including how much it widens its spacing; what a group of this size may still do; the separation monitor that makes aircraft climb to a new layer; peer-aided navigation without GPS; and the assembly and rendezvous rings.</p>
-      <p><b>Written for this page:</b> the mission phases, the wedge, V, line and column shapes, the leader-follower steering, the radio and GPS models, and the scenario scripts. The search area is abstract. This is a browser simulation, not a flight result: the largest formation TurtleShield has flown in simulation is the 8 aircraft in Evidence below. The same seed always gives the same run.</p>
+      <p><b>TurtleShield code, unchanged:</b> which vehicle takes which search lane or station, across air, ground and water, and who takes over after a loss (CBBA, with its domain rules: a robot never gets a water station); when a silent vehicle counts as lost; what a degraded or cut-off vehicle may still do, including how much it widens its spacing; what a group of this size may still do; the separation monitor that makes aircraft climb to a new layer; peer-aided navigation without GPS; and the assembly, relay and rendezvous rings.</p>
+      <p><b>Written for this page:</b> the mission phases, the wedge, V, line and column shapes, the leader-follower steering, the radio and GPS models, and the scenario scripts. The search area is abstract. This is a browser simulation, not a flight result: TurtleShield is built for a fleet this size, but the largest formation it has flown in simulation so far is the 8 aircraft in Evidence below. The same seed always gives the same run.</p>
     </div>
   </div>
 </section>

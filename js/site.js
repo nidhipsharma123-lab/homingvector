@@ -62,7 +62,7 @@ export function cue(kind) {
 
 /* ---------------- film + strip telemetry (film time is the state) ---------------- */
 const CUE = [0, 10, 15, 18.6, 21, 26];
-const CH = ['Five aircraft, one AI', 'Air, ground and water', 'GPS jammed', 'Radio drops', 'Aircraft lost', 'A person decides'];
+const CH = ['Seventy aircraft, one AI', 'Air, ground and water', 'GPS jammed', 'Radio drops', 'Aircraft lost', 'A person decides'];
 (() => {
   const v = $('#filmv'), steps = $$('.film-steps li'), btn = $('#film-toggle');
   const ft = $('#ft'), fc = $('#fc'), fs = $('#fs');
@@ -92,7 +92,7 @@ function playSeg(n) {
 }
 sv.addEventListener('timeupdate', () => { const s = SEG[Math.max(current, 0)]; if (sv.currentTime >= s[1] - .06 || sv.currentTime < s[0] - .6) { try { sv.currentTime = s[0]; } catch {} } });
 watch($('.view'), v => { svVisible = v; if (v) svPlay(); else sv.pause(); }, false);
-const STATES = ['Formation holding', 'Nine vehicles linked', 'GPS jammed', 'Radio degraded', 'Aircraft lost', 'Awaiting operator'];
+const STATES = ['Formation holding', 'Eighty vehicles linked', 'GPS jammed', 'Radio degraded', 'Aircraft lost', 'Awaiting operator'];
 const chapters = $$('[data-ch]'), cards = $$('#chapters .chapter'), car = $('#chapters'), vstate = $('#vstate'), carPos = $('#car-pos');
 const mq = matchMedia('(max-width: 999px)');
 window.__chapter = 0;

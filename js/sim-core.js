@@ -38,6 +38,12 @@ export async function loadCore(bytes) {
     geom() { return new Float64Array(mem.buffer, x.m_geom(), 29).slice(); },
     decision() { const n = x.m_decision_len(); return n ? dec.decode(new Uint8Array(mem.buffer, x.m_decision_ptr(), n)) : ''; },
     drainLog() { const n = x.m_log_len(); if (!n) return ''; const s = dec.decode(new Uint8Array(mem.buffer, x.m_log_ptr(), n)); x.m_log_clear(); return s; },
+    zone: (x0, y0, x1, y1) => x.m_zone(x0, y0, x1, y1), zonesClear: () => x.m_zones_clear(), rdv: (px, py) => x.m_rdv(px, py),
+    zones() { const p = x.m_zones(), c = new Float64Array(mem.buffer, p, 1)[0]; return new Float64Array(mem.buffer, p + 8, c * 4).slice(); },
+    // Exact rewind: the whole engine lives in linear memory, so a copy of it IS the simulation state.
+    // Restored only between calls, when the stack pointer is back at its base.
+    checkpoint() { return new Uint8Array(mem.buffer).slice(); },
+    restore(cp) { if (mem.buffer.byteLength < cp.length) mem.grow(Math.ceil((cp.length - mem.buffer.byteLength) / 65536)); new Uint8Array(mem.buffer).set(cp); },
   };
   return api;
 }

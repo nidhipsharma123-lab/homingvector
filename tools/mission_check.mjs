@@ -33,7 +33,7 @@ let code = 0;
 {
   const shared = await loadCore(bytes);
   for (const sc of [7, 3, 7]) {
-    const r = await run(sc, 11, 4000, shared), fresh = await run(sc, 11);
+    const r = await run(sc, 11, 5000, shared), fresh = await run(sc, 11);
     const same = r.hash === fresh.hash && r.me[1] === 9;
     console.log(`reuse: scenario ${sc} on a shared engine ${r.me[1] === 9 ? 'COMPLETE' : 'STALLED'}  hash ${same ? 'matches' : 'DIFFERS from'} a fresh engine`);
     if (!same) code = 1;

@@ -7,7 +7,7 @@ anywhere. See brand/CONSTRUCTION.md for the reasoning behind each number.
 """
 import os, sys
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), '..', 'brand')
-FG, RED, BG = '#ece7da', '#c6f032', '#0b1417'   # RED is the LOCK colour: vector lime since 2026-09-17
+FG, RED, BG = '#e9e5dc', '#ff4632', '#0f1114'   # RED is the LOCK colour: signal red on gunmetal
 
 # ---------------------------------------------------------------- mark (48 x 48 grid)
 # heavy stroke: 10 units wide at the top, driving to the vertex
