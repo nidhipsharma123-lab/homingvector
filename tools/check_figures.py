@@ -161,11 +161,49 @@ def derive_real_flights(repo):
                   "assume 0 real flights")
 
 
+# THE TWO ADAPTER COMMITS, PINNED BY HASH.
+#
+# The page claims a second autopilot went in behind IVehicle without the core
+# moving at all, which is an architectural claim and a strong one. It is only
+# true under one specific reading of "the two adapter commits", and nothing
+# machine-readable said which two -- ADR-044 cites no hashes. nidhip-a6
+# identified them by SUBJECT first and counted SECOND, and that order mattered:
+# 90c7171 also touches adapters/ and changes 2 files under core/, so a looser
+# rule ("recent commits touching adapters/") returns a non-zero answer and would
+# fail a page that is correct.
+#
+# Pinning the hashes converts an exemption into a real rule. It is exact,
+# reproducible, and gets MORE trustworthy with age rather than less -- where an
+# exemption gets less, because nobody re-examines it.
+ADAPTER_COMMITS = ("06ac890", "68547a1")
+
+
+def derive_core_files_adapter_commits(repo):
+    import subprocess
+    total = 0
+    for sha in ADAPTER_COMMITS:
+        proc = subprocess.run(
+            ["git", "-C", repo, "show", "--pretty=format:", "--name-only", sha, "--", "core/"],
+            capture_output=True, text=True)
+        if proc.returncode != 0:
+            raise Missing(f"commit {sha} not found in {repo} "
+                          f"({proc.stderr.strip()[:80]}) -- refusing to report 0")
+        total += len([ln for ln in proc.stdout.splitlines() if ln.strip()])
+    return str(total)
+
+
+# KEYED TO THE PAGE, NOT TO THIS FILE. The page owns the naming: on 2026-09-16
+# the attribute was renamed data-fig -> data-figure and every key with it, and
+# this checker found ZERO hooks and refused. That refusal was correct -- it did
+# not report "0 figures checked, all OK" -- but a gate that has to be re-keyed by
+# hand every rename is a gate that will eventually be switched off. If it ever
+# refuses for "no data-figure attributes" again, check for a rename FIRST.
 DERIVATIONS = {
-    "missions_total": derive_missions_total,
-    "formation_max_fw": derive_formation_max_fw,
-    "defects_logged": derive_defects_logged,
+    "missions": derive_missions_total,
+    "formation_fleet_max": derive_formation_max_fw,
+    "defects": derive_defects_logged,
     "real_flights": derive_real_flights,
+    "autopilot_core_files_per_commit": derive_core_files_adapter_commits,
 }
 
 # EXPLICIT, NAMED, AND EACH WITH A REASON AND A REQUIRED DISCLOSURE.
@@ -173,13 +211,7 @@ DERIVATIONS = {
 # disclosure is edited away the figure becomes an unsourced claim, and that
 # fails here rather than shipping.
 EXEMPTIONS = {
-    "orders_accepted_min": dict(
-        reason="CLAIMS.md slide 14 marks it MEASURED (NOT RE-DERIVED): 2,060 "
-               "accepted and 7 refused, counted by hand 2026-09-15. Logs of "
-               "passing runs are not all retained, so it cannot be recounted.",
-        disclosure="cannot recount it today",
-    ),
-    "gps_denied_error_range": dict(
+    "nav_error_without_gps": dict(
         reason="CLAIMS.md sources it to a written report section "
                "(docs/report/90_pitch_front_matter.md 90.2) plus two named "
                "campaigns, not to a results column. Re-deriving it would mean "
@@ -187,12 +219,29 @@ EXEMPTIONS = {
                "a second implementation free to disagree with the first.",
         disclosure=None,
     ),
-    "core_files_adapter_commits": dict(
-        reason="The two adapter commits are not identified in any "
-               "machine-readable place, so 'files changed under core/ by those "
-               "two commits' has no reproducible definition yet. Give it the "
-               "two shas and it becomes derivable.",
-        disclosure=None,
+}
+
+
+# A FIGURE WITH NO MARKER AT ALL IS THE HARDEST CASE, AND IT IS ON THIS PAGE.
+#
+# "2,000+" orbit commands cannot be recounted -- the logs of passing runs are
+# not all retained -- so on 2026-09-16 its data-figure marker was deliberately
+# removed rather than left pointing at a rule that cannot exist. That is
+# defensible: a marker promising a derivation nobody can perform is worse than
+# no marker. But it leaves the figure INVISIBLE to this gate, and an exemption
+# nobody sees again is one nobody re-examines (nidhip-a6). In five years it
+# would still read "2,000+" and everyone would assume something still checks it.
+#
+# So the caveat itself is the thing gated. The figure may stay unmarked, but the
+# sentence admitting it cannot be recounted must remain: delete the admission
+# and this fails, because an un-recountable number without its caveat is an
+# unsourced claim. This needs no marker on the page and cannot be renamed away.
+UNMARKED_FIGURES = {
+    "orders accepted (2,000+)": dict(
+        value="2,000+",
+        disclosure="cannot recount it today",
+        reason="CLAIMS.md slide 14 marks it MEASURED (NOT RE-DERIVED): 2,060 "
+               "accepted and 7 refused, counted by hand 2026-09-15.",
     ),
 }
 
@@ -202,11 +251,11 @@ def page_figures(page_path):
         raise Missing(f"{page_path} does not exist")
     text = open(page_path, errors="replace").read()
     found = {}
-    for m in re.finditer(r'data-fig="([^"]+)"[^>]*>([^<]*)<', text):
+    for m in re.finditer(r'data-figure="([^"]+)"[^>]*>([^<]*)<', text):
         found[m.group(1)] = html.unescape(m.group(2)).strip()
     if not found:
-        raise Missing("no data-fig attributes on the page -- refusing to pass a "
-                      "page with nothing to check")
+        raise Missing("no data-figure attributes on the page -- refusing to pass "
+                      "a page with nothing to check (was the attribute renamed?)")
     return found, text
 
 
@@ -261,7 +310,23 @@ def check(repo, page_path, verbose=True):
             if verbose:
                 print(f"  UNKNOWN   {key:<28} {shown}")
 
-    # Sub-figures that are not their own data-fig but are read as claims.
+    # Figures carrying no marker, whose CAVEAT is what gets gated.
+    for label, spec in sorted(UNMARKED_FIGURES.items()):
+        if spec["value"] not in page_text:
+            if verbose:
+                print(f"  gone      {label:<28} (no longer on the page)")
+            continue
+        if spec["disclosure"].lower() not in page_text.lower():
+            failures.append(
+                f"{label}: present on the page but its caveat is gone "
+                f"(missing: {spec['disclosure']!r}). It cannot be recounted "
+                f"({spec['reason']}), so without the caveat it is an unsourced claim.")
+            if verbose:
+                print(f"  NO-CAVEAT {label:<28} {spec['value']}")
+        elif verbose:
+            print(f"  unmarked  {label:<28} {spec['value']}   (caveat present)")
+
+    # Sub-figures that are not their own data-figure but are read as claims.
     try:
         counts = derive_verdict_counts(repo)
         campaigns = derive_campaigns_scored(repo)
@@ -311,19 +376,58 @@ def self_test(repo):
             ok = False
 
     real = derive_missions_total(repo)
+    counts = derive_verdict_counts(repo)
+    campaigns = derive_campaigns_scored(repo)
+    # The verdict tally and campaign count are checked against the WHOLE page,
+    # so a minimal test page legitimately lacks them and every "expect pass"
+    # case would fail for a reason that has nothing to do with what it tests.
+    # Supply them rather than relaxing the rule: the rule is right, the fixture
+    # was incomplete.
+    tail = (f'<p>{counts["PASS"]} passed, {counts["FAIL"]} failed, '
+            f'{counts["SKIP"]} skipped, across {campaigns} campaigns</p>')
+
     case("a correct figure passes",
-         f'<td data-fig="missions_total">{real}</td>', False)
+         f'<td data-figure="missions">{real}</td>' + tail, False)
     case("a WRONG figure is caught (mutant control)",
-         '<td data-fig="missions_total">999999</td>', True, "repo says")
-    case("an unknown data-fig key is caught, not skipped",
-         '<td data-fig="totally_made_up">7</td>', True, "NO RULE")
-    case("a page with no data-fig at all is refused",
+         '<td data-figure="missions">999999</td>' + tail, True, "repo says")
+    case("an unknown data-figure key is caught, not skipped",
+         '<td data-figure="totally_made_up">7</td>' + tail, True, "NO RULE")
+    case("a page with no data-figure at all is refused",
          '<td>nothing here</td>', True)
-    case("an exempt figure missing its disclosure is caught",
-         '<td data-fig="orders_accepted_min">2,000+</td>', True, "no longer discloses")
-    case("an exempt figure WITH its disclosure passes that rule",
-         '<td data-fig="orders_accepted_min">2,000+</td>'
-         '<p>we cannot recount it today</p>', False)
+    case("an exempt figure with NO required disclosure passes",
+         '<td data-figure="nav_error_without_gps">1 m</td>' + tail, False)
+
+    # THE EXEMPTIONS DISCLOSURE BRANCH, exercised with a synthetic entry.
+    # No current exemption requires a disclosure -- orders_accepted_min moved to
+    # UNMARKED_FIGURES when its marker was dropped -- so without this the branch
+    # is dead code sitting inside a gate, which is the liability this whole file
+    # exists to remove. A capability nothing exercises is a capability nobody
+    # knows is broken.
+    EXEMPTIONS["__synthetic__"] = dict(reason="self-test only",
+                                       disclosure="a sentence that is not present")
+    try:
+        case("an exemption whose required disclosure is missing is caught",
+             '<td data-figure="__synthetic__">1</td>' + tail, True, "no longer discloses")
+        EXEMPTIONS["__synthetic__"]["disclosure"] = "this caveat is present"
+        case("an exemption whose required disclosure is present passes",
+             '<td data-figure="__synthetic__">1</td>'
+             '<p>this caveat is present</p>' + tail, False)
+        EXEMPTIONS["__synthetic__"]["reason"] = ""
+        case("an exemption with no reason recorded is caught",
+             '<td data-figure="__synthetic__">1</td>'
+             '<p>this caveat is present</p>' + tail, True, "no reason")
+    finally:
+        del EXEMPTIONS["__synthetic__"]
+    case("a stale verdict tally is caught",
+         f'<td data-figure="missions">{real}</td>'
+         '<p>1 passed, 2 failed, 3 skipped, across 4 campaigns</p>', True, "verdict tally")
+    # THE UNMARKED FIGURE: its caveat is the gate, and it needs no marker.
+    case("an unmarked un-recountable figure WITH its caveat passes",
+         f'<td data-figure="missions">{real}</td>'
+         '<td>2,000+</td><td>we cannot recount it today</td>' + tail, False)
+    case("an unmarked un-recountable figure with its caveat DELETED is caught",
+         f'<td data-figure="missions">{real}</td>'
+         '<td>2,000+</td>' + tail, True, "caveat is gone")
 
     print("self-test: OK" if ok else "self-test: FAILED")
     return 0 if ok else 1
