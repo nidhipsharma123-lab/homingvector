@@ -45,11 +45,11 @@ export function startLive({ watch, cue, RM }) {
   const TS = .12, terr = document.createElement('canvas');
   terr.width = Math.round((WORLD.x1 - WORLD.x0) * TS); terr.height = Math.round((WORLD.y1 - WORLD.y0) * TS);
   (() => {
-    const t = terr.getContext('2d'); t.fillStyle = '#0c0d0b'; t.fillRect(0, 0, terr.width, terr.height);
+    const t = terr.getContext('2d'); t.fillStyle = '#0a1316'; t.fillRect(0, 0, terr.width, terr.height);
     const hills = [[4000, 9000, 1.4], [7000, 1500, 1], [11500, 3200, .9], [11500, 7300, .9], [15000, 11500, 1.2], [21500, 12800, .8], [3000, 12000, 1.1], [26000, 1500, 1], [9500, 11000, .7], [17500, 2200, .9]];
     t.lineWidth = 1;
     for (const [hx, hy, k] of hills) for (let ring = 1; ring < 9; ring++) {
-      t.strokeStyle = ring % 4 === 0 ? '#1f211c' : '#161814'; t.beginPath();
+      t.strokeStyle = ring % 4 === 0 ? '#1b2c2b' : '#12201f'; t.beginPath();
       for (let a = 0; a <= 72; a++) {
         const th = a / 72 * Math.PI * 2, r = ring * 170 * k * (1 + .18 * Math.sin(3 * th + hx) + .08 * Math.cos(5 * th + hy));
         const px = (hx + Math.cos(th) * r) * TS, py = (WORLD.y1 - (hy + Math.sin(th) * r)) * TS;
@@ -344,10 +344,10 @@ export function startLive({ watch, cue, RM }) {
       for (let i = 0; i < n; i++) { const st = S[i * UF + 7]; trails[i] = trails[i] || []; if (st >= 1 && st <= 4) { trails[i].push([S[i * UF], S[i * UF + 1]]); if (trails[i].length > 90) trails[i].shift(); } }
     }
     // ground
-    ctx.fillStyle = '#090a08'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#081012'; ctx.fillRect(0, 0, W, H);
     ctx.drawImage(terr, sx(WORLD.x0), sy(WORLD.y1), (WORLD.x1 - WORLD.x0) * cam.s, (WORLD.y1 - WORLD.y0) * cam.s);
     const step = cam.s > .06 ? 1000 : 5000;
-    ctx.strokeStyle = 'rgba(242,240,234,.035)'; ctx.lineWidth = 1; ctx.beginPath();
+    ctx.strokeStyle = 'rgba(236,231,218,.035)'; ctx.lineWidth = 1; ctx.beginPath();
     for (let x = Math.floor(wx(0) / step) * step; x < wx(W); x += step) { ctx.moveTo(sx(x), 0); ctx.lineTo(sx(x), H); }
     for (let y = Math.floor(wy(H) / step) * step; y < wy(0); y += step) { ctx.moveTo(0, sy(y)); ctx.lineTo(W, sy(y)); }
     ctx.stroke();
@@ -359,30 +359,30 @@ export function startLive({ watch, cue, RM }) {
     // search area: abstract, simulated
     const ax0 = sx(G[14]), ay1 = sy(G[17]), aw = (G[16] - G[14]) * cam.s, ah = (G[17] - G[15]) * cam.s;
     ctx.save(); ctx.beginPath(); ctx.rect(ax0, ay1, aw, ah); ctx.clip();
-    ctx.strokeStyle = 'rgba(242,240,234,.045)'; ctx.lineWidth = 1; ctx.beginPath();
+    ctx.strokeStyle = 'rgba(236,231,218,.045)'; ctx.lineWidth = 1; ctx.beginPath();
     for (let i = -ah; i < aw; i += 14 * dp) { ctx.moveTo(ax0 + i, ay1 + ah); ctx.lineTo(ax0 + i + ah, ay1); }
     ctx.stroke(); ctx.restore();
-    ctx.strokeStyle = 'rgba(242,240,234,.4)'; ctx.setLineDash([2 * dp, 4 * dp]); ctx.strokeRect(ax0, ay1, aw, ah); ctx.setLineDash([]);
-    label('SEARCH AREA · ABSTRACT, SIMULATED', ax0 + 8 * dp, ay1 - 8 * dp, '#a6a49d');
-    if (me[20]) { ctx.strokeStyle = 'rgba(242,240,234,.25)'; ctx.beginPath(); ctx.moveTo(ax0, sy(G[18])); ctx.lineTo(ax0 + aw, sy(G[18])); ctx.stroke(); label('A', ax0 + aw + 8 * dp, sy((G[17] + G[18]) / 2), '#f2f0ea', 14); label('B', ax0 + aw + 8 * dp, sy((G[15] + G[18]) / 2), '#f2f0ea', 14); }
+    ctx.strokeStyle = 'rgba(236,231,218,.4)'; ctx.setLineDash([2 * dp, 4 * dp]); ctx.strokeRect(ax0, ay1, aw, ah); ctx.setLineDash([]);
+    label('SEARCH AREA · ABSTRACT, SIMULATED', ax0 + 8 * dp, ay1 - 8 * dp, '#a9b5b0');
+    if (me[20]) { ctx.strokeStyle = 'rgba(236,231,218,.25)'; ctx.beginPath(); ctx.moveTo(ax0, sy(G[18])); ctx.lineTo(ax0 + aw, sy(G[18])); ctx.stroke(); label('A', ax0 + aw + 8 * dp, sy((G[17] + G[18]) / 2), '#ece7da', 14); label('B', ax0 + aw + 8 * dp, sy((G[15] + G[18]) / 2), '#ece7da', 14); }
     // route and waypoints
     const WP = [['BASE', 0], ['ASSY', 2], ['W1', 4], ['W2', 6], ['W3', 8], ['RDV', 10], ['W4', 12]];
-    ctx.strokeStyle = 'rgba(166,164,157,.28)'; ctx.setLineDash([8 * dp, 6 * dp]); ctx.lineWidth = 1.2 * dp; ctx.beginPath();
+    ctx.strokeStyle = 'rgba(169,181,176,.28)'; ctx.setLineDash([8 * dp, 6 * dp]); ctx.lineWidth = 1.2 * dp; ctx.beginPath();
     [0, 2, 4, 6, 8].forEach((j, i) => i ? ctx.lineTo(sx(G[j]), sy(G[j + 1])) : ctx.moveTo(sx(G[j]), sy(G[j + 1])));
     if (scenario > 2) { ctx.moveTo(sx(G[10]), sy(G[11])); ctx.lineTo(sx(G[12]), sy(G[13])); ctx.lineTo(sx(G[0]), sy(G[1])); } else { ctx.moveTo(sx(G[8]), sy(G[9])); ctx.lineTo(sx(G[12]), sy(G[13])); ctx.lineTo(sx(G[0]), sy(G[1])); }
     ctx.stroke(); ctx.setLineDash([]);
     for (const [name, j] of WP) {
       if (name === 'RDV' && scenario <= 2) continue;
       const x = sx(G[j]), y = sy(G[j + 1]), r = 6 * dp;
-      ctx.strokeStyle = name === 'BASE' ? '#f2f0ea' : '#a6a49d'; ctx.lineWidth = 1.3 * dp; ctx.beginPath();
+      ctx.strokeStyle = name === 'BASE' ? '#ece7da' : '#a9b5b0'; ctx.lineWidth = 1.3 * dp; ctx.beginPath();
       if (name === 'BASE') ctx.rect(x - r, y - r, 2 * r, 2 * r); else { ctx.moveTo(x, y - r); ctx.lineTo(x + r, y); ctx.lineTo(x, y + r); ctx.lineTo(x - r, y); ctx.closePath(); }
-      ctx.stroke(); label(name, x + 10 * dp, y - 8 * dp, '#a6a49d');
+      ctx.stroke(); label(name, x + 10 * dp, y - 8 * dp, '#a9b5b0');
     }
     // lanes
     const lb = n * UF + n * n;
     for (let l = 0; l < cur.nl; l++) {
       const o = lb + l * 7, st = S[o + 5];
-      ctx.strokeStyle = st === 3 ? 'rgba(242,240,234,.16)' : st === 2 ? 'rgba(242,240,234,.75)' : st === 1 ? 'rgba(242,240,234,.4)' : 'rgba(166,164,157,.22)';
+      ctx.strokeStyle = st === 3 ? 'rgba(236,231,218,.16)' : st === 2 ? 'rgba(236,231,218,.75)' : st === 1 ? 'rgba(236,231,218,.4)' : 'rgba(169,181,176,.22)';
       ctx.lineWidth = (st === 2 ? 1.6 : 1) * dp; ctx.setLineDash(st === 3 || st === 2 ? [] : [4 * dp, 5 * dp]);
       ctx.beginPath(); ctx.moveTo(sx(S[o]), sy(S[o + 1])); ctx.lineTo(sx(S[o + 2]), sy(S[o + 3])); ctx.stroke();
     }
@@ -390,10 +390,10 @@ export function startLive({ watch, cue, RM }) {
     // trails
     for (let i = 0; i < n; i++) {
       const tr = trails[i]; if (!tr || tr.length < 2) continue;
-      for (let j = 1; j < tr.length; j++) { ctx.strokeStyle = `rgba(242,240,234,${(.18 * j / tr.length).toFixed(3)})`; ctx.lineWidth = dp; ctx.beginPath(); ctx.moveTo(sx(tr[j - 1][0]), sy(tr[j - 1][1])); ctx.lineTo(sx(tr[j][0]), sy(tr[j][1])); ctx.stroke(); }
+      for (let j = 1; j < tr.length; j++) { ctx.strokeStyle = `rgba(236,231,218,${(.18 * j / tr.length).toFixed(3)})`; ctx.lineWidth = dp; ctx.beginPath(); ctx.moveTo(sx(tr[j - 1][0]), sy(tr[j - 1][1])); ctx.lineTo(sx(tr[j][0]), sy(tr[j][1])); ctx.stroke(); }
     }
     // comm links
-    ctx.lineWidth = dp; ctx.strokeStyle = eng ? 'rgba(166,200,220,.28)' : 'rgba(166,164,157,.08)'; ctx.beginPath();
+    ctx.lineWidth = dp; ctx.strokeStyle = eng ? 'rgba(95,208,196,.3)' : 'rgba(95,208,196,.1)'; ctx.beginPath();
     for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) if (S[n * UF + i * n + j]) { ctx.moveTo(sx(X(i)), sy(Y(i))); ctx.lineTo(sx(X(j)), sy(Y(j))); }
     ctx.stroke();
     // groups: hull, leader->follower lines, label
@@ -403,16 +403,16 @@ export function startLive({ watch, cue, RM }) {
       if (!mem.length) continue;
       const form = me[2 + g];
       if (L >= 0 && form <= 3) {
-        ctx.strokeStyle = 'rgba(242,240,234,.14)'; ctx.lineWidth = dp; ctx.beginPath();
+        ctx.strokeStyle = 'rgba(236,231,218,.14)'; ctx.lineWidth = dp; ctx.beginPath();
         for (const i of mem) if (i !== L && S[i * UF + 7] === 1) { ctx.moveTo(sx(X(L)), sy(Y(L))); ctx.lineTo(sx(X(i)), sy(Y(i))); }
         ctx.stroke();
       }
       if (mem.length >= 3) {
         const hp_ = hull(mem.map(i => [sx(X(i)), sy(Y(i))]));
-        ctx.strokeStyle = g ? 'rgba(242,240,234,.3)' : 'rgba(242,240,234,.45)'; ctx.setLineDash(g ? [3 * dp, 4 * dp] : [8 * dp, 4 * dp]); ctx.lineWidth = dp; ctx.beginPath();
+        ctx.strokeStyle = g ? 'rgba(236,231,218,.3)' : 'rgba(236,231,218,.45)'; ctx.setLineDash(g ? [3 * dp, 4 * dp] : [8 * dp, 4 * dp]); ctx.lineWidth = dp; ctx.beginPath();
         hp_.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.closePath(); ctx.stroke(); ctx.setLineDash([]);
         const top = hp_.reduce((a, b) => b[1] < a[1] ? b : a);
-        label(`${me[21] || g ? 'GROUP ' + 'AB'[g] : 'SWARM'} · ${FORM[form]} · ${mem.length}`, top[0] - 40 * dp, top[1] - 16 * dp, '#f2f0ea');
+        label(`${me[21] || g ? 'GROUP ' + 'AB'[g] : 'SWARM'} · ${FORM[form]} · ${mem.length}`, top[0] - 40 * dp, top[1] - 16 * dp, '#ece7da');
       }
     }
     // aircraft
@@ -424,38 +424,38 @@ export function startLive({ watch, cue, RM }) {
       if (st === 5) { ctx.strokeStyle = 'rgba(255,74,43,.8)'; ctx.lineWidth = 2 * dp; ctx.beginPath(); ctx.moveTo(x - 6 * dp, y - 6 * dp); ctx.lineTo(x + 6 * dp, y + 6 * dp); ctx.moveTo(x + 6 * dp, y - 6 * dp); ctx.lineTo(x - 6 * dp, y + 6 * dp); ctx.stroke(); label(`U${String(i + 1).padStart(2, '0')} LOST`, x + 9 * dp, y - 8 * dp, '#ff4a2b'); continue; }
       if (eng) {
         const vx = S[o + 17], vy = S[o + 18];
-        arrow(x, y, x + vx * 25 * cam.s, y - vy * 25 * cam.s, 'rgba(242,240,234,.85)');
+        arrow(x, y, x + vx * 25 * cam.s, y - vy * 25 * cam.s, 'rgba(236,231,218,.85)');
         const tx = sx(S[o + 13]), ty = sy(S[o + 14]), L = Math.hypot(tx - x, ty - y), c = Math.min(1, 140 * dp / Math.max(L, 1));
-        arrow(x, y, x + (tx - x) * c, y + (ty - y) * c, 'rgba(166,164,157,.8)', [5 * dp, 4 * dp]);
-        if (S[o + 15] >= 0) { const qx = sx(S[o + 15]), qy = sy(S[o + 16]); ctx.strokeStyle = 'rgba(242,240,234,.6)'; ctx.setLineDash([dp, 3 * dp]); ctx.beginPath(); ctx.moveTo(sx(S[o + 21]), sy(S[o + 22])); ctx.lineTo(qx, qy); ctx.stroke(); ctx.setLineDash([]); ctx.strokeRect(qx - 3 * dp, qy - 3 * dp, 6 * dp, 6 * dp); }
-        if (S[o + 19] > 0) label(`L${S[o + 19]}`, x - 18 * dp, y + 16 * dp, '#a6a49d', 10);
+        arrow(x, y, x + (tx - x) * c, y + (ty - y) * c, 'rgba(169,181,176,.8)', [5 * dp, 4 * dp]);
+        if (S[o + 15] >= 0) { const qx = sx(S[o + 15]), qy = sy(S[o + 16]); ctx.strokeStyle = 'rgba(236,231,218,.6)'; ctx.setLineDash([dp, 3 * dp]); ctx.beginPath(); ctx.moveTo(sx(S[o + 21]), sy(S[o + 22])); ctx.lineTo(qx, qy); ctx.stroke(); ctx.setLineDash([]); ctx.strokeRect(qx - 3 * dp, qy - 3 * dp, 6 * dp, 6 * dp); }
+        if (S[o + 19] > 0) label(`L${S[o + 19]}`, x - 18 * dp, y + 16 * dp, '#a9b5b0', 10);
       }
-      if (S[o + 8] > 12) { ctx.strokeStyle = st === 4 ? 'rgba(255,74,43,.55)' : 'rgba(166,164,157,.45)'; ctx.lineWidth = dp; ctx.beginPath(); ctx.arc(sx(S[o + 21]), sy(S[o + 22]), Math.max(4 * dp, S[o + 8] * cam.s), 0, Math.PI * 2); ctx.stroke(); }
-      const col = st === 4 ? null : st === 2 || st === 3 ? '#a6a49d' : grp ? '#0b0b0a' : '#f2f0ea';
-      const stroke = st === 4 ? '#ff4a2b' : grp && st === 1 ? '#f2f0ea' : null;
+      if (S[o + 8] > 12) { ctx.strokeStyle = st === 4 ? 'rgba(255,74,43,.55)' : 'rgba(169,181,176,.45)'; ctx.lineWidth = dp; ctx.beginPath(); ctx.arc(sx(S[o + 21]), sy(S[o + 22]), Math.max(4 * dp, S[o + 8] * cam.s), 0, Math.PI * 2); ctx.stroke(); }
+      const col = st === 4 ? null : st === 2 || st === 3 ? '#a9b5b0' : grp ? '#0b1417' : '#c6f032';
+      const stroke = st === 4 ? '#ff4a2b' : grp && st === 1 ? '#ece7da' : null;
       plane(x, y, hd, z, col, stroke);
-      if (S[o + 6]) { ctx.strokeStyle = '#f2f0ea'; ctx.lineWidth = dp; const r = z + 5 * dp; ctx.beginPath(); ctx.moveTo(x, y - r); ctx.lineTo(x + r, y); ctx.lineTo(x, y + r); ctx.lineTo(x - r, y); ctx.closePath(); ctx.stroke(); }
-      if (i === selected) { ctx.strokeStyle = '#ff4a2b'; ctx.lineWidth = 2 * dp; const r = z + 10 * dp, l = 7 * dp; ctx.beginPath();
+      if (S[o + 6]) { ctx.strokeStyle = '#ece7da'; ctx.lineWidth = dp; const r = z + 5 * dp; ctx.beginPath(); ctx.moveTo(x, y - r); ctx.lineTo(x + r, y); ctx.lineTo(x, y + r); ctx.lineTo(x - r, y); ctx.closePath(); ctx.stroke(); }
+      if (i === selected) { ctx.strokeStyle = '#c6f032'; ctx.lineWidth = 2 * dp; const r = z + 10 * dp, l = 7 * dp; ctx.beginPath();
         for (const [sx_, sy_] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) { ctx.moveTo(x + sx_ * r, y + sy_ * (r - l)); ctx.lineTo(x + sx_ * r, y + sy_ * r); ctx.lineTo(x + sx_ * (r - l), y + sy_ * r); } ctx.stroke(); }
       if (showIds || i === selected || st !== 1 || S[o + 6]) {
         const tag = `U${String(i + 1).padStart(2, '0')}${S[o + 6] ? ' L' : ''}${st === 4 ? ' COMMS LOST' : st === 3 ? ' REJOINING' : st === 2 ? ' LEFT' : ''}`;
-        label(tag, x + z + 4 * dp, y - z * .6, st === 4 ? '#ff4a2b' : i === selected ? '#f2f0ea' : '#a6a49d', 10.5);
+        label(tag, x + z + 4 * dp, y - z * .6, st === 4 ? '#ff4a2b' : i === selected ? '#c6f032' : '#a9b5b0', 10.5);
       }
     }
     // HUD, drawn into the same image (never a DOM layer over the map)
-    ctx.fillStyle = 'rgba(9,10,8,.72)'; ctx.fillRect(0, 0, 380 * dp, 58 * dp);
-    label(`PHASE  ${PHASE[me[1]]}`, 14 * dp, 24 * dp, '#f2f0ea', 13);
-    label(`${me[15] ? 'GPS UNAVAILABLE  ' : ''}${me[16] ? 'RADIO DEGRADED  ' : ''}${me[24] > 1 ? `SPACING ×${me[24].toFixed(2)} (LADDER)` : ''}` || 'ALL LINKS NOMINAL', 14 * dp, 44 * dp, me[15] || me[16] ? '#ff4a2b' : '#a6a49d', 11);
-    const bar = 1000 * cam.s; ctx.strokeStyle = '#a6a49d'; ctx.lineWidth = dp; ctx.beginPath(); ctx.moveTo(14 * dp, H - 16 * dp); ctx.lineTo(14 * dp + bar, H - 16 * dp); ctx.moveTo(14 * dp, H - 20 * dp); ctx.lineTo(14 * dp, H - 12 * dp); ctx.moveTo(14 * dp + bar, H - 20 * dp); ctx.lineTo(14 * dp + bar, H - 12 * dp); ctx.stroke();
-    label('1 KM', 20 * dp + bar, H - 12 * dp, '#a6a49d', 10);
+    ctx.fillStyle = 'rgba(8,16,18,.8)'; ctx.fillRect(0, 0, 380 * dp, 58 * dp);
+    label(`PHASE  ${PHASE[me[1]]}`, 14 * dp, 24 * dp, '#c6f032', 13);
+    label(`${me[15] ? 'GPS UNAVAILABLE  ' : ''}${me[16] ? 'RADIO DEGRADED  ' : ''}${me[24] > 1 ? `SPACING ×${me[24].toFixed(2)} (LADDER)` : ''}` || 'ALL LINKS NOMINAL', 14 * dp, 44 * dp, me[15] || me[16] ? '#ff4a2b' : '#a9b5b0', 11);
+    const bar = 1000 * cam.s; ctx.strokeStyle = '#a9b5b0'; ctx.lineWidth = dp; ctx.beginPath(); ctx.moveTo(14 * dp, H - 16 * dp); ctx.lineTo(14 * dp + bar, H - 16 * dp); ctx.moveTo(14 * dp, H - 20 * dp); ctx.lineTo(14 * dp, H - 12 * dp); ctx.moveTo(14 * dp + bar, H - 20 * dp); ctx.lineTo(14 * dp + bar, H - 12 * dp); ctx.stroke();
+    label('1 KM', 20 * dp + bar, H - 12 * dp, '#a9b5b0', 10);
     if (eng) {
-      const x0 = W - 300 * dp, y0 = H - 92 * dp; ctx.fillStyle = 'rgba(9,10,8,.8)'; ctx.fillRect(x0 - 10 * dp, y0 - 18 * dp, 300 * dp, 100 * dp);
-      arrow(x0, y0, x0 + 34 * dp, y0, '#f2f0ea'); label('velocity (25 s ahead)', x0 + 44 * dp, y0 + 4 * dp, '#a6a49d', 10);
-      arrow(x0, y0 + 20 * dp, x0 + 34 * dp, y0 + 20 * dp, '#a6a49d', [5 * dp, 4 * dp]); label('homing vector to target', x0 + 44 * dp, y0 + 24 * dp, '#a6a49d', 10);
-      ctx.strokeStyle = '#f2f0ea'; ctx.setLineDash([dp, 3 * dp]); ctx.beginPath(); ctx.moveTo(x0, y0 + 40 * dp); ctx.lineTo(x0 + 30 * dp, y0 + 40 * dp); ctx.stroke(); ctx.setLineDash([]); ctx.strokeRect(x0 + 30 * dp, y0 + 37 * dp, 6 * dp, 6 * dp); label('formation vector to slot', x0 + 44 * dp, y0 + 44 * dp, '#a6a49d', 10);
-      ctx.strokeStyle = 'rgba(166,200,220,.6)'; ctx.beginPath(); ctx.moveTo(x0, y0 + 60 * dp); ctx.lineTo(x0 + 34 * dp, y0 + 60 * dp); ctx.stroke(); label('comm link   ○ nav uncertainty', x0 + 44 * dp, y0 + 64 * dp, '#a6a49d', 10);
+      const x0 = W - 300 * dp, y0 = H - 92 * dp; ctx.fillStyle = 'rgba(8,16,18,.85)'; ctx.fillRect(x0 - 10 * dp, y0 - 18 * dp, 300 * dp, 100 * dp);
+      arrow(x0, y0, x0 + 34 * dp, y0, '#ece7da'); label('velocity (25 s ahead)', x0 + 44 * dp, y0 + 4 * dp, '#a9b5b0', 10);
+      arrow(x0, y0 + 20 * dp, x0 + 34 * dp, y0 + 20 * dp, '#a9b5b0', [5 * dp, 4 * dp]); label('homing vector to target', x0 + 44 * dp, y0 + 24 * dp, '#a9b5b0', 10);
+      ctx.strokeStyle = '#ece7da'; ctx.setLineDash([dp, 3 * dp]); ctx.beginPath(); ctx.moveTo(x0, y0 + 40 * dp); ctx.lineTo(x0 + 30 * dp, y0 + 40 * dp); ctx.stroke(); ctx.setLineDash([]); ctx.strokeRect(x0 + 30 * dp, y0 + 37 * dp, 6 * dp, 6 * dp); label('formation vector to slot', x0 + 44 * dp, y0 + 44 * dp, '#a9b5b0', 10);
+      ctx.strokeStyle = 'rgba(95,208,196,.7)'; ctx.beginPath(); ctx.moveTo(x0, y0 + 60 * dp); ctx.lineTo(x0 + 34 * dp, y0 + 60 * dp); ctx.stroke(); label('comm link   ○ nav uncertainty', x0 + 44 * dp, y0 + 64 * dp, '#a9b5b0', 10);
     }
-    if (me[1] === 9) { label('MISSION COMPLETE', W / 2 - 80 * dp, 30 * dp, '#f2f0ea', 14); }
+    if (me[1] === 9) { label('MISSION COMPLETE', W / 2 - 80 * dp, 30 * dp, '#ece7da', 14); }
   }
   requestAnimationFrame(draw);
   window.__live = { frames: () => frames, scenario: () => scenario, phase: () => cur && cur.meta[1], hash: () => cur && cur.hash };

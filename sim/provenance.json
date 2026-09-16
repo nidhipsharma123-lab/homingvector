@@ -1,6 +1,6 @@
 {
  "product_repo": "TurtleShield",
- "product_sha": "b04e493932fe3bb7f8d26e467e480998afbf733d",
+ "product_sha": "2fe5908caf4e6e2ebf6e58c326ed11a95a833b98",
  "product_files": {
   "core/task/task.cpp": "4df438f8c2502da8087973b8b07ee5168a9282148019797b5aac8fafef4d0735",
   "core/task/score.cpp": "410bb5f598e02f1f5f60014034529146f0e25ef3b92aa8cb473a51e1e5bce190",
@@ -21,7 +21,7 @@
   "core/common/geodesy.cpp": "371b9102249e84ecc1a82519d67e59b7d67d996ba4eb999111d48cf26559cce4"
  },
  "harness_sha256": "6d5bef1637dba3fe1c3796fb726eb28600c36526fc9ec11a4743244e2de710e7",
- "mission_sha256": "39c05ca64c35e4eb547eae2dfc4985c7b76a61110b765282e00f87144fb92988",
- "wasm_sha256": "02b0226e373681a8ffba7dfa0095d3f5bcabaf404a4f54db5be7c41bdbdd0dc3",
- "wasm_bytes": 546853
+ "mission_sha256": "21b4328e1beba19e974a35f460379106a35b159f1a7d6c9f266e8a9bd781fec2",
+ "wasm_sha256": "dcc628dab3fae2620da33f536ac59e1662e933921d955a5ec0f70de2845dfd57",
+ "wasm_bytes": 543730
 }

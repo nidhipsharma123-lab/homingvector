@@ -31,16 +31,19 @@ mitre 7 u through the baseline.
 
 ## Legibility proof at 16 px
 `brand/favicon-16.png` is rasterised by the same headless Chrome the verify suite uses. At 16 px the
-heavy stroke is 3 px, the hairline 1 px and the lock corner a 1 px L in red: all three survive, and
+heavy stroke is 3 px, the hairline 1 px and the lock corner a 1 px L in lime: all three survive, and
 the silhouette reads as a V with a lock. Re-run `tools/make_icons.sh` after any geometry change.
 
 ## Colour
-Mark in `#F2F0EA` on `#070707`; lock corner in signal red `#FF4A2B` (6.0 : 1 on the canvas). Mono
-variants use one colour for all three parts. No gradients, shadows, bevels or extrusion, ever.
+Mark in bone `#ECE7DA` on slate `#0B1417`; the lock corner in **vector lime `#C6F032`** (14.1 : 1 on the
+ground). Lime means "live, tracking, chosen" across the whole identity; alarm red `#FF4A2B` is never used
+in the mark. Mono variants use one colour for all three parts. No gradients, shadows, bevels or
+extrusion, ever. (Until 2026-09-17 the lock was red; changed so the identity does not read as a
+black-and-white-plus-red copy of anyone else's.)
 
 ## Misuse
 - Do not close the V, extend the hairline to the vertex, or add the missing three corners.
 - Do not round anything, outline the mark, or place it on an image without a solid ground.
-- Do not recolour the heavy stroke red; red belongs to the lock alone.
+- Do not recolour the heavy stroke lime; lime belongs to the lock alone. Never use alarm red in the mark.
 - Do not add a turtle, shield, crosshair circle, globe or animal. The products are named Turtle;
   the company is not.

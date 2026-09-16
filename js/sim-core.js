@@ -29,13 +29,13 @@ export async function loadCore(bytes) {
     drainLog() { const n = x.sim_log_len(); if (!n) return ''; const s = dec.decode(new Uint8Array(mem.buffer, x.sim_log_ptr(), n)); x.sim_log_clear(); return s; },
   };
   // ---- swarm mission engine (sim/mission.cpp)
-  const U_F = 24;
+  const U_F = 26, L_F = 8;
   api.mission = {
     init: (scenario, seed) => x.m_init(scenario, seed), step: (k) => x.m_step(k), event: (kind, arg) => x.m_event(kind, arg | 0),
-    confirm: (id) => x.m_event(20, id), n: () => x.m_n(), hash: () => x.m_hash(), U_F,
-    snapshot() { const n = x.m_n(), nl = x.m_nlanes(), p = x.m_snapshot(); return { n, nl, buf: new Float64Array(mem.buffer, p, n * U_F + n * n + nl * 7).slice() }; },
-    meta() { return new Float64Array(mem.buffer, x.m_meta(), 32).slice(); },
-    geom() { return new Float64Array(mem.buffer, x.m_geom(), 23).slice(); },
+    confirm: (id) => x.m_event(20, id), U_F, L_F, tune: (i, v) => x.m_tune(i, v), n: () => x.m_n(), hash: () => x.m_hash(),
+    snapshot() { const n = x.m_n(), nl = x.m_nlanes(), p = x.m_snapshot(); return { n, nl, buf: new Float64Array(mem.buffer, p, n * U_F + n * n + nl * L_F).slice() }; },
+    meta() { return new Float64Array(mem.buffer, x.m_meta(), 40).slice(); },
+    geom() { return new Float64Array(mem.buffer, x.m_geom(), 29).slice(); },
     decision() { const n = x.m_decision_len(); return n ? dec.decode(new Uint8Array(mem.buffer, x.m_decision_ptr(), n)) : ''; },
     drainLog() { const n = x.m_log_len(); if (!n) return ''; const s = dec.decode(new Uint8Array(mem.buffer, x.m_log_ptr(), n)); x.m_log_clear(); return s; },
   };

@@ -6,8 +6,8 @@ import { loadCore } from '../js/sim-core.js';
 const bytes = readFileSync(new URL('../sim/tscore.wasm', import.meta.url));
 const PH = ['LAUNCH', 'ASSEMBLY', 'FORMATION', 'TRANSIT', 'SPLIT', 'SEARCH', 'RENDEZVOUS', 'REFORM', 'RETURN', 'COMPLETE'];
 const verbose = process.argv.includes('--log');
-async function run(sc, seed, maxT = 4000) {
-  const c = await loadCore(bytes), m = c.mission; m.init(sc, seed);
+async function run(sc, seed, maxT = 5000, shared = null) {
+  const c = shared || await loadCore(bytes), m = c.mission; m.init(sc, seed);
   let log = '', phases = [], lastPh = -1, pendSince = -1;
   while (true) {
     m.step(10); log += m.drainLog();
@@ -18,15 +18,27 @@ async function run(sc, seed, maxT = 4000) {
   }
 }
 const need = {
-  1: [/GPS unavailable/, /GPS restored|GPS available again/],
-  2: [/formation WEDGE -> |formation .* -> V|formation .* -> COLUMN/, /leaves formation/, /REJOINING|back in slot/],
-  3: [/SPLIT/, /RENDEZVOUS/, /MISSION COMPLETE/],
+  1: [/GPS unavailable/, /GPS restored|GPS available again/, /ISOLATED/],
+  2: [/formation .* -> COLUMN/, /formation .* -> V/, /leaves formation/, /REJOINING|back in slot/],
+  3: [/70 fixed-wing  6 ground  4 surface/, /SPLIT  Group A/, /station held/, /RENDEZVOUS/, /MISSION COMPLETE/],
   4: [/GPS denied/, /GPS unavailable/, /-> DEGRADED_NAV/],
   5: [/radio links degraded/, /COMMS LOST/, /link restored/],
-  6: [/lost/, /leader U01 -> /, /took lane/],
-  7: [/GPS denied/, /COMMS LOST/, /leaves formation/, /took lane/, /MISSION COMPLETE/],
+  6: [/EVENT  U01 lost/, /leader U01 -> /, /G0\d lost/, /took (lane|station)/],
+  7: [/GPS denied/, /COMMS LOST/, /leaves formation/, /G0\d lost/, /took (lane|station)/, /MISSION COMPLETE/],
 };
 let code = 0;
+// REUSE: the browser keeps ONE engine across restarts and scenario changes. A fresh engine per run hid
+// function-static state that leaked between missions; run every scenario back to back on one instance
+// and require the same hashes as fresh instances.
+{
+  const shared = await loadCore(bytes);
+  for (const sc of [7, 3, 7]) {
+    const r = await run(sc, 11, 4000, shared), fresh = await run(sc, 11);
+    const same = r.hash === fresh.hash && r.me[1] === 9;
+    console.log(`reuse: scenario ${sc} on a shared engine ${r.me[1] === 9 ? 'COMPLETE' : 'STALLED'}  hash ${same ? 'matches' : 'DIFFERS from'} a fresh engine`);
+    if (!same) code = 1;
+  }
+}
 for (let sc = 1; sc <= 7; sc++) {
   const r = await run(sc, 11), r2 = await run(sc, 11);
   const me = r.me, done = me[1] === 9;
