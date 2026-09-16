@@ -1,0 +1,22 @@
+{
+ "product_repo": "TurtleShield",
+ "product_sha": "b04e493932fe3bb7f8d26e467e480998afbf733d",
+ "product_files": {
+  "core/task/task.cpp": "4df438f8c2502da8087973b8b07ee5168a9282148019797b5aac8fafef4d0735",
+  "core/task/score.cpp": "410bb5f598e02f1f5f60014034529146f0e25ef3b92aa8cb473a51e1e5bce190",
+  "core/task/cbba.cpp": "430d7deb8ab6b0d04db5ac376d5b0cafb9c9cd546fdb50277f7327bbce8a5a2f",
+  "core/hal/capability_profile.cpp": "d85fa24dbf0a7f312424c3a62ecebee4e7c43549f4c6056ceba1b88ee1e50ff0",
+  "core/hal/kinematic_envelope.cpp": "863de21f00feaaf7b27319486ef38503cbce3378c706d7dcb1aeec8efaf812bb",
+  "core/health/degradation.cpp": "26cd39d81f6f921d3e4e721e742a4edde4bbe73e926ee28a3ca7440e802bc49c",
+  "core/health/failure_response.cpp": "94ef8905d69d4aaec09bdc1dd9b93fbccce97c086acd4a6fc73677dda604f86b",
+  "core/health/quorum_policy.cpp": "78cb6d6f287b8f28bbf2ea5f17b24b36cec5fecc5f01c34417b805262a03a7c6",
+  "core/nav/spoof_detector.cpp": "818cdd15c1104f7944263789dccea27578317d2be476e7b6f2aea1d6a5626dea",
+  "core/world/belief.cpp": "5292deb4b4b5a8638af0953416d5579e272d082d53ecf419e6fe1f307bff5d1d",
+  "core/common/time.cpp": "22c60584c6cbf05033494fc41528b85bca1bfcb488e332e4aeadfe28aaa4b5ed",
+  "core/common/log.cpp": "8aac78c12ea336749b708134926f17f6fb26274cdebb6bb67f1bc1ed3c07a0da",
+  "core/world/track_fusion.cpp": "5f09e39af4e40d9d31e0b83a67d7c00e54cbeaa141d528203f0d60bd41121127"
+ },
+ "harness_sha256": "6d5bef1637dba3fe1c3796fb726eb28600c36526fc9ec11a4743244e2de710e7",
+ "wasm_sha256": "453a8fde0dbafdbfc9d0e4fcb27c35f81b9d4c0ca47ca819c67f9af73be78b62",
+ "wasm_bytes": 430834
+}

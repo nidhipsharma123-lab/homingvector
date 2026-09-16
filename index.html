@@ -3,302 +3,86 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- ZERO third-party requests. Every byte is served from this origin: no CDN, no analytics, no
+     trackers, no cookies. The policy below is what makes that a guarantee rather than a habit.
+     'wasm-unsafe-eval' is the narrowest grant that lets the live simulation compile its
+     WebAssembly; it does not permit eval() of JavaScript. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Homingvector</title>
 <meta name="description" content="Homingvector builds TurtleShield, an AI that keeps drones, ground robots and boats working as one team when GPS is jammed, and Turtle Eyes, its ground station.">
 <meta property="og:title" content="Homingvector">
-<meta property="og:description" content="When GPS goes dark, the mission doesn't. TurtleShield AI and the Turtle Eyes GCS.">
-<!-- Open Graph / Twitter URLs must be ABSOLUTE: scrapers fetch these without the page's base, so
-     a relative path yields no preview image at all. Found by turtleshield-36. twitter:card is what
-     makes the image render wide rather than as a small thumbnail -- without it an otherwise correct
-     og:image still looks broken when the link is shared. -->
-<meta property="og:image" content="https://nidhipsharma123-lab.github.io/homingvector/media/hero-poster.jpg">
-<meta property="og:image:width" content="1600">
-<meta property="og:image:height" content="900">
-<meta property="og:image:alt" content="A fixed-wing aircraft flying low over terrain, from the Homingvector film.">
+<meta property="og:description" content="Holds the mission when GPS and comms are gone. TurtleShield AI and the Turtle Eyes console.">
+<!-- Open Graph / Twitter URLs must be ABSOLUTE: scrapers fetch these without the page's base. -->
+<meta property="og:image" content="https://nidhipsharma123-lab.github.io/homingvector/brand/og-image-1200x630.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The Homingvector mark, a broken V with a lock corner, above the line: Holds the mission when GPS and comms are gone.">
 <meta property="og:url" content="https://nidhipsharma123-lab.github.io/homingvector/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Homingvector">
 <meta property="og:locale" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Homingvector">
-<meta name="twitter:description" content="When GPS goes dark, the mission doesn't. TurtleShield AI and the Turtle Eyes GCS.">
-<meta name="twitter:image" content="https://nidhipsharma123-lab.github.io/homingvector/media/hero-poster.jpg">
-<meta name="twitter:image:alt" content="A fixed-wing aircraft flying low over terrain, from the Homingvector film.">
+<meta name="twitter:description" content="Holds the mission when GPS and comms are gone. TurtleShield AI and the Turtle Eyes console.">
+<meta name="twitter:image" content="https://nidhipsharma123-lab.github.io/homingvector/brand/og-image-1200x630.png">
+<meta name="twitter:image:alt" content="The Homingvector mark, a broken V with a lock corner, above the line: Holds the mission when GPS and comms are gone.">
 <link rel="canonical" href="https://nidhipsharma123-lab.github.io/homingvector/">
 <meta name="theme-color" content="#070707">
 <meta name="color-scheme" content="dark">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23070707'/%3E%3Cpath d='M40 5H59V24' fill='none' stroke='%23ff4a2b' stroke-width='4.5' stroke-linecap='square'/%3E%3Cpath d='M24 59H5V40' fill='none' stroke='%23ff4a2b' stroke-width='4.5' stroke-linecap='square'/%3E%3Cpath d='M53 10 L4 33 L26 31 Z' fill='%23f2f0ea'/%3E%3Cpath d='M51.5 13.5 L27.5 35.5 L33 59 Z' fill='%23f2f0ea'/%3E%3C/svg%3E">
-<!-- iOS does NOT accept a data: URI for apple-touch-icon, so the rel=icon above
-     cannot serve double duty here. media/apple-touch-icon.png is generated from
-     that same inline SVG by tools/make_icons.py, so the mark cannot drift. -->
-<link rel="apple-touch-icon" sizes="180x180" href="media/apple-touch-icon.png">
+<link rel="icon" href="brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="brand/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" sizes="180x180" href="brand/apple-touch-icon-180.png">
 <link rel="preload" href="fonts/HostGrotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
-<style>
-@font-face{font-family:"Host Grotesk";src:url(fonts/HostGrotesk-latin.woff2) format("woff2");font-weight:300 800;font-style:normal;font-display:swap}
-@font-face{font-family:"IBM Plex Mono";src:url(fonts/IBMPlexMono-400-latin.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
-@font-face{font-family:"IBM Plex Mono";src:url(fonts/IBMPlexMono-500-latin.woff2) format("woff2");font-weight:500;font-style:normal;font-display:swap}
-:root{
-  --bg:#070707; --bg2:#0e0e0d; --fg:#f2f0ea; --g1:#a6a49d; --g2:#6f6e69; --line:#232321; --red:#ff4a2b;
-  --sans:"Host Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-  --gut:clamp(20px,5vw,72px);
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{background:var(--bg);-webkit-text-size-adjust:100%;text-size-adjust:100%}
-body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:clamp(17px,1.15vw,19px);line-height:1.55;overflow-x:clip;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-a{color:inherit}
-button{font:inherit;color:inherit}
-svg,canvas,video{display:block}
-:focus-visible{outline:2px solid var(--red);outline-offset:4px}
-.skip{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.skip:focus{position:static;width:auto;height:auto;clip:auto;display:block;padding:14px var(--gut);background:var(--fg);color:var(--bg);font-weight:600}
-.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.w{max-width:1440px;margin:0 auto;padding-left:var(--gut);padding-right:var(--gut)}
-
-/* ---------- header ---------- */
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px 24px;padding:14px var(--gut);border-bottom:1px solid var(--line)}
-.mark{display:inline-flex;align-items:center;gap:12px;text-decoration:none;padding:8px 0}
-.mark b{font-weight:700;font-size:14.5px;letter-spacing:.17em;text-transform:uppercase}
-.top ul{display:flex;gap:clamp(16px,2.6vw,40px);list-style:none;font-size:15px}
-.top ul a{display:inline-block;text-decoration:none;color:var(--g1);padding:12px 0}
-.top ul a:hover{color:var(--fg)}
-
-/* ---------- hero + film ---------- */
-.hero{max-width:1440px;margin:0 auto;padding:clamp(48px,8vw,120px) var(--gut) clamp(36px,4vw,60px)}
-.hero h1{font-weight:500;font-size:clamp(44px,8vw,146px);line-height:.95;letter-spacing:-.047em;max-width:11.5ch}
-.hero-foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px 60px;margin-top:clamp(28px,3.5vw,52px)}
-.hero-foot p{font-size:clamp(18px,1.5vw,23px);line-height:1.45;color:var(--g1);max-width:46ch}
-.hero-foot p b{color:var(--fg);font-weight:500}
-.cta{display:flex;flex-wrap:wrap;gap:10px 28px}
-.go{display:inline-flex;align-items:center;gap:12px;text-decoration:none;font-size:16px;border-bottom:1px solid var(--g2);padding:12px 0;white-space:nowrap}
-.go:hover{border-color:var(--fg)}
-.film{margin:0;border-top:1px solid var(--line)}
-.film-v{width:100%;aspect-ratio:16/9;max-height:90vh;object-fit:cover;background:#0b0a09}
-.film-cap{max-width:1440px;margin:0 auto;padding:18px var(--gut) 0;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px 40px}
-.film-steps{list-style:none;display:flex;flex-wrap:wrap;gap:6px 26px;font-size:15px;color:var(--g1)}
-.film-steps li{display:flex;gap:8px;align-items:baseline;transition:color .3s}
-.film-steps li span{font-family:var(--mono);font-size:12.5px}
-.film-steps li.on{color:var(--fg)}
-.film-steps li.on span{color:var(--red)}
-.film-note{max-width:1440px;margin:0 auto;padding:10px var(--gut) clamp(70px,9vw,120px);font-size:14px;color:var(--g1)}
-.ctrl{background:transparent;border:1px solid #3a3a37;font-size:14.5px;padding:10px 18px;border-radius:999px;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;gap:10px}
-.ctrl:hover{border-color:var(--g1)}
-.ctrl:disabled{opacity:.35;cursor:default}
-
-/* ---------- story ---------- */
-.story{border-top:1px solid var(--line)}
-.story-grid{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)}
-.left{padding:0 clamp(28px,4vw,72px) 0 var(--gut)}
-.chapter{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:10vh 0}
-.clock{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:13px;color:var(--g1)}
-.clock i{width:7px;height:7px;border-radius:50%;background:var(--g2);transition:background .3s}
-.chapter.on .clock i{background:var(--red)}
-.chapter h2{font-weight:500;font-size:clamp(34px,3.5vw,62px);line-height:1.03;letter-spacing:-.035em;margin-top:18px;max-width:13ch}
-.c0 h2{font-size:clamp(40px,4.4vw,80px);max-width:12ch}
-.chapter p{color:var(--g1);font-size:clamp(17px,1.3vw,20px);max-width:38ch;margin-top:20px}
-.chapter p b{color:var(--fg);font-weight:500}
-.chapter .hint{display:inline-flex;align-items:center;gap:10px;margin-top:36px;color:var(--fg);font-size:15px}
-.hint.mob{display:none}
-.car-nav{display:none}
-.view{position:sticky;top:0;height:100vh;align-self:start;display:flex;flex-direction:column;border-left:1px solid var(--line);background:#0b0a09}
-.view-gl{position:relative;flex:1;min-height:0;overflow:hidden}
-.story-v{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#0b0a09}
-.view-cap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 20px;padding:13px 20px;border-top:1px solid var(--line);font-size:13.5px;color:var(--g1)}
-.view-cap b{color:var(--fg);font-weight:500;display:inline-flex;align-items:center;gap:8px}
-.view-cap b::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--red)}
-
-/* ---------- bridge ---------- */
-.bridge{max-width:1440px;margin:0 auto;padding:clamp(90px,12vw,180px) var(--gut);border-top:1px solid var(--line)}
-.bridge p{font-size:clamp(26px,3.3vw,54px);line-height:1.14;letter-spacing:-.026em;max-width:30ch}
-.bridge a{color:var(--g1);text-underline-offset:6px;text-decoration-thickness:1px}
-.bridge a:hover{color:var(--fg)}
-
-/* ---------- products ---------- */
-.product{max-width:1440px;margin:0 auto;padding:clamp(64px,8vw,120px) var(--gut) clamp(100px,12vw,180px);border-top:1px solid var(--line)}
-.p-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:10px 40px}
-.p-head h2{font-weight:500;font-size:clamp(52px,9.2vw,168px);line-height:.92;letter-spacing:-.055em}
-.p-head p{font-size:15px;color:var(--g1)}
-.p-head p b{color:var(--red);font-weight:500}
-.p-lede{font-size:clamp(22px,2.25vw,34px);line-height:1.3;letter-spacing:-.015em;max-width:36ch;margin-top:clamp(26px,3vw,44px)}
-.notes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(28px,3.5vw,56px) clamp(28px,6vw,110px);margin-top:clamp(56px,7vw,96px)}
-.notes div{border-top:1px solid var(--line);padding-top:22px}
-.notes h3{font-weight:500;font-size:clamp(21px,1.7vw,26px);letter-spacing:-.015em;line-height:1.2}
-.notes p{color:var(--g1);font-size:16.5px;margin-top:10px;max-width:46ch}
-.notes.three{grid-template-columns:repeat(3,minmax(0,1fr))}
-
-/* ---------- turtle eyes console ---------- */
-.console{margin-top:clamp(40px,5vw,64px);border:1px solid #33322d;background:#0e0d0a;font-family:var(--mono);font-size:11px;letter-spacing:.03em;border-radius:10px;overflow:hidden}
-.c-top{display:flex;align-items:center;gap:16px;padding:8px 14px;border-bottom:1px solid #26251f}
-.c-logo{display:flex;gap:10px;align-items:center;white-space:nowrap}
-.c-logo b{font-family:var(--sans);font-weight:600;font-size:14px;letter-spacing:.1em}
-.c-logo small{display:block;font-size:8px;color:#8d8570;letter-spacing:.2em}
-.c-tabs{display:flex;gap:2px;margin-left:14px}
-.c-tabs button{color:#a39b84;background:none;border:0;border-bottom:2px solid transparent;padding:12px 14px;cursor:pointer;text-transform:uppercase;letter-spacing:.14em;font-family:var(--mono);font-size:11px;white-space:nowrap;min-height:44px}
-.c-tabs button:hover{color:var(--fg)}
-.c-tabs button[aria-selected="true"]{color:var(--fg);background:#211f19;border-bottom-color:var(--fg)}
-.c-meta{margin-left:auto;display:flex;gap:12px;align-items:center;white-space:nowrap}
-.mock{background:var(--fg);color:#111;padding:5px 9px;font-weight:500;letter-spacing:.14em}
-.c-body{display:grid;grid-template-columns:220px minmax(0,1fr) 280px;min-height:470px}
-.c-left{border-right:1px solid #26251f;padding:10px 0;overflow:hidden}
-.c-h{color:#a39b84;letter-spacing:.16em;font-size:10px;padding:0 12px 8px;border-bottom:1px solid #26251f}
-.veh{padding:8px 12px;border-bottom:1px solid #1d1c16;border-left:3px solid transparent;display:grid;grid-template-columns:1fr auto;gap:2px 8px}
-.veh b{font-family:var(--sans);font-size:13px;letter-spacing:.04em;font-weight:600}
-.veh .st{color:#b3be7c;font-size:9.5px;letter-spacing:.1em}
-.veh .sub{color:#958d77;font-size:9.5px}
-.veh.warn{border-left-color:#e3a82b} .veh.warn .st{color:#e3a82b}
-.veh.dr .sub:first-of-type{color:#e3a82b}
-.c-map{display:flex;flex-direction:column;border-right:1px solid #26251f;background:#15140f;min-width:0}
-.c-map svg{width:100%;flex:1;min-height:340px}
-.c-cap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;padding:8px 12px;border-top:1px solid #26251f;background:#0e0d0a;font-size:10.5px;color:var(--fg)}
-.c-leg{display:flex;flex-wrap:wrap;gap:4px 12px;color:#a39b84}
-.c-leg i{font-style:normal;margin-right:4px}
-.c-right{padding:12px;display:flex;flex-direction:column;gap:10px}
-.c-note{border-left:2px solid #6b6552;background:#1a1913;padding:9px 11px;font-family:var(--sans);font-size:13.5px;letter-spacing:0;line-height:1.4;color:#d6cdb4}
-.c-note b{color:var(--fg)}
-.c-order{border:1px solid #3a372b;background:#12110d;min-height:64px;padding:10px;font-size:12px;line-height:1.5;color:var(--fg)}
-.c-order .pr{color:#b3be7c;margin-right:6px}
-.caret{display:inline-block;width:7px;height:13px;background:var(--fg);vertical-align:-2px;margin-left:2px;animation:blink 1s steps(1) infinite}
-@keyframes blink{50%{opacity:0}}
-.hold{--p:0;position:relative;overflow:hidden;background:#1d1c16;color:var(--fg);border:1px solid var(--fg);padding:13px;min-height:44px;cursor:pointer;letter-spacing:.18em;text-transform:uppercase;font-family:var(--mono);font-size:11px;user-select:none;-webkit-user-select:none;touch-action:none;border-radius:6px}
-.hold::before{content:"";position:absolute;inset:0;background:var(--fg);transform:scaleX(var(--p));transform-origin:left}
-.hold span{position:relative;mix-blend-mode:difference;color:var(--fg)}
-.hold:disabled{opacity:.4;cursor:not-allowed}
-.hold.rel::before{transition:transform .25s}
-.c-hint{color:#a39b84;font-size:10px;min-height:1.4em;letter-spacing:.06em}
-.c-log{border-top:1px solid #26251f;padding-top:8px;flex:1}
-#olog li{list-style:none;padding:5px 0;border-bottom:1px dashed #2a2820;line-height:1.45;color:#c2b9a2}
-#olog li em{font-style:normal;margin:0 6px;letter-spacing:.1em}
-#olog li em.ok{color:#b3be7c} #olog li em.no{color:#e3a82b}
-.c-foot{display:flex;gap:6px 22px;padding:8px 14px;border-top:1px solid #26251f;color:#958d77;font-size:10px;letter-spacing:.12em;flex-wrap:wrap}
-.c-foot b{color:var(--fg);font-weight:400}
-.c-note-out{font-size:14.5px;color:var(--g1);margin-top:16px;max-width:70ch}
-
-/* ---------- status letter (light) ---------- */
-.status{background:var(--fg);color:#111110}
-.status .w{padding-top:clamp(96px,12vw,180px);padding-bottom:clamp(96px,12vw,180px)}
-.letter{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(30px,6vw,110px);align-items:start}
-.letter h2{font-weight:500;font-size:clamp(40px,5.4vw,92px);line-height:.98;letter-spacing:-.045em}
-.letter .body p{font-size:clamp(18px,1.4vw,21px);line-height:1.55;color:#2f2e2b;max-width:58ch}
-.letter .body p+p{margin-top:1.1em}
-.ledger{width:100%;border-collapse:collapse;margin:clamp(28px,3vw,40px) 0;font-size:16px}
-.ledger th,.ledger td{text-align:left;vertical-align:top;padding:15px 18px 15px 0;border-top:1px solid #cdc9bf}
-.ledger tr:last-child th,.ledger tr:last-child td{border-bottom:1px solid #cdc9bf}
-.ledger th{font-weight:500;width:36%}
-.ledger td.v{font-family:var(--mono);font-weight:500;white-space:nowrap}
-.ledger td.n{color:#55534e}
-.ledger tr.zero td.v{color:#b8290f}
-.sig{margin-top:2.2em;font-size:19px;font-weight:500}
-.sig span{display:block;color:#55534e;font-size:15px;font-weight:400}
-
-/* ---------- next ---------- */
-.next{max-width:1440px;margin:0 auto;padding:clamp(64px,8vw,120px) var(--gut) clamp(100px,13vw,190px)}
-.next h2{font-weight:500;font-size:clamp(34px,4.2vw,68px);letter-spacing:-.035em;line-height:1.04;max-width:20ch}
-.tl{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(20px,3vw,44px);margin-top:clamp(56px,7vw,96px)}
-.tl li{border-top:1px solid var(--g2);padding-top:22px}
-.tl .mo{font-family:var(--mono);font-size:13px;color:var(--red)}
-.tl h3{font-weight:500;font-size:clamp(20px,1.7vw,26px);line-height:1.22;letter-spacing:-.015em;margin-top:10px}
-.tl p{color:var(--g1);font-size:16px;margin-top:10px}
-
-/* ---------- contact ---------- */
-.contact{max-width:1440px;margin:0 auto;padding:clamp(90px,12vw,180px) var(--gut) 36px;border-top:1px solid var(--line)}
-.contact h2{font-weight:500;font-size:clamp(48px,8vw,140px);line-height:.94;letter-spacing:-.05em;max-width:12ch}
-.contact-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(30px,6vw,100px);margin-top:clamp(36px,4vw,60px);align-items:end}
-.contact-row p{color:var(--g1);max-width:44ch}
-.contact-row p a{color:var(--fg);text-underline-offset:3px;text-decoration-color:var(--g2)}
-.reach{display:flex;flex-direction:column;align-items:flex-start}
-.mail{font-size:clamp(22px,2.6vw,40px);letter-spacing:-.02em;text-decoration:none;border-bottom:1px solid var(--g2);padding-bottom:6px;overflow-wrap:anywhere;line-height:1.25}
-.mail:hover{border-color:var(--red)}
-.li{margin-top:16px;color:var(--g1);font-size:16px;padding:12px 0;text-decoration:none}
-.li:hover{color:var(--fg)}
-.legal{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 30px;margin-top:clamp(80px,10vw,140px);padding-top:20px;border-top:1px solid var(--line);font-size:13.5px;color:var(--g1)}
-
-/* reveal */
-.js .rv{opacity:0;transform:translateY(16px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
-.js .rv.in{opacity:1;transform:none}
-
-/* ---------- responsive ---------- */
-@media (max-width:1100px){
-  .c-body{grid-template-columns:minmax(0,1fr) 260px}
-  .c-left{display:none}
-}
-@media (max-width:999px){
-  .story-grid{grid-template-columns:1fr}
-  .left{display:contents}
-  .c0{order:1;min-height:0;padding:clamp(56px,10vw,90px) var(--gut) clamp(24px,5vw,40px)}
-  .view{order:2;position:relative;height:auto;border-left:0;border-top:1px solid var(--line)}
-  .view-gl{flex:none;height:min(64vh,560px)}
-  .chapters{order:3;display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:18px var(--gut) 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-padding-left:var(--gut)}
-  .chapters::-webkit-scrollbar{display:none}
-  .chapters .chapter{flex:0 0 min(86%,520px);min-height:0;scroll-snap-align:start;justify-content:flex-start;padding:22px;border:1px solid var(--line);border-radius:16px;background:var(--bg2)}
-  .chapters .chapter h2{font-size:clamp(28px,7.4vw,40px);max-width:none}
-  .chapters .chapter p{font-size:16.5px;margin-top:14px}
-  .car-nav{order:4;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px var(--gut) 40px}
-  .car-nav span{font-family:var(--mono);font-size:13px;color:var(--g1)}
-  .hint.desk{display:none}
-  .hint.mob{display:inline-flex}
-  .notes,.notes.three{grid-template-columns:1fr}
-  .letter{grid-template-columns:1fr}
-  .tl{grid-template-columns:1fr 1fr}
-  .contact-row{grid-template-columns:1fr}
-}
-@media (max-width:640px){
-  .top{flex-wrap:wrap}
-  .top nav{width:100%}
-  .top ul{justify-content:space-between;gap:6px}
-  .film-v{aspect-ratio:auto;height:58vh}
-  .tl{grid-template-columns:1fr}
-  .c-top{flex-wrap:wrap;gap:6px}
-  .c-tabs{margin-left:0;order:3;width:100%}
-  .c-tabs button{padding:10px 8px;font-size:10px;letter-spacing:.08em}
-  .c-meta .clkc{display:none}
-  .c-body{grid-template-columns:1fr}
-  .c-map{border-right:0;border-bottom:1px solid #26251f}
-  .c-map svg{min-height:280px}
-  .ledger,.ledger tbody,.ledger tr,.ledger th,.ledger td{display:block;width:auto}
-  .ledger tr{border-top:1px solid #cdc9bf;padding:14px 0}
-  .ledger tr:last-child{border-bottom:1px solid #cdc9bf}
-  .ledger th,.ledger td,.ledger tr:last-child th,.ledger tr:last-child td{border:0;padding:2px 0}
-}
-@media (prefers-reduced-motion:reduce){
-  .js .rv{transition:none}
-  .caret{animation:none}
-}
-</style>
+<link rel="preload" href="fonts/IBMPlexMono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/site.css">
+<script type="module" src="js/site.js"></script>
 </head>
 <body>
-<script>document.documentElement.classList.add('js')</script>
 <a class="skip" href="#main">Skip to content</a>
 
+<div class="boot" id="boot" hidden>
+  <svg class="boot-mark" viewBox="0 0 48 48" aria-hidden="true"><path class="b-heavy" d="M3 5H13L25 34H19Z"/><path class="b-hair" d="M43 5H45.5L32 29H29.5Z"/><path class="b-lock" d="M27 39.5H36.5V32H39V42H27Z"/></svg>
+  <p class="boot-line" id="boot-line">TURTLESHIELD CORE · LINK · NAV · QUORUM</p>
+</div>
+
 <header class="top" id="top">
-  <a class="mark" href="#top" aria-label="Homingvector, back to top">
-    <svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true"><path d="M40 5H59V24" fill="none" stroke="#ff4a2b" stroke-width="4.5" stroke-linecap="square"/><path d="M24 59H5V40" fill="none" stroke="#ff4a2b" stroke-width="4.5" stroke-linecap="square"/><path d="M53 10 L4 33 L26 31 Z" fill="currentColor"/><path d="M51.5 13.5 L27.5 35.5 L33 59 Z" fill="currentColor"/></svg>
-    <b>Homingvector</b>
-  </a>
+  <a class="brand" href="#top" aria-label="Homingvector, back to top"><img src="brand/logo-primary.svg" alt="" width="220" height="30"></a>
   <nav aria-label="Main">
     <ul>
-      <li><a href="#turtleshield">TurtleShield AI</a></li>
-      <li><a href="#turtleeyes">Turtle Eyes GCS</a></li>
+      <li><a href="#system">System</a></li>
+      <li><a href="#live">Live</a></li>
+      <li><a href="#evidence">Evidence</a></li>
       <li><a href="#status">Status</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
   </nav>
+  <button class="snd" id="snd" type="button" aria-pressed="false">Sound off</button>
 </header>
 
 <main id="main">
-<section class="hero" aria-labelledby="h1">
-  <h1 id="h1">When GPS goes dark, the mission doesn’t.</h1>
-  <div class="hero-foot">
-    <p>We’re building <b>TurtleShield</b>, an AI that keeps drones, ground robots and boats working as one team when GPS is jammed and the radio drops out, and <b>Turtle Eyes</b>, the ground control station its operators use.</p>
-    <div class="cta"><a class="go" href="#film">Watch the film</a><a class="go" href="#story">Fly the mission yourself</a></div>
-  </div>
-</section>
 
-<figure class="film" id="film">
-  <video class="film-v" id="filmv" autoplay muted loop playsinline preload="auto" poster="media/hero-poster.jpg" aria-describedby="film-desc">
-    <source src="media/hero-film.webm" type="video/webm">
-    <source src="media/hero-film.mp4" type="video/mp4">
-  </video>
-  <figcaption class="film-cap">
+<section class="hero" aria-labelledby="h1">
+  <figure class="film" id="film">
+    <video class="film-v" id="filmv" autoplay muted loop playsinline preload="auto" poster="media/hero-poster.jpg" aria-describedby="film-desc">
+      <source src="media/hero-film.webm" type="video/webm">
+      <source src="media/hero-film.mp4" type="video/mp4">
+    </video>
+    <canvas class="film-hud" id="film-hud" aria-hidden="true"></canvas>
+  </figure>
+  <div class="strip">
+    <span aria-hidden="true">FILM <b id="ft">T+00:00</b></span><span aria-hidden="true">CHAPTER <b id="fc">01</b></span><span id="fs" aria-hidden="true">FIVE AIRCRAFT, ONE AI</span>
+    <span class="inshot" id="inshot" role="group" aria-label="Vehicles in this shot of the film"></span>
+    <output class="veh-info" id="veh-info" aria-live="polite"></output>
+    <span class="strip-r" aria-hidden="true">CGI · NOT FLIGHT FOOTAGE</span>
+  </div>
+  <div class="hero-body">
+    <p class="eyebrow">TurtleShield AI · Turtle Eyes</p>
+    <h1 id="h1">Holds the mission when GPS and comms are gone.</h1>
+    <div class="hero-foot">
+      <p id="film-desc">TurtleShield keeps drones, ground robots and boats working as one team when GPS is jammed and the radio drops out. Turtle Eyes is the console its operators supervise it from. The film is CGI rendered in Blender, not flight footage.</p>
+      <div class="cta"><a class="go mag" href="#live" data-cursor="engage">Break it yourself</a><button class="ctrl" id="film-toggle" type="button" aria-pressed="true">Pause film</button></div>
+    </div>
     <ol class="film-steps" aria-label="What the film shows">
       <li class="on"><span>0:00</span>Five aircraft, one AI</li>
       <li><span>0:10</span>Air, ground and water</li>
@@ -307,46 +91,56 @@ svg,canvas,video{display:block}
       <li><span>0:21</span>Aircraft lost</li>
       <li><span>0:26</span>A person decides</li>
     </ol>
-    <button class="ctrl" id="film-toggle" type="button" aria-pressed="true">Pause film</button>
-  </figcaption>
-  <p class="film-note" id="film-desc">CGI of TurtleShield at work: five aircraft, two ground robots and two boats share one plan, keep going through GPS jamming and radio loss, close the gap when one aircraft is lost, and stop to let a person decide. CGI rendered in Blender, not flight footage.</p>
-</figure>
+  </div>
+</section>
 
-<section class="story" id="story" aria-label="Fly the mission yourself">
+<section class="problem sec" id="problem" aria-labelledby="pb">
+  <div class="w">
+    <p class="idx">01 · The problem</p>
+    <h2 id="pb" class="rv">GPS is the first thing taken.</h2>
+    <div class="cols3">
+      <div class="rv"><h3>Jamming</h3><p>A cheap transmitter drowns satellite signals over kilometres. Every vehicle in that area loses its position at the same moment, and the error grows every second after.</p></div>
+      <div class="rv"><h3>Spoofing</h3><p>A stronger fake signal is worse than none. The receiver reports a confident position that is wrong, and drags a vehicle off course slowly enough to look plausible.</p></div>
+      <div class="rv"><h3>Contested links</h3><p>Radios are jammed, links are cut and bandwidth collapses. A team that needs a base station to coordinate stops being a team the moment that link is gone.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="story sec" id="story" aria-label="The mission, step by step">
   <div class="story-grid">
     <div class="left">
       <div class="chapter c0 on" data-ch="0">
-        <span class="clock"><i></i>T+00:00</span>
+        <p class="idx">02 · The mission</p>
         <h2>Step through the mission.</h2>
-        <p>Each step replays the moment in the film where it happens, and shows what <b>TurtleShield</b> does about it.</p>
-        <p class="hint desk">Scroll to advance the mission <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1v12M2 8l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></p>
+        <p>Each step replays the moment in the film where it happens, and says what TurtleShield does about it.</p>
+        <p class="hint desk">Scroll to advance</p>
         <p class="hint mob">Swipe the cards below the picture</p>
       </div>
-      <div class="chapters" id="chapters">
+      <div class="chapters" id="chapters" tabindex="0" role="region" aria-label="Mission steps">
         <article class="chapter" data-ch="1">
-          <span class="clock"><i></i>T+00:40</span>
+          <span class="clock">T+00:40</span>
           <h2>Nine machines. One AI on every one of them.</h2>
           <p>Five aircraft, two ground robots and two boats, all running TurtleShield and watched from Turtle Eyes. No vehicle waits for base and none of them is the boss.</p>
         </article>
         <article class="chapter" data-ch="2">
-          <span class="clock"><i></i>T+04:12</span>
+          <span class="clock">T+04:12</span>
           <h2>GPS goes dark.</h2>
-          <p>Every vehicle now tracks where it probably is, and how sure it is. The rings are that doubt. As they grow, the aircraft take looser positions instead of pretending nothing changed.</p>
+          <p>Every vehicle now tracks where it probably is, and how sure it is. As that doubt grows, the aircraft take looser positions instead of pretending nothing changed.</p>
         </article>
         <article class="chapter" data-ch="3">
-          <span class="clock"><i></i>T+06:30</span>
+          <span class="clock">T+06:30</span>
           <h2>The radio drops.</h2>
-          <p>Direct links fail. Messages hop through whichever vehicles can still hear each other and wait until a path opens. Nothing depends on one link staying up.</p>
+          <p>Direct links fail. Messages hop through whichever vehicles can still hear each other. Nothing depends on one link staying up.</p>
         </article>
         <article class="chapter" data-ch="4">
-          <span class="clock"><i></i>T+09:05</span>
+          <span class="clock">T+09:05</span>
           <h2>One aircraft is lost.</h2>
-          <p>The others notice the gap and share its work between them. Nobody has to tell them.</p>
+          <p>The others notice the silence, wait until its claim on the work has expired, then share that work between them. Nobody has to tell them.</p>
         </article>
         <article class="chapter" data-ch="5">
-          <span class="clock"><i></i>T+11:20</span>
-          <h2>It suggests. A person decides.</h2>
-          <p>TurtleShield can spot something, keep track of it and suggest a way to intercept. Then it stops and waits for the operator in Turtle Eyes. It contains no weapon code.</p>
+          <span class="clock">T+11:20</span>
+          <h2>It recommends. A person decides.</h2>
+          <p>TurtleShield plans and reports. The operator in Turtle Eyes supervises, and can pause, stop or recall every vehicle at any time. There is no weapon employment in either product.</p>
         </article>
       </div>
       <div class="car-nav">
@@ -367,412 +161,155 @@ svg,canvas,video{display:block}
   </div>
 </section>
 
-<section class="bridge" aria-label="A note before the details">
-  <p class="rv">Everything above is CGI. The software behind it has flown 768 missions in simulation and none on a real aircraft yet. <a href="#status">Here is exactly where we are.</a></p>
-</section>
-
-<section class="product" id="turtleshield" aria-labelledby="ts">
-  <div class="p-head rv"><h2 id="ts">TurtleShield</h2><p><b>The AI we’re building.</b> Runs on every vehicle.</p></div>
-  <p class="p-lede rv">TurtleShield is the AI at the centre of Homingvector. Every drone already flies itself; what breaks under jamming is the team. TurtleShield takes the team out of the base station and puts it on every vehicle.</p>
-  <div class="notes">
-    <div class="rv"><h3>Keeps the drones you already own.</h3><p>It sits on top of the autopilot. Neither commit that added a second autopilot brand changed a file in our coordination core, though a separate terrain-following change did touch the core in the same period. That brand, ArduPilot, has only been tested standing still so far.</p></div>
-    <div class="rv"><h3>Air, ground and water, together.</h3><p>Fixed-wing aircraft, ground robots and surface boats share one plan and hand work to each other.</p></div>
-    <div class="rv"><h3>Built for the edge.</h3><p>Designed for an NVIDIA Jetson Orin next to a Cube Orange flight controller, with no base station in the loop.</p></div>
-    <div class="rv"><h3>Suggests. Never decides.</h3><p>It can spot something, keep track of it and suggest a way to intercept. A person makes the call. There is no weapon code.</p></div>
-  </div>
-</section>
-
-<section class="product" id="turtleeyes" aria-labelledby="te">
-  <div class="p-head rv"><h2 id="te">Turtle Eyes</h2><p><b>Ground control station (GCS)</b> for TurtleShield.</p></div>
-  <p class="p-lede rv">Turtle Eyes is the GCS operators use to run a TurtleShield team. Three modes, one click each. Orders go in as plain English. Nothing moves until a person holds the button down.</p>
-
-  <div class="console rv" id="console">
-    <div class="c-top">
-      <div class="c-logo">
-        <svg width="26" height="26" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="none" stroke="#f2f0ea" stroke-width="1.5"/><circle cx="20" cy="20" r="6" fill="none" stroke="#f2f0ea" stroke-width="1.5"/><path d="M20 0V10M20 30V40M0 20H10M30 20H40" stroke="#f2f0ea" stroke-width="1.5"/></svg>
-        <div><b>TURTLE EYES</b><small>PERSISTENT OVERWATCH</small></div>
-      </div>
-      <!-- A half-declared tab pattern is WORSE than plain buttons: role=tab promises arrow-key
-           navigation, so a screen reader announces "tab, 1 of 3", the user presses Arrow and
-           nothing happens. These need aria-controls, a real tabpanel, and a roving tabindex
-           (selected tab 0, the rest -1) so Tab reaches the set and Arrow moves within it.
-           Found by turtleshield-fc (A071-A074); their patch landed only the hold-control half. -->
-      <div class="c-tabs" role="tablist" aria-label="Console mode">
-        <button role="tab" id="tab-0" aria-controls="cpanel" aria-selected="true" tabindex="0" data-mode="0">Targeting</button>
-        <button role="tab" id="tab-1" aria-controls="cpanel" aria-selected="false" tabindex="-1" data-mode="1">Surveillance</button>
-        <button role="tab" id="tab-2" aria-controls="cpanel" aria-selected="false" tabindex="-1" data-mode="2">Simulation</button>
-      </div>
-      <div class="c-meta"><span class="mock">MOCK</span><span class="clkc" data-clock>--:--:--Z</span></div>
+<section class="live sec" id="live" aria-labelledby="lv">
+  <div class="w">
+    <p class="idx">03 · Live</p>
+    <div class="live-head">
+      <h2 id="lv" class="rv">Attack the swarm.</h2>
+      <p class="rv">This is not an animation. The decisions below are made by TurtleShield’s own allocation, health, quorum and spoof-detection code, compiled to WebAssembly from commit <code id="sim-sha">b04e493</code> and running in your browser. Jam it, cut it, destroy part of it, and watch it hold.</p>
     </div>
-    <div class="c-body">
-      <aside class="c-left" aria-label="Connected vehicles">
-        <div class="c-h">CONNECTED &middot; 9/9</div>
-        <div id="vlist"></div>
+  </div>
+  <div class="rig" id="rig">
+    <div class="tools" role="toolbar" aria-label="Adversary controls" aria-controls="map">
+      <button type="button" class="tool" data-tool="jam" aria-pressed="false" data-cursor="scan">Jam GNSS</button>
+      <button type="button" class="tool" data-tool="spoof" aria-pressed="false" data-cursor="scan">Spoof GNSS</button>
+      <button type="button" class="tool" data-tool="sever" aria-pressed="false" data-cursor="scan">Sever link</button>
+      <button type="button" class="tool" data-tool="destroy" aria-pressed="false" data-cursor="scan">Destroy vehicle</button>
+      <button type="button" class="tool" data-tool="band" aria-pressed="false">Collapse bandwidth</button>
+      <span class="tools-sep" aria-hidden="true"></span>
+      <button type="button" class="tool" data-act="pause" aria-pressed="false">Pause</button>
+      <button type="button" class="tool" data-act="replay">Replay</button>
+      <button type="button" class="tool" data-act="reset">Reset to nominal</button>
+    </div>
+    <div class="rig-body">
+      <div class="map-col">
+        <canvas id="map" class="map" width="1280" height="800" tabindex="0" role="img" aria-label="Live map of the simulated fleet. Use the adversary controls; with a tool selected, arrow keys move the aim and Enter applies it." aria-describedby="tool-hint"></canvas>
+        <p class="tool-hint" id="tool-hint" aria-live="polite">Loading the TurtleShield core…</p>
+        <dl class="metrics" id="metrics">
+          <div><dt>Vehicles alive</dt><dd id="m-alive">–</dd></div>
+          <div><dt>Mission complete</dt><dd id="m-done">–</dd></div>
+          <div><dt>Open work with an owner</dt><dd id="m-owned">–</dd></div>
+          <div><dt>Mesh connectivity</dt><dd id="m-conn">–</dd></div>
+          <div><dt>Time to reallocate</dt><dd id="m-realloc">–</dd></div>
+        </dl>
+      </div>
+      <aside class="log-col" aria-label="Turtle Eyes decision log">
+        <div class="log-h"><span>TURTLE EYES · DECISION LOG</span><span id="sim-clock">T+00:00</span></div>
+        <ol class="dlog" id="dlog" tabindex="0" aria-label="Decision log"></ol>
+        <p class="vh" id="narrate" aria-live="polite"></p>
+        <div class="seed"><span>SEED <b id="seed">–</b></span><a id="share" href="#live">Link to this run</a></div>
       </aside>
-      <!-- id=cpanel is what the tabs' aria-controls points at. It must exist: a dangling
-           aria-controls is the same defect as the half-landed patch, and one mode's map plus
-           its caption really is the region each tab governs. aria-labelledby tracks selection. -->
-      <div class="c-map" id="cpanel" role="tabpanel" aria-labelledby="tab-0">
-        <svg id="tmap" viewBox="0 0 640 440" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Drawn map showing vehicles moving in the selected mode"></svg>
-        <!-- #cmode is written once per mode change, not per frame, so it is safe as a live
-             region: it announces the switch a sighted user sees, and nothing else. -->
-        <div class="c-cap"><span id="cmode" aria-live="polite">TARGETING: find something of interest and keep eyes on it.</span><span class="c-leg"><span><i>&#9650;</i>AIR</span><span><i>&#9632;</i>GROUND</span><span><i>&#9670;</i>SURFACE</span><span><i style="color:#e3a82b">&#9671;</i>TRACK</span><span><i>&#9633;</i>HOME</span></span></div>
+    </div>
+    <div class="rig-fallback" id="rig-fallback" hidden>
+      <p>This browser cannot run the live simulation (it needs WebAssembly and Web Workers). Below is what it shows: survey stations on land and water, a mixed fleet sharing them out, and what changes when you attack it.</p>
+      <img src="brand/sim-static.svg" alt="Diagram: twelve vehicles split across land and water survey stations; a jammed sector where vehicles fall back to ranging off their peers; a destroyed aircraft whose stations are taken over by the survivors after its lease expires." width="1280" height="800">
+    </div>
+  </div>
+  <div class="w">
+    <p class="live-note">What is TurtleShield code and what is not: vehicle motion, the radio model, the navigation error model and the terrain are a simple harness written for this page. Who takes which station, when a silent vehicle’s work may be taken, what a degraded or isolated vehicle is still allowed to do, and when GPS is convicted of lying are decided by the product code, unchanged. The same seed always produces the same run.</p>
+  </div>
+</section>
+
+<section class="product sec" id="system" aria-labelledby="ts">
+  <div class="w">
+    <p class="idx">04 · TurtleShield AI</p>
+    <h2 id="ts" class="rv">Above the autopilot. Below the operator.</h2>
+    <p class="lede rv">Every drone already flies itself. What breaks under jamming is the team. TurtleShield is the coordination layer on every vehicle: one shared picture of the world, one plan, and rules for what each vehicle may still do as things degrade.</p>
+    <figure class="arch rv">
+      <svg viewBox="0 0 1200 520" role="img" aria-labelledby="arch-t arch-d">
+        <title id="arch-t">Where TurtleShield sits</title>
+        <desc id="arch-d">Five layers, top to bottom: the operator in Turtle Eyes, supervisory only; TurtleShield AI on every vehicle, holding the shared world model, task allocation, mission decomposition, health monitoring, cross-domain reassignment and degraded modes; one vehicle abstraction; the PX4 and ArduPilot autopilots; and the aircraft, ground robots and boats.</desc>
+        <g class="a-row"><rect x="1" y="1" width="1198" height="80"/><text x="28" y="36" class="a-k">OPERATOR</text><text x="28" y="62" class="a-v">Turtle Eyes · supervises · outside the decision loop · no weapons interface</text></g>
+        <path class="a-link" d="M600 81V111"/>
+        <g class="a-row a-hot"><rect x="1" y="111" width="1198" height="150"/><text x="28" y="146" class="a-k">TURTLESHIELD AI · ON EVERY VEHICLE</text>
+          <g class="a-cells"><rect x="28" y="166" width="178" height="72"/><text x="44" y="208">World model</text><rect x="222" y="166" width="178" height="72"/><text x="238" y="208">Task allocation</text><rect x="416" y="166" width="178" height="72"/><text x="432" y="208">Mission plan</text><rect x="610" y="166" width="178" height="72"/><text x="626" y="208">Health</text><rect x="804" y="166" width="178" height="72"/><text x="820" y="208">Cross-domain</text><rect x="998" y="166" width="174" height="72"/><text x="1014" y="208">Degraded modes</text></g></g>
+        <path class="a-link" d="M600 261V291"/>
+        <g class="a-row"><rect x="1" y="291" width="1198" height="64"/><text x="28" y="330" class="a-k">ONE VEHICLE ABSTRACTION</text></g>
+        <path class="a-link" d="M600 355V385"/>
+        <g class="a-row"><rect x="1" y="385" width="590" height="56"/><text x="28" y="420" class="a-k">PX4</text><rect x="609" y="385" width="590" height="56"/><text x="636" y="420" class="a-k">ARDUPILOT</text></g>
+        <path class="a-link" d="M296 441V463M904 441V463"/>
+        <g class="a-row"><rect x="1" y="463" width="1198" height="56"/><text x="28" y="498" class="a-k">FIXED-WING AIRCRAFT · GROUND ROBOTS · SURFACE BOATS</text></g>
+      </svg>
+    </figure>
+    <div class="notes">
+      <div class="rv"><h3>Keeps the drones you already own.</h3><p>It sits on top of the autopilot. Neither commit that added a second autopilot brand changed a file in the coordination core. That brand, ArduPilot, has only been tested standing still so far.</p></div>
+      <div class="rv"><h3>Air, ground and water, together.</h3><p>Fixed-wing aircraft, ground robots and surface boats share one plan and hand work to each other across domains.</p></div>
+      <div class="rv"><h3>Degrades on purpose.</h3><p>A vehicle that cannot reliably coordinate takes on no new commitments. One that cannot vouch for its position is ineligible for work that needs a precise one. A pair that cannot out-vote a liar gives up tight formation. The rules are written down and tested, not improvised.</p></div>
+      <div class="rv"><h3>Built for the edge.</h3><p>Designed for an NVIDIA Jetson Orin next to a Cube Orange flight controller, with no base station in the loop.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="product sec" id="turtleeyes" aria-labelledby="te">
+  <div class="w">
+    <p class="idx">05 · Turtle Eyes</p>
+    <h2 id="te" class="rv">Supervises. Never decides.</h2>
+    <p class="lede rv">Turtle Eyes is the console operators run a TurtleShield team from. The decision log in the live simulation above is drawn in its visual language. Three choices define it, and each is deliberate.</p>
+    <div class="notes three">
+      <div class="rv"><h3>Outside the decision loop.</h3><p>The swarm does not wait for the console to act, so losing the console does not stop a mission while the vehicles can still hear each other. The operator can pause, stop or recall every vehicle at any time.</p></div>
+      <div class="rv"><h3>Air-gapped by default.</h3><p>It carries its own maps and runs on a rugged laptop with no internet connection. A Rust trusted core handles credentials, roles and the audit log.</p></div>
+      <div class="rv"><h3>No weapons interface.</h3><p>There is nothing in Turtle Eyes that can command an effector, and nothing in TurtleShield that employs a weapon. That is written into both products’ scope.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="evidence sec" id="evidence" aria-labelledby="ev">
+  <div class="w">
+    <p class="idx">06 · Evidence</p>
+    <h2 id="ev" class="rv">Every number, with where it came from.</h2>
+    <p class="lede rv">Each figure below is recounted from the TurtleShield repository by a script before this page can be published. If the repository disagrees, the page does not ship.</p>
+    <table class="ledger">
+      <caption class="vh">Results as of 16 September 2026, with how each was measured</caption>
+      <thead><tr><th scope="col">Figure</th><th scope="col">Value</th><th scope="col">How it was measured</th><th scope="col">Source</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Test missions flown in simulation</th><td class="v" data-figure="missions">768</td><td class="n">555 passed, 141 failed, 72 skipped, across 114 campaigns. Every result row recounted.</td><td class="s">Simulation</td></tr>
+        <tr><th scope="row">Orders from our software accepted by the autopilot</th><td class="v">2,000+</td><td class="n">Counted once from recorded runs. The logs behind it are not all kept, so unlike the other figures here we cannot recount it today.</td><td class="s">Simulation</td></tr>
+        <tr><th scope="row">Aircraft in tight formation</th><td class="v" data-figure="formation_fleet_max">8</td><td class="n">All six runs passed the separation check. That check measures distance in three dimensions, so side-by-side spacing is still unmeasured. We treat it as an open defect, not a result.</td><td class="s">Simulation</td></tr>
+        <tr><th scope="row">Position error without GPS</th><td class="v" data-figure="nav_error_without_gps">396–750 m &rarr; 25.5–39.0 m</td><td class="n">After one day of fixes, from a written report and two named campaigns. Still not good enough to rely on.</td><td class="s">Simulation</td></tr>
+        <tr><th scope="row">Core files changed by the two adapter commits</th><td class="v" data-figure="autopilot_core_files_per_commit">0</td><td class="n">Counted from the repository history. Core edits in that period belong to a separate terrain-following change.</td><td class="s">Code history</td></tr>
+        <tr><th scope="row">Problems written up with their causes</th><td class="v" data-figure="defects">149</td><td class="n">67 closed, 82 still not closed: 46 open and 36 fixed but not yet proven.</td><td class="s">Bug log</td></tr>
+        <tr class="zero"><th scope="row">Flights on a real aircraft</th><td class="v" data-figure="real_flights">0</td><td class="n">None yet. The first is planned for the next few weeks.</td><td class="s">Flight</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="status sec" id="status" aria-labelledby="st">
+  <div class="w">
+    <p class="idx">07 · Status</p>
+    <div class="letter">
+      <h2 id="st" class="rv">Where it stands.</h2>
+      <div class="body rv">
+        <p>Validated in simulation and on a real flight controller wired to a simulator. Flight campaign pending: we have not flown a real aircraft yet, and you should hear that from us before anything else.</p>
+        <p>Still open: navigation without GPS is not accurate enough yet, each vehicle uses about 33 times the radio capacity we budget for, and some backup behaviours are written and tested but not yet switched on.</p>
+        <p class="sig">Nidhip Sharma<span>Founder, Homingvector</span></p>
       </div>
-      <div class="c-right">
-        <p class="c-note"><b>Operations console ready.</b> Type an order in plain English. Orders are shown on the map and need one hold-to-confirm.</p>
-        <div class="c-order"><span class="pr">&gt;</span><span id="otext"></span><i class="caret"></i></div>
-        <button class="hold" id="hold" disabled><span>Hold to confirm</span></button>
-        <p class="c-hint" id="ohint" aria-live="polite">&nbsp;</p>
-        <div class="c-log"><div class="c-h" style="padding-left:0">ORDER LOG</div><ol id="olog" role="log" aria-label="Order log"></ol></div>
+    </div>
+    <h3 class="tl-h rv">The next few weeks: out of the simulator and into the air.</h3>
+    <ol class="tl">
+      <li class="rv"><span class="mo">Next few weeks</span><h4>First real flight with TurtleShield in charge</h4><p>A safety pilot on standby, every bench check done first.</p></li>
+      <li class="rv"><span class="mo">Month 6</span><h4>Three aircraft in formation, in real wind</h4><p>Radio use brought down to budget. Real numbers replace simulated ones.</p></li>
+      <li class="rv"><span class="mo">Month 9</span><h4>Flying without GPS, against a jamming rig</h4><p>Backup behaviours switched on. The core idea, tested for real.</p></li>
+      <li class="rv"><span class="mo">Month 10</span><h4>A five-aircraft field trial, run by an outsider</h4><p>Operated through Turtle Eyes and signed off by someone who watched.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="contact sec" id="contact" aria-labelledby="ct">
+  <div class="w">
+    <p class="idx">08 · Contact</p>
+    <h2 id="ct" class="rv">Talk to the engineer.</h2>
+    <div class="contact-row">
+      <p class="rv">We are raising a pre-seed round to take TurtleShield from simulation to a field trial that someone outside the company signs off. If you fly drones, build them, or back the people who do, write directly.</p>
+      <div class="reach rv">
+        <a class="mail mag" id="mail" href="#contact" data-cursor="engage">nidhip.sharma.123 [at] gmail.com</a>
+        <a class="li" href="https://www.linkedin.com/in/nidhip-sharma/" rel="noopener">LinkedIn</a>
       </div>
     </div>
-    <div class="c-foot"><span>VEHICLES <b>9</b></span><span>MESH PEERS <b>8</b></span><span>REJECTED/S <b>0</b></span><span>ALERTS <b>1</b></span></div>
+    <div class="legal"><span>&copy; 2026 Homingvector, India</span><span>Performance figures are from simulation unless stated otherwise.</span><span>No cookies, no trackers, no third-party requests.</span></div>
   </div>
-  <p class="c-note-out">Drawn for this page. The real Turtle Eyes runs on sample data today and says MOCK in the corner, same as this one. Try holding the button.</p>
-
-  <div class="notes three">
-    <div class="rv"><h3>Offline by default.</h3><p>It carries its own maps and runs on a rugged laptop in the field.</p></div>
-    <div class="rv"><h3>Locked down.</h3><p>Operators see only what they need. Engineering controls sit behind a separate login.</p></div>
-    <div class="rv"><h3>Where to go, what to watch.</h3><p>Nothing more. Pause, stop or call every vehicle home at any time.</p></div>
-  </div>
-</section>
-
-<section class="status" id="status" aria-labelledby="st">
-  <div class="w letter">
-    <h2 id="st" class="rv">Where we actually are.</h2>
-    <div class="body rv">
-      <p>We haven’t flown a real aircraft yet. Everything on this page comes from simulation, or from a real flight controller wired to a simulator. You should hear that from us before anything else.</p>
-      <p>Here is what the simulator has shown so far. We keep every failure, because that is where the lessons are.</p>
-      <table class="ledger">
-        <caption class="vh">Results from simulation, as of 16 September 2026</caption>
-        <tbody>
-          <tr><th scope="row">Test missions flown in simulation</th><td class="v" data-figure="missions">768</td><td class="n">555 passed, 141 failed, 72 skipped, across 114 campaigns</td></tr>
-          <tr><th scope="row">Orders from our software accepted by the autopilot</th><td class="v">2,000+</td><td class="n">Counted once from recorded runs after the base station handed over. The logs behind it are not all kept, so unlike the other figures here we cannot recount it today.</td></tr>
-          <tr><th scope="row">Aircraft in tight formation</th><td class="v" data-figure="formation_fleet_max">8</td><td class="n">All six runs passed the separation check. That check measures distance in three dimensions, so side-by-side spacing is still unmeasured. We treat it as an open defect, not a result.</td></tr>
-          <tr><th scope="row">Position error without GPS</th><td class="v" data-figure="nav_error_without_gps">396–750 m &rarr; 25.5–39.0 m</td><td class="n">After one day of fixes. Still not good enough to rely on.</td></tr>
-          <tr><th scope="row">Core files changed by the two adapter commits</th><td class="v" data-figure="autopilot_core_files_per_commit">0</td><td class="n">The core edits in that period belong to a separate terrain-following change, not to the adapter. ArduPilot has only been tested standing still.</td></tr>
-          <tr><th scope="row">Problems written up with their causes</th><td class="v" data-figure="defects">149</td><td class="n">67 closed, 82 still not closed: 46 open and 36 fixed but not yet proven</td></tr>
-          <tr class="zero"><th scope="row">Flights on a real aircraft</th><td class="v" data-figure="real_flights">0</td><td class="n">The first is planned for month 3</td></tr>
-        </tbody>
-      </table>
-      <p>Still open: navigation without GPS isn’t accurate enough yet, each vehicle uses about 33 times the radio capacity we budget for, and some backup behaviours are written and tested but not yet switched on. The next twelve months are built to close those.</p>
-      <p class="sig">Nidhip Sharma<span>Founder, Homingvector</span></p>
-    </div>
-  </div>
-</section>
-
-<section class="next" aria-labelledby="nx">
-  <h2 id="nx" class="rv">The next twelve months, out of the simulator and into the air.</h2>
-  <ol class="tl">
-    <li class="rv"><span class="mo">Month 3</span><h3>First real flight with TurtleShield in charge</h3><p>A safety pilot on standby, every bench check done first.</p></li>
-    <li class="rv"><span class="mo">Month 6</span><h3>Three aircraft in formation, in real wind</h3><p>Radio use brought down to budget. Real numbers replace simulated ones.</p></li>
-    <li class="rv"><span class="mo">Month 9</span><h3>Flying without GPS, against a jamming rig</h3><p>Backup behaviours switched on. Our core idea, tested for real.</p></li>
-    <li class="rv"><span class="mo">Month 10</span><h3>A five-aircraft field trial, run by an outsider</h3><p>Operated through Turtle Eyes and signed off by someone who watched.</p></li>
-  </ol>
-</section>
-
-<section class="contact" id="contact" aria-labelledby="ct">
-  <h2 id="ct" class="rv">Build this with us.</h2>
-  <div class="contact-row">
-    <p class="rv">We’re raising a pre-seed round to take TurtleShield from simulation to a field trial that someone outside the company signs off. If you fly drones, build them, or back the people who do, write to us. Founded by <a href="https://www.linkedin.com/in/nidhip-sharma/" target="_blank" rel="noopener">Nidhip Sharma</a>.</p>
-    <div class="reach rv">
-      <a class="mail" id="mail" href="#contact">nidhip.sharma.123 [at] gmail.com</a>
-      <a class="li" href="https://www.linkedin.com/in/nidhip-sharma/" target="_blank" rel="noopener">LinkedIn &nearr;</a>
-    </div>
-  </div>
-  <div class="legal"><span>&copy; 2026 Homingvector, India</span><span>Performance figures are from simulation unless stated otherwise.</span><span>No cookies, no trackers.</span></div>
 </section>
 </main>
-
-<script>
-(function(){
-"use strict";
-var RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-function $(s,r){return (r||document).querySelector(s)}
-function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
-function pad(n){return String(n).padStart(2,'0')}
-function utc(){var d=new Date();return pad(d.getUTCHours())+':'+pad(d.getUTCMinutes())+':'+pad(d.getUTCSeconds())+'Z'}
-function tickClock(){$$('[data-clock]').forEach(function(e){e.textContent=utc()})}
-tickClock(); setInterval(tickClock,1000);
-
-/* email, assembled here so it is not sitting in the HTML for scrapers */
-(function(){var u='nidhip.sharma.123',d='gmail.com',a=$('#mail');a.textContent=u+'@'+d;a.href='mailto:'+u+'@'+d+'?subject=Homingvector';})();
-
-/* visibility by plain rect checks on scroll */
-var watchers=[];
-function watch(el,fn,once){watchers.push({el:el,fn:fn,once:once,last:null,done:false})}
-function checkViews(){
-  var h=window.innerHeight;
-  watchers.forEach(function(w){
-    if(w.done) return;
-    var r=w.el.getBoundingClientRect();
-    if(w.once){ if(r.top<h*.92 && r.bottom>0){w.done=true; w.fn(true)} }
-    else { var vis=r.top<h && r.bottom>0; if(vis!==w.last){w.last=vis; w.fn(vis)} }
-  });
-}
-var queued=false;
-function queue(){ if(queued) return; queued=true; requestAnimationFrame(function(){queued=false; checkViews(); story()}) }
-window.addEventListener('scroll',queue,{passive:true});
-window.addEventListener('resize',queue);
-window.__watch=watch;
-$$('.rv').forEach(function(x){watch(x,function(){x.classList.add('in')},true)});
-
-/* ================= film ================= */
-(function(){
-  var v=$('#filmv'), steps=$$('.film-steps li'), btn=$('#film-toggle'), userPaused=false, CUE=[0,10,15,18.6,21,26];
-  function upd(){ var t=v.currentTime||0, idx=0; CUE.forEach(function(s,i){ if(t>=s) idx=i }); steps.forEach(function(li,i){ li.classList.toggle('on',i===idx) }) }
-  function setBtn(){ btn.textContent=v.paused?'Play film':'Pause film'; btn.setAttribute('aria-pressed',String(!v.paused)) }
-  v.addEventListener('timeupdate',upd); v.addEventListener('play',setBtn); v.addEventListener('pause',setBtn);
-  btn.addEventListener('click',function(){ if(v.paused){ userPaused=false; var p=v.play(); if(p&&p.catch) p.catch(function(){}) } else { userPaused=true; v.pause() } });
-  if(RM){ v.removeAttribute('autoplay'); v.pause(); userPaused=true }
-  watch(v,function(vis){ if(userPaused) return; if(vis){ var p=v.play(); if(p&&p.catch) p.catch(function(){}) } else v.pause() },false);
-  setBtn(); upd();
-})();
-
-/* ================= story video: loops the film segment for the current step ================= */
-var SEG=[[0,10],[10,15],[15,18.6],[18.6,21],[21,26],[26,32]], sv=$('#storyv'), svVisible=false;
-function svPlay(){ if(RM) return; var p=sv.play(); if(p&&p.catch) p.catch(function(){}) }
-function playSeg(n){
-  var s=SEG[n]||SEG[0];
-  function seek(){ try{ sv.currentTime=RM?Math.min(s[0]+1.5,s[1]-.1):s[0] }catch(e){} }
-  if(sv.readyState>=1) seek(); else sv.addEventListener('loadedmetadata',function h(){ sv.removeEventListener('loadedmetadata',h); seek() });
-  if(svVisible) svPlay();
-}
-sv.addEventListener('timeupdate',function(){ var s=SEG[Math.max(current,0)]; if(sv.currentTime>=s[1]-.06||sv.currentTime<s[0]-.6){ try{ sv.currentTime=s[0] }catch(e){} } });
-watch($('.view'),function(v){ svVisible=v; if(v) svPlay(); else sv.pause() },false);
-
-/* ================= story controller ================= */
-var STATES=['Formation holding','Nine vehicles linked','GPS jammed','Radio degraded','Aircraft lost','Awaiting operator'];
-var chapters=$$('[data-ch]'), cards=$$('#chapters .chapter'), car=$('#chapters'), vstate=$('#vstate'), carPos=$('#car-pos');
-var mq=window.matchMedia('(max-width: 999px)'), current=-1;
-window.__chapter=0;
-function setChapter(n){
-  if(n===current) return; current=n; window.__chapter=n;
-  chapters.forEach(function(c){c.classList.toggle('on',+c.dataset.ch===n)});
-  vstate.textContent=STATES[n];
-  playSeg(n);
-}
-function cardIndex(){ var w=cards[0].getBoundingClientRect().width+12; return Math.max(0,Math.min(cards.length-1,Math.round(car.scrollLeft/w))) }
-function story(){
-  if(mq.matches){
-    var i=cardIndex(); carPos.textContent=(i+1)+' of '+cards.length;
-    $('#car-prev').disabled=i===0; $('#car-next').disabled=i===cards.length-1;
-    setChapter(+cards[i].dataset.ch);
-  } else {
-    var mid=window.innerHeight*.5, best=0, bd=1e9;
-    chapters.forEach(function(c){var r=c.getBoundingClientRect(), d=Math.abs((r.top+r.bottom)/2-mid); if(d<bd){bd=d; best=+c.dataset.ch}});
-    setChapter(best);
-  }
-}
-car.addEventListener('scroll',queue,{passive:true});
-function go(step){ var w=cards[0].getBoundingClientRect().width+12; car.scrollTo({left:(cardIndex()+step)*w,behavior:RM?'auto':'smooth'}) }
-$('#car-prev').addEventListener('click',function(){go(-1)});
-$('#car-next').addEventListener('click',function(){go(1)});
-if(mq.addEventListener) mq.addEventListener('change',function(){current=-1; story()});
-
-/* ================= Turtle Eyes console ================= */
-(function(){
-  var svg=$('#tmap'), NS='http://www.w3.org/2000/svg';
-  function el(n,a,p){var e=document.createElementNS(NS,n); for(var k in a) e.setAttribute(k,a[k]); (p||svg).appendChild(e); return e}
-  function g(a,p){return el('g',a||{},p)}
-  el('rect',{x:0,y:0,width:640,height:440,fill:'#15140f'});
-  var grid=g({stroke:'#221f18','stroke-width':1});
-  for(var x=0;x<=640;x+=40) el('line',{x1:x,y1:0,x2:x,y2:440},grid);
-  for(var y=0;y<=440;y+=40) el('line',{x1:0,y1:y,x2:640,y2:y},grid);
-  var hills=[[140,120,1,.3],[470,300,1.25,1.7],[560,70,.7,2.9],[250,370,.6,4.1]];
-  var cg=g({fill:'none',stroke:'#4a4633','stroke-width':1});
-  hills.forEach(function(h){
-    for(var k=0;k<7;k++){
-      var d='';
-      for(var i=0;i<=72;i++){var a=i/72*Math.PI*2, r=(k+1)*18*h[2]*(1+.17*Math.sin(3*a+h[3])+.08*Math.cos(5*a+h[3]*2)+.04*Math.sin(9*a+k));
-        d+=(i?'L':'M')+(h[0]+Math.cos(a)*r).toFixed(1)+' '+(h[1]+Math.sin(a)*r).toFixed(1)}
-      el('path',{d:d+'Z','stroke-opacity':k%3===2?.95:.45},cg);
-    }
-  });
-  var river=el('path',{d:'M-10 398 C 110 352 210 424 320 368 S 520 282 650 322',fill:'none',stroke:'#2b3a3f','stroke-width':10,'stroke-linecap':'round'});
-  var road=el('path',{d:'M-10 214 L 170 236 L 300 208 L 430 170 L 650 196',fill:'none',stroke:'#5a543b','stroke-width':1.5,'stroke-dasharray':'7 5'});
-  var Ltrack=g(), Lsect=g({opacity:0}), Lsim=g({opacity:0});
-  [Ltrack,Lsect,Lsim].forEach(function(L){L.style.transition='opacity .5s'});
-  for(var s=0;s<5;s++){
-    el('rect',{x:190+s*82,y:48,width:82,height:340,fill:s%2?'#f2f0ea':'#b3be7c','fill-opacity':.04,stroke:'#b3be7c','stroke-opacity':.5,'stroke-dasharray':'4 4'},Lsect);
-  }
-  var eightD=''; for(var j=0;j<=120;j++){var u=j/120*Math.PI*2; eightD+=(j?'L':'M')+(320+200*Math.sin(u)).toFixed(1)+' '+(210+108*Math.sin(2*u)).toFixed(1)}
-  el('path',{d:eightD,fill:'none',stroke:'#f2f0ea','stroke-opacity':.4,'stroke-dasharray':'3 6'},Lsim);
-  var trk=g({transform:'translate(330 215)'},Ltrack);
-  el('path',{d:'M0 -9 L9 0 L0 9 L-9 0Z',fill:'none',stroke:'#e3a82b','stroke-width':2},trk);
-  var homeMark=g({transform:'translate(46 396)'});
-  el('rect',{x:-8,y:-8,width:16,height:16,fill:'none',stroke:'#f2f0ea','stroke-opacity':.8},homeMark);
-
-  var V=[
-    {n:'FIXED-01',k:'fw',nav:'GNSS OK',bat:91},{n:'FIXED-02',k:'fw',nav:'GNSS OK',bat:88},
-    {n:'FIXED-03',k:'fw',nav:'DEAD-RECKON',bat:84,dr:1},{n:'FIXED-04',k:'fw',nav:'GNSS OK',bat:27,warn:1},
-    {n:'FIXED-05',k:'fw',nav:'GNSS SHAKY',bat:79},{n:'GROUND-01',k:'ugv',nav:'GNSS OK',bat:96},
-    {n:'GROUND-02',k:'ugv',nav:'GNSS OK',bat:93},{n:'SURFACE-01',k:'usv',nav:'GNSS OK',bat:72},
-    {n:'SURFACE-02',k:'usv',nav:'GNSS OK',bat:70}
-  ];
-  var vg=g(), list=$('#vlist');
-  V.forEach(function(v,i){
-    v.i=i; v.x=320; v.y=220; v.hd=0;
-    v.g=el('g',{},vg);
-    if(v.k==='fw') el('path',{d:'M9 0 L-6 -6 L-2 0 L-6 6Z',fill:'#f2f0ea'},v.g);
-    else if(v.k==='ugv') el('rect',{x:-5,y:-5,width:10,height:10,fill:'#b3be7c'},v.g);
-    else el('rect',{x:-5,y:-5,width:10,height:10,fill:'#8fb3bd',transform:'rotate(45)'},v.g);
-    var row=document.createElement('div'); row.className='veh'+(v.warn?' warn':'')+(v.dr?' dr':'');
-    row.innerHTML='<b></b><span class="st"></span><span class="sub"></span><span class="sub"></span>';
-    row.children[0].textContent=v.n; row.children[1].textContent=v.warn?'LOW FUEL':'CONNECTED';
-    row.children[2].textContent=v.nav; row.children[3].textContent=v.bat+'%';
-    list.appendChild(row);
-  });
-
-  var mode=0, vt=0, holdUntil=0, homeUntil=0, bias=[0,0];
-  var MODES=['TARGETING: find something of interest and keep eyes on it.','SURVEILLANCE: keep watch over an area, shared out between whoever is up.','SIMULATION: rehearse the mission before anyone flies. Nothing is in the air.'];
-  /* Keyboard support for the tablist. Everything routes through selectTab so aria-selected, the
-     caption, the roving tabindex and the SVG layer opacities cannot drift apart -- a second code
-     path that sets some of those is how a widget ends up announcing one mode and drawing another. */
-  var TABS=$$('.c-tabs button');
-  function selectTab(b,focus){
-    mode=+b.dataset.mode;
-    TABS.forEach(function(o){
-      var on = o===b;
-      o.setAttribute('aria-selected',on);
-      o.tabIndex = on ? 0 : -1;          // roving: Tab reaches the set, Arrow moves within it
-    });
-    $('#cpanel').setAttribute('aria-labelledby', b.id);
-    $('#cmode').textContent=MODES[mode];
-    Ltrack.setAttribute('opacity',mode===0?1:0); Lsect.setAttribute('opacity',mode===1?1:0); Lsim.setAttribute('opacity',mode===2?1:0);
-    if(focus) b.focus();
-  }
-  TABS.forEach(function(b){
-    b.addEventListener('click',function(){ selectTab(b,false) });
-    b.addEventListener('keydown',function(e){
-      var i=TABS.indexOf(b), n=TABS.length, t=null;
-      if(e.key==='ArrowRight'||e.key==='ArrowDown') t=TABS[(i+1)%n];
-      else if(e.key==='ArrowLeft'||e.key==='ArrowUp') t=TABS[(i-1+n)%n];
-      else if(e.key==='Home') t=TABS[0];
-      else if(e.key==='End') t=TABS[n-1];
-      if(t){ e.preventDefault(); selectTab(t,true) }
-    });
-  });
-  var rLen=river.getTotalLength(), dLen=road.getTotalLength();
-  function target(v,now){
-    var T=[330+110*Math.sin(vt*.11)+bias[0], 215+60*Math.sin(vt*.17)+bias[1]];
-    T[0]=Math.min(Math.max(T[0],230),560); T[1]=Math.min(Math.max(T[1],90),300);
-    if(mode===0) trk.setAttribute('transform','translate('+T[0].toFixed(1)+' '+T[1].toFixed(1)+')');
-    if(v.warn && now<homeUntil) return [46,366];
-    var fi=v.i, p;
-    if(v.k==='fw'){
-      if(mode===0){var a=vt*.55+fi*Math.PI*2/5; return [T[0]+Math.cos(a)*58, T[1]+Math.sin(a)*58]}
-      if(mode===1){return [231+fi*82+22*Math.cos(vt*.7+fi), 218+150*Math.sin(vt*.33+fi*1.3)]}
-      var u=vt*.28+fi*Math.PI*2/5; return [320+200*Math.sin(u), 210+108*Math.sin(2*u)];
-    }
-    if(v.k==='ugv'){
-      if(mode===0){return [T[0]-118-(fi-5)*30, T[1]+74+(fi-5)*10]}
-      p=road.getPointAtLength(((vt*16+(fi-5)*260)%dLen+dLen)%dLen); return [p.x,p.y];
-    }
-    var frac = mode===2 ? .42+(fi-7)*.16 : ((vt*.012+(fi-7)*.3)%1+1)%1;
-    p=river.getPointAtLength(frac*rLen); return [p.x,p.y];
-  }
-  var visible=false, last=performance.now();
-  function frame(){
-    var t=performance.now(), dt=Math.max(0,Math.min(.05,(t-last)/1000)); last=t;
-    if(visible){
-      if(t>holdUntil) vt+=dt*(RM?.3:1);
-      V.forEach(function(v){
-        var p=target(v,t), k=Math.min(1,dt*2.6), ox=v.x, oy=v.y;
-        v.x+=(p[0]-v.x)*k; v.y+=(p[1]-v.y)*k;
-        var mx=v.x-ox, my=v.y-oy; if(Math.hypot(mx,my)>.05) v.hd=Math.atan2(my,mx);
-        v.g.setAttribute('transform','translate('+v.x.toFixed(1)+' '+v.y.toFixed(1)+') rotate('+(v.hd*57.2958).toFixed(1)+')');
-      });
-    }
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-
-  var ORDERS=['take the swarm of 5 fixed wing to 50.68, 9.05','HAWK-02 orbit 50.69, 9.04 radius 400','send the ground vehicles to 50.68, 9.06 in column','bring anything below 30% fuel home','hold everything'];
-  var oi=0, cur='', typer=null, idle=null, started=false;
-  var otext=$('#otext'), hold=$('#hold'), hint=$('#ohint'), olog=$('#olog');
-  function addLog(ok,s){
-    var li=document.createElement('li'), em=document.createElement('em');
-    li.appendChild(document.createTextNode(utc())); em.className=ok?'ok':'no'; em.textContent=ok?'CONFIRMED':'DISCARDED';
-    li.appendChild(em); li.appendChild(document.createTextNode(s));
-    olog.insertBefore(li,olog.firstChild); while(olog.children.length>4) olog.removeChild(olog.lastChild);
-  }
-  function typeNext(){
-    clearTimeout(idle); clearInterval(typer);
-    cur=ORDERS[oi%ORDERS.length]; oi++; hold.disabled=true; otext.textContent=''; hint.textContent='operator typing...';
-    var i=0;
-    typer=setInterval(function(){
-      otext.textContent=cur.slice(0,++i);
-      if(i>=cur.length){
-        clearInterval(typer); hold.disabled=false; hint.textContent='press and hold the button to confirm';
-        idle=setTimeout(function(){addLog(false,cur); hint.textContent='not confirmed, so nothing moved'; setTimeout(typeNext,1800)},9000);
-      }
-    }, RM?8:42);
-  }
-  function confirmOrder(){
-    clearTimeout(idle); hold.disabled=true;
-    addLog(true,cur); hint.textContent='confirmed. shown on the map.';
-    var now=performance.now();
-    if(/hold everything/.test(cur)) holdUntil=now+5000;
-    else if(/home/.test(cur)) homeUntil=now+7000;
-    else bias=[(Math.random()-.5)*140,(Math.random()-.5)*80];
-    if(mode!==0 && /swarm|orbit/.test(cur)) $('.c-tabs button[data-mode="0"]').click();
-    releaseVisual(); setTimeout(typeNext,2400);
-  }
-  var holding=false, hp=0, ht0=0;
-  function holdFrame(){
-    if(!holding) return;
-    hp=Math.max(0,Math.min(1,(performance.now()-ht0)/1100)); hold.style.setProperty('--p',hp);
-    if(hp>=1){holding=false; confirmOrder(); return}
-    requestAnimationFrame(holdFrame);
-  }
-  function releaseVisual(){hold.classList.add('rel'); hold.style.setProperty('--p',0); hp=0}
-  function startHold(e){
-    if(hold.disabled||holding) return; if(e&&e.preventDefault) e.preventDefault();
-    holding=true; hold.classList.remove('rel'); ht0=performance.now(); hint.textContent='keep holding...'; requestAnimationFrame(holdFrame);
-  }
-  function endHold(){
-    if(!holding) return; holding=false; releaseVisual();
-    if(!hold.disabled) hint.textContent='let go too early. hold for about a second.';
-  }
-  hold.addEventListener('pointerdown',startHold);
-  ['pointerup','pointerleave','pointercancel'].forEach(function(ev){hold.addEventListener(ev,endHold)});
-  hold.addEventListener('keydown',function(e){if((e.key===' '||e.key==='Enter')&&!e.repeat) startHold(e)});
-  hold.addEventListener('keyup',function(e){if(e.key===' '||e.key==='Enter') endHold()});
-  hold.addEventListener('contextmenu',function(e){e.preventDefault()});
-
-  /* A HOLD MUST NOT COMPLETE ITSELF. holdFrame() advances on wall-clock time, and endHold() was
-     reachable only from events delivered to this button. Press Space and alt-tab away and no keyup
-     is ever delivered: holding stays true, rAF keeps running because the page is still visible,
-     and the order confirms about a second later with nobody holding it. The page promises
-     "Nothing moves until a person holds the button down" -- these three lines are what make that
-     sentence true. Pointer holds already had pointerleave/pointercancel as backstops; a key press
-     had only keyup on the element. Found by turtleshield-fc. */
-  hold.addEventListener('blur',endHold);
-  window.addEventListener('blur',endHold);
-  document.addEventListener('visibilitychange',function(){if(document.hidden) endHold()});
-
-  /* Screen readers in browse mode (NVDA, JAWS) activate a button with a SYNTHETIC CLICK -- no
-     pointerdown, no keydown, no keyup -- so the hold gesture is unreachable and the order could
-     never be confirmed at all. Keep the DELIBERATENESS rather than the gesture: two activations.
-     Note that keyboard Space/Enter on a <button> also produces a click with detail 0, so detail
-     alone would arm this after a too-early keyboard release; the recent-gesture guard excludes it. */
-  var armed='', lastGesture=0;
-  hold.addEventListener('pointerdown',function(){lastGesture=performance.now()});
-  hold.addEventListener('keydown',function(){lastGesture=performance.now()});
-  hold.addEventListener('click',function(e){
-    if(hold.disabled||e.detail!==0) return;
-    if(performance.now()-lastGesture<1500) return;
-    if(armed===cur){armed=''; confirmOrder(); return}
-    armed=cur; hint.textContent='activate again to confirm this order';
-  });
-
-  watch($('#console'),function(v){visible=v; last=performance.now(); if(v&&!started){started=true; typeNext()}},false);
-})();
-
-checkViews(); story(); setTimeout(function(){checkViews(); story()},150);
-})();
-</script>
-
+<div class="reticle" id="reticle" aria-hidden="true"></div>
 </body>
 </html>
