@@ -61,11 +61,13 @@ export function cue(kind) {
 }
 
 /* ---------------- film + strip telemetry (film time is the state) ---------------- */
-const CUE = [0, 10, 15, 18.6, 21, 26];
-const CH = ['Seventy aircraft, one AI', 'Air, ground and water', 'GPS jammed', 'Radio drops', 'Aircraft lost', 'A person decides'];
+const CUE = [0, 6, 11, 17, 23, 28.5, 34, 40, 46];
+const CH = ['Seventy aircraft, one AI', 'Inside the wedge', 'Air, ground and water', 'GPS jammed', 'Radio degraded, relays climb', 'Aircraft lost, wedge re-forms', 'Split and search', 'Sensor lock', 'A person decides'];
 (() => {
   const v = $('#filmv'), steps = $$('.film-steps li'), btn = $('#film-toggle');
   const ft = $('#ft'), fc = $('#fc'), fs = $('#fs');
+  // chapters are buttons: jump the film to that moment
+  $$('.film-steps button').forEach(b => b.addEventListener('click', () => { try { v.currentTime = +b.dataset.t; } catch {} if (v.paused && !RM) v.play().catch(() => {}); }));
   let userPaused = false, lastIdx = -1;
   const upd = () => {
     const t = v.currentTime || 0; let idx = 0; CUE.forEach((s, i) => { if (t >= s) idx = i; });
@@ -74,6 +76,10 @@ const CH = ['Seventy aircraft, one AI', 'Air, ground and water', 'GPS jammed', '
   };
   const setBtn = () => { btn.textContent = v.paused ? 'Play film' : 'Pause film'; btn.setAttribute('aria-pressed', String(!v.paused)); };
   v.addEventListener('timeupdate', upd); v.addEventListener('play', setBtn); v.addEventListener('pause', setBtn);
+  const scrub = $('#film-scrub'); let dragging = false;
+  v.addEventListener('timeupdate', () => { if (!dragging) scrub.value = String(v.currentTime || 0); });
+  scrub.addEventListener('input', () => { dragging = true; try { v.currentTime = +scrub.value; } catch {} });
+  scrub.addEventListener('change', () => { dragging = false; });
   btn.addEventListener('click', () => { if (v.paused) { userPaused = false; v.play().catch(() => {}); } else { userPaused = true; v.pause(); } });
   if (RM) { v.removeAttribute('autoplay'); v.pause(); userPaused = true; }
   watch(v, vis => { if (userPaused) return; if (vis) v.play().catch(() => {}); else v.pause(); }, false);
@@ -81,7 +87,7 @@ const CH = ['Seventy aircraft, one AI', 'Air, ground and water', 'GPS jammed', '
 })();
 
 /* ---------------- story: loops the film segment for the current step ---------------- */
-const SEG = [[0, 10], [10, 15], [15, 18.6], [18.6, 21], [21, 26], [26, 32]];
+const SEG = [[0, 11], [6, 11], [11, 17], [17, 23], [23, 28.5], [28.5, 34], [34, 40], [40, 46], [46, 54]];
 const sv = $('#storyv'); let svVisible = false, current = -1;
 const svPlay = () => { if (!RM) sv.play().catch(() => {}); };
 function playSeg(n) {
@@ -92,7 +98,7 @@ function playSeg(n) {
 }
 sv.addEventListener('timeupdate', () => { const s = SEG[Math.max(current, 0)]; if (sv.currentTime >= s[1] - .06 || sv.currentTime < s[0] - .6) { try { sv.currentTime = s[0]; } catch {} } });
 watch($('.view'), v => { svVisible = v; if (v) svPlay(); else sv.pause(); }, false);
-const STATES = ['Formation holding', 'Eighty vehicles linked', 'GPS jammed', 'Radio degraded', 'Aircraft lost', 'Awaiting operator'];
+const STATES = ['Formation holding', 'Seventy aircraft linked', 'Cross-domain team', 'GPS jammed', 'Relay ring up', 'Aircraft lost', 'Searching', 'Sensor locked', 'Awaiting operator'];
 const chapters = $$('[data-ch]'), cards = $$('#chapters .chapter'), car = $('#chapters'), vstate = $('#vstate'), carPos = $('#car-pos');
 const mq = matchMedia('(max-width: 999px)');
 window.__chapter = 0;

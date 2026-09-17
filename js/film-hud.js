@@ -24,8 +24,10 @@ export async function startHud({ RM }) {
     const n = V[k].name, air = V[k].kind.startsWith('Fixed');
     if (n === E.lostVehicle && t >= E.lost) return 'LOST · its work shared out by the others';
     if (t >= E.decide) return 'HOLDING · awaiting the operator';
-    if (t >= E.lost) return air ? 'RE-SPACING · covering the lost aircraft’s sector' : 'CONTINUING · plan updated';
-    if (t >= E.radio) return 'GNSS JAMMED · radio degraded, relaying through peers';
+    if (E.sensor && t >= E.sensor) return air ? 'SEARCHING · sensor on the ground team' : 'ON STATION · watched from above';
+    if (E.split && t >= E.split) return air ? 'SEARCHING · group split into search lines' : 'ON STATION · plan updated';
+    if (t >= E.lost) return air ? 'RE-SLOTTING · covering the lost aircraft’s work' : 'CONTINUING · plan updated';
+    if (t >= E.radio) return 'GNSS JAMMED · radio degraded, relay ring climbing';
     if (t >= E.jam) return 'GNSS JAMMED · dead reckoning, uncertainty growing';
     return 'GNSS OK · mesh linked';
   };

@@ -64,32 +64,37 @@
 
 <section class="hero" aria-labelledby="h1">
   <figure class="film" id="film">
-    <video class="film-v" id="filmv" autoplay muted loop playsinline preload="auto" poster="media/hero-poster.jpg" aria-describedby="film-desc">
+    <video class="film-v" id="filmv" autoplay muted loop playsinline preload="auto" poster="media/hero-poster.jpg" aria-describedby="film-desc" data-tracks="media/film-tracks.json">
+      <source src="media/hero-film-av1.mp4" type='video/mp4; codecs="av01.0.08M.10"'>
       <source src="media/hero-film.webm" type="video/webm">
       <source src="media/hero-film.mp4" type="video/mp4">
     </video>
     <canvas class="film-hud" id="film-hud" aria-hidden="true"></canvas>
   </figure>
   <div class="strip">
-    <span aria-hidden="true">FILM <b id="ft">T+00:00</b></span><span aria-hidden="true">CHAPTER <b id="fc">01</b></span><span id="fs" aria-hidden="true">FIVE AIRCRAFT, ONE AI</span>
+    <span aria-hidden="true">FILM <b id="ft">T+00:00</b></span><span aria-hidden="true">CHAPTER <b id="fc">01</b></span><span id="fs" aria-hidden="true">SEVENTY AIRCRAFT, ONE AI</span>
+    <input type="range" class="film-scrub" id="film-scrub" min="0" max="54" step="0.1" value="0" aria-label="Film position, 0 to 54 seconds">
     <span class="inshot" id="inshot" role="group" aria-label="Vehicles in this shot of the film"></span>
     <output class="veh-info" id="veh-info" aria-live="polite"></output>
-    <span class="strip-r" aria-hidden="true">CGI · NOT FLIGHT FOOTAGE</span>
+    <span class="strip-r" aria-hidden="true">PANGONG TSO · LADAKH</span>
   </div>
   <div class="hero-body">
     <p class="eyebrow">TurtleShield AI · Turtle Eyes</p>
     <h1 id="h1">Holds the mission when GPS and comms are gone.</h1>
     <div class="hero-foot">
-      <p id="film-desc">TurtleShield keeps drones, ground robots and boats working as one team when GPS is jammed and the radio drops out. Turtle Eyes is the console its operators supervise it from. The film is CGI rendered in Blender, not flight footage.</p>
+      <p id="film-desc">TurtleShield keeps drones, ground robots and boats working as one team when GPS is jammed and the radio drops out. Turtle Eyes is the console its operators supervise it from.</p>
       <div class="cta"><a class="go mag" href="#live" data-cursor="engage">Break it yourself</a><button class="ctrl" id="film-toggle" type="button" aria-pressed="true">Pause film</button></div>
     </div>
-    <ol class="film-steps" aria-label="What the film shows">
-      <li class="on"><span>0:00</span>Seventy aircraft, one AI</li>
-      <li><span>0:10</span>Air, ground and water</li>
-      <li><span>0:15</span>GPS jammed</li>
-      <li><span>0:18</span>Radio drops</li>
-      <li><span>0:21</span>Aircraft lost</li>
-      <li><span>0:26</span>A person decides</li>
+    <ol class="film-steps" aria-label="Film chapters: choose one to jump to it">
+      <li class="on"><button type="button" data-t="0"><span>0:00</span>Seventy aircraft, one AI</button></li>
+      <li><button type="button" data-t="6"><span>0:06</span>Inside the wedge</button></li>
+      <li><button type="button" data-t="11"><span>0:11</span>Air, ground and water</button></li>
+      <li><button type="button" data-t="17"><span>0:17</span>GPS jammed</button></li>
+      <li><button type="button" data-t="23"><span>0:23</span>Radio degraded, relays climb</button></li>
+      <li><button type="button" data-t="28.5"><span>0:28</span>Aircraft lost, wedge re-forms</button></li>
+      <li><button type="button" data-t="34"><span>0:34</span>Split and search</button></li>
+      <li><button type="button" data-t="40"><span>0:40</span>Sensor lock</button></li>
+      <li><button type="button" data-t="46"><span>0:46</span>A person decides</button></li>
     </ol>
   </div>
 </section>
@@ -118,45 +123,61 @@
       </div>
       <div class="chapters" id="chapters" tabindex="0" role="region" aria-label="Mission steps">
         <article class="chapter" data-ch="1">
-          <span class="clock">T+00:40</span>
-          <h2>Eighty machines. One AI on every one of them.</h2>
-          <p>Seventy fixed-wing aircraft in five wedges, six ground robots and four boats, all running TurtleShield and watched from Turtle Eyes. No vehicle waits for base and none of them is the boss. This is the fleet TurtleShield is built for; the largest formation flown in its simulator so far is 8 aircraft.</p>
+          <span class="clock">T+00:06</span>
+          <h2>Seventy aircraft. One AI on every one of them.</h2>
+          <p>Five wedges of fourteen fixed-wing aircraft cross the lake, each running TurtleShield. No aircraft waits for a base station and none of them is the boss. This is the fleet TurtleShield is built for; the largest formation flown in its simulator so far is 8 aircraft.</p>
         </article>
         <article class="chapter" data-ch="2">
-          <span class="clock">T+04:12</span>
-          <h2>GPS goes dark.</h2>
-          <p>Every vehicle now tracks where it probably is, and how sure it is. As that doubt grows, the aircraft take looser positions instead of pretending nothing changed.</p>
+          <span class="clock">T+00:11</span>
+          <h2>Air, ground and water, one plan.</h2>
+          <p>Ground robots move along the shore road while boats run the shallows and the aircraft pass overhead. Work is shared across all three, under rules that know a robot cannot take a job on the water.</p>
         </article>
         <article class="chapter" data-ch="3">
-          <span class="clock">T+06:30</span>
-          <h2>The radio drops.</h2>
-          <p>Direct links fail. Messages hop through whichever vehicles can still hear each other. Nothing depends on one link staying up.</p>
+          <span class="clock">T+00:17</span>
+          <h2>GPS goes dark.</h2>
+          <p>Every vehicle falls back to inertial navigation and ranging off its peers, and tracks how uncertain it has become. The wedges open up as that uncertainty grows instead of pretending nothing changed.</p>
         </article>
         <article class="chapter" data-ch="4">
-          <span class="clock">T+09:05</span>
-          <h2>One aircraft is lost.</h2>
-          <p>A wedge leader goes down. Its thirteen followers re-slot into the neighbouring wedges, and the rest share its work once its claim has expired. Nobody has to tell them.</p>
+          <span class="clock">T+00:23</span>
+          <h2>The radio degrades.</h2>
+          <p>Four aircraft climb out of their wedges and form a relay ring high above the swarm, so messages still hop from vehicle to vehicle. Nothing depends on one link staying up.</p>
         </article>
         <article class="chapter" data-ch="5">
-          <span class="clock">T+11:20</span>
+          <span class="clock">T+00:28</span>
+          <h2>A lead aircraft is lost.</h2>
+          <p>Its thirteen followers re-slot into the neighbouring wedges, and the rest share its work once its claim on that work has expired. Nobody has to tell them.</p>
+        </article>
+        <article class="chapter" data-ch="6">
+          <span class="clock">T+00:34</span>
+          <h2>Split and search.</h2>
+          <p>The swarm divides into two groups that peel away into search lines over land and water, while the boats hold their stations on the lake.</p>
+        </article>
+        <article class="chapter" data-ch="7">
+          <span class="clock">T+00:40</span>
+          <h2>Eyes on the ground team.</h2>
+          <p>A relay aircraft keeps its thermal sensor locked on the robot convoy below: the swarm watching over its own ground vehicles.</p>
+        </article>
+        <article class="chapter" data-ch="8">
+          <span class="clock">T+00:46</span>
           <h2>It recommends. A person decides.</h2>
           <p>TurtleShield plans and reports. The operator in Turtle Eyes supervises, and can pause, stop or recall every vehicle at any time. There is no weapon employment in either product.</p>
         </article>
       </div>
       <div class="car-nav">
         <button class="ctrl" id="car-prev" type="button">Previous</button>
-        <span id="car-pos" aria-live="polite">1 of 5</span>
+        <span id="car-pos" aria-live="polite">1 of 8</span>
         <button class="ctrl" id="car-next" type="button">Next</button>
       </div>
     </div>
     <div class="view">
       <div class="view-gl">
-        <video class="story-v" id="storyv" muted playsinline preload="metadata" poster="media/hero-poster.jpg" aria-label="The part of the CGI film that matches the current step of the mission">
+        <video class="story-v" id="storyv" muted playsinline preload="metadata" poster="media/hero-poster.jpg" aria-label="The part of the film that matches the current step of the mission">
+          <source src="media/hero-film-av1.mp4" type='video/mp4; codecs="av01.0.08M.10"'>
           <source src="media/hero-film.webm" type="video/webm">
           <source src="media/hero-film.mp4" type="video/mp4">
         </video>
       </div>
-      <div class="view-cap"><span>CGI rendered in Blender, not flight footage.</span><b id="vstate" aria-live="polite">Formation holding</b></div>
+      <div class="view-cap"><span>Pangong Tso, Ladakh</span><b id="vstate" aria-live="polite">Formation holding</b></div>
     </div>
   </div>
 </section>
@@ -324,7 +345,7 @@
         <tr><th scope="row">Aircraft in tight formation</th><td class="v" data-figure="formation_fleet_max">8</td><td class="n">All six runs passed the separation check. That check measures distance in three dimensions, so side-by-side spacing is still unmeasured. We treat it as an open defect, not a result.</td><td class="s">Simulation</td></tr>
         <tr><th scope="row">Position error without GPS</th><td class="v" data-figure="nav_error_without_gps">396–750 m &rarr; 25.5–39.0 m</td><td class="n">After one day of fixes, from a written report and two named campaigns. Still not good enough to rely on.</td><td class="s">Simulation</td></tr>
         <tr><th scope="row">Core files changed by the two adapter commits</th><td class="v" data-figure="autopilot_core_files_per_commit">0</td><td class="n">Counted from the repository history. Core edits in that period belong to a separate terrain-following change.</td><td class="s">Code history</td></tr>
-        <tr><th scope="row">Problems written up with their causes</th><td class="v" data-figure="defects">149</td><td class="n">67 closed, 82 still not closed: 46 open and 36 fixed but not yet proven.</td><td class="s">Bug log</td></tr>
+        <tr><th scope="row">Problems written up with their causes</th><td class="v" data-figure="defects">151</td><td class="n">67 closed, 84 still not closed: 48 open and 36 fixed but not yet proven.</td><td class="s">Bug log</td></tr>
         <tr class="zero"><th scope="row">Flights on a real aircraft</th><td class="v" data-figure="real_flights">0</td><td class="n">None yet. The first is planned for the next few weeks.</td><td class="s">Flight</td></tr>
       </tbody>
     </table>
